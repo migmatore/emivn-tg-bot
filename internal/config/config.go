@@ -2,8 +2,8 @@ package config
 
 import (
 	"context"
+	"emivn-tg-bot/pkg/logging"
 	"github.com/ilyakaznacheev/cleanenv"
-	"github.com/migmatore/emivn-tg-bot/pkg/logging"
 	"sync"
 )
 
@@ -25,6 +25,8 @@ type Config struct {
 	}
 	AppConfig struct {
 		LogLevel string `env:"LOG_LEVEL" env-default:"info"`
+		Token    string `env:"BOT_TOKEN" env-default:""`
+		BaseURL  string `env:"BASE_URL" env-default:""`
 	}
 }
 
