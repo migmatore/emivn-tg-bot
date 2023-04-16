@@ -32,7 +32,7 @@ func (a *App) Run(ctx context.Context) error {
 	}
 
 	if a.config.AppConfig.BaseURL != "" {
-		fullURL := a.config.AppConfig.BaseURL
+		fullURL := a.config.AppConfig.BaseURL + "/webhook"
 		logging.GetLogger(ctx).Info("Start webhook server...")
 
 		return tgb.NewWebhook(
