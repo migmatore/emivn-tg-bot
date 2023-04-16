@@ -42,7 +42,7 @@ func (a *App) Run(ctx context.Context) error {
 			tgb.WithWebhookLogger(logging.GetLogger(ctx)),
 		).Run(
 			ctx,
-			a.config.Listen.Port,
+			":8080",
 		)
 	} else {
 		logging.GetLogger(ctx).Info("start polling...")
