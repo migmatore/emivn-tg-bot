@@ -8,6 +8,9 @@ import (
 	"fmt"
 	"github.com/mr-linch/go-tg"
 	"github.com/mr-linch/go-tg/tgb"
+	"log"
+	"net/http"
+	"time"
 )
 
 type App struct {
@@ -35,15 +38,21 @@ func (a *App) Run(ctx context.Context) error {
 		fullURL := a.config.AppConfig.BaseURL + "/webhook"
 		logging.GetLogger(ctx).Info("Start webhook server...")
 
-		return tgb.NewWebhook(
+		webhook := tgb.NewWebhook(
 			bot,
 			botClient,
 			fullURL,
 			tgb.WithWebhookLogger(logging.GetLogger(ctx)),
-		).Run(
-			ctx,
-			":8080",
 		)
+
+		if err := webhook.Setup(ctx); err != nil {
+			return err
+		}
+
+		mux := http.NewServeMux()
+		mux.Handle("/webhook", webhook)
+
+		return runServer(ctx, mux, "")
 	} else {
 		logging.GetLogger(ctx).Info("start polling...")
 
@@ -67,4 +76,29 @@ func newBotClient(ctx context.Context, config *config.Config) (*tg.Client, error
 	logging.GetLogger(ctx).Infof("Authorized as bot https://t.me/%s", me.Username)
 
 	return client, nil
+}
+
+func runServer(ctx context.Context, handler http.Handler, listen string) error {
+	server := &http.Server{
+		Addr:    ":8080",
+		Handler: handler,
+	}
+
+	go func() {
+		<-ctx.Done()
+
+		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer shutdownCancel()
+
+		if err := server.Shutdown(shutdownCtx); err != nil {
+			log.Printf("shutdown: %v", err)
+		}
+	}()
+
+	log.Printf("listening on %s", ":8080")
+	if err := server.ListenAndServe(); err != http.ErrServerClosed {
+		return fmt.Errorf("listen and serve: %w", err)
+	}
+
+	return nil
 }
