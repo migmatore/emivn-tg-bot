@@ -20,7 +20,7 @@ type Config struct {
 		Password string `env:"DB_PASSWORD" env-default:"root"`
 		Host     string `env:"DB_HOST" env-default:"localhost"`
 		Port     string `env:"DB_PORT" env-default:"5432"`
-		DB       string `env:"DB_NAME" env-default:"testdb"`
+		DB       string `env:"DB_NAME" env-default:"bot"`
 		MaxConns string `env:"DB_MAX_CONNS" env-default:"50"`
 	}
 	AppConfig struct {
