@@ -8,7 +8,9 @@ import (
 )
 
 func (bot *Bot) onStartCmd(ctx context.Context, msg *tgb.MessageUpdate) error {
-	return msg.Update.Reply(ctx, bot.buildStartMsg().AsSendCall(msg.Chat.ID))
+	//return msg.Update.Reply(ctx, bot.buildStartMsg().AsSendCall(msg.Chat.ID))
+
+	return msg.Answer("Hi, <b>username</b>!").ParseMode(tg.HTML).DoVoid(ctx)
 }
 
 func (bot *Bot) buildStartMsg() *tgx.TextMessage {
