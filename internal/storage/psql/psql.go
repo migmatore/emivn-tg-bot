@@ -41,12 +41,11 @@ func NewPostgres(ctx context.Context, maxAttempts int, cfg *config.Config) (*Ato
 	)
 
 	err = utils.DoWithTries(func() error {
-		ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
-		defer cancel()
+		//ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+		//defer cancel()
+		ctx := context.Background()
 
 		pool, err = pgxpool.Connect(ctx, dsn)
-		stat := pool.Stat()
-		fmt.Printf("max conns: %d, total conns: %d", stat.MaxConns(), stat.TotalConns())
 		if err != nil {
 			logging.GetLogger(ctx).Errorf("DB connection error. %v", err)
 			return err
