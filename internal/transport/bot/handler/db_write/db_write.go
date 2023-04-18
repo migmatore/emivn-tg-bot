@@ -2,12 +2,15 @@ package db_write
 
 import (
 	"context"
-	"emivn-tg-bot/pkg/logging"
+	"emivn-tg-bot/internal/domain"
+	"fmt"
 	"github.com/mr-linch/go-tg"
 	"github.com/mr-linch/go-tg/tgb"
+	"github.com/mr-linch/go-tg/tgb/session"
 )
 
 type DbWriteHandler struct {
+	sessionManager *session.Manager[domain.Session]
 }
 
 type Menu struct {
@@ -15,8 +18,8 @@ type Menu struct {
 	Read  string
 }
 
-func NewDbWriteHandler() *DbWriteHandler {
-	return &DbWriteHandler{}
+func NewDbWriteHandler(sessionManager *session.Manager[domain.Session]) *DbWriteHandler {
+	return &DbWriteHandler{sessionManager: sessionManager}
 }
 
 func (h *DbWriteHandler) Menu(ctx context.Context, msg *tgb.MessageUpdate) error {
@@ -32,17 +35,33 @@ func (h *DbWriteHandler) Menu(ctx context.Context, msg *tgb.MessageUpdate) error
 		)...,
 	).WithResizeKeyboardMarkup()
 
+	h.sessionManager.Get(ctx).Step = domain.SessionStepAcionSelect
+
 	return msg.Answer("Hey, please click a button above").
 		ReplyMarkup(kb).
 		DoVoid(ctx)
 }
 
-func (h *DbWriteHandler) Write(ctx context.Context, msg *tgb.MessageUpdate) error {
-	return msg.Answer("db write").DoVoid(ctx)
+func (h *DbWriteHandler) ActionSelect(ctx context.Context, msg *tgb.MessageUpdate) error {
+	switch msg.Text {
+	case "Read":
+		h.sessionManager.Get(ctx).Step = domain.SessionStepReadData
+	case "Write":
+		h.sessionManager.Get(ctx).Step = domain.SessionStepWriteData
+	default:
+		h.sessionManager.Get(ctx).Step = domain.SessionStepAcionSelect
+	}
+	return msg.Answer(fmt.Sprintf("action selected: %s", msg.Text)).DoVoid(ctx)
 }
 
 func (h *DbWriteHandler) Read(ctx context.Context, msg *tgb.MessageUpdate) error {
-	logging.GetLogger(ctx).Infof("%s", msg.Text)
+	h.sessionManager.Get(ctx).Step = domain.SessionStepAcionSelect
 
-	return msg.Update.Reply(ctx, msg.Answer("write data"))
+	return msg.Answer(fmt.Sprintf("read", msg.Text)).DoVoid(ctx)
+}
+
+func (h *DbWriteHandler) Write(ctx context.Context, msg *tgb.MessageUpdate) error {
+	h.sessionManager.Get(ctx).Step = domain.SessionStepInit
+
+	return msg.Answer(fmt.Sprintf("write", msg.Text)).DoVoid(ctx)
 }
