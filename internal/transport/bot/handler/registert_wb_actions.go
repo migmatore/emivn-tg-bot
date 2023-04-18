@@ -6,7 +6,7 @@ import (
 	"github.com/mr-linch/go-tg/tgb"
 )
 
-func (h *Handler) registerDbWriteHandler() {
+func (h *Handler) registerDbActionsHandler() {
 	h.Message(h.DbWriteHandler.Menu, tgb.Command("db_menu")).
 		Message(h.DbWriteHandler.ActionSelect, h.isSessionStep(domain.SessionStepAcionSelect)).
 		Message(h.DbWriteHandler.Read, h.isSessionStep(domain.SessionStepReadData)).

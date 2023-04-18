@@ -3,14 +3,15 @@ package handler
 import (
 	"context"
 	"emivn-tg-bot/internal/domain"
-	"emivn-tg-bot/internal/transport/bot/handler/db_write"
+	"emivn-tg-bot/internal/transport/bot/handler/db_actions"
 	"emivn-tg-bot/internal/transport/bot/handler/start"
 	"github.com/mr-linch/go-tg/tgb"
 	"github.com/mr-linch/go-tg/tgb/session"
 )
 
 type Deps struct {
-	sessionManager *session.Manager[domain.Session]
+	sessionManager   *session.Manager[domain.Session]
+	DbActionsService db_actions.DbActionsService
 }
 
 type Handler struct {
@@ -18,7 +19,7 @@ type Handler struct {
 	sessionManager *session.Manager[domain.Session]
 
 	StartHandler   *start.StartHandler
-	DbWriteHandler *db_write.DbWriteHandler
+	DbWriteHandler *db_actions.DbActionsHandler
 }
 
 func New(deps Deps) *Handler {
@@ -29,7 +30,7 @@ func New(deps Deps) *Handler {
 		Router:         tgb.NewRouter(),
 		sessionManager: sm.Manager,
 		StartHandler:   start.NewStartHandler(),
-		DbWriteHandler: db_write.NewDbWriteHandler(sm.Manager),
+		DbWriteHandler: db_actions.NewDbWriteHandler(sm.Manager, deps.DbActionsService),
 	}
 }
 
@@ -54,7 +55,7 @@ func (h *Handler) Init(ctx context.Context) *tgb.Router {
 	//isDigit := tgb.Regexp(regexp.MustCompile(`^\d+$`))
 
 	h.registerSession()
-	h.registerDbWriteHandler()
+	h.registerDbActionsHandler()
 
 	//h.Router.Message(func(ctx context.Context, msg *tgb.MessageUpdate) error {
 	//	// handle /start command

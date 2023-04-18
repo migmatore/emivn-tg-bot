@@ -3,6 +3,8 @@ package app
 import (
 	"context"
 	"emivn-tg-bot/internal/config"
+	"emivn-tg-bot/internal/service"
+	"emivn-tg-bot/internal/storage"
 	"emivn-tg-bot/internal/storage/psql"
 	"emivn-tg-bot/internal/transport/bot"
 	"emivn-tg-bot/internal/transport/bot/handler"
@@ -30,13 +32,14 @@ func (a *App) Run(ctx context.Context) error {
 		return err
 	}
 
-	//storages := storage.New(pool)
+	storages := storage.New(pool)
 
-	//services := service.New(service.Deps{
-	//	Transactor: storages.Transactor,
-	//})
+	services := service.New(service.Deps{
+		Transactor:       storages.Transactor,
+		DbActionsStorage: storages.DbActions,
+	})
 
-	handlers := handler.New(handler.Deps{})
+	handlers := handler.New(handler.Deps{DbActionsService: services.DbActions})
 
 	router := handlers.Init(ctx)
 
