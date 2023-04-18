@@ -19,7 +19,7 @@ CREATE TABLE daimyo
     id            INTEGER      NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     username      VARCHAR(255) NOT NULL,
     nickname      VARCHAR(255) NOT NULL,
-    cards_balance INTEGER      NOT NULL, -- Остаток на картах под конец смены
+    cards_balance FLOAT        NOT NULL, -- Остаток на картах под конец смены
     shogun_id     INTEGER      NOT NULL REFERENCES shoguns (id)
 );
 
@@ -29,7 +29,7 @@ CREATE TABLE samurai
     username           VARCHAR(255) NOT NULL,
     nickname           VARCHAR(255) NOT NULL,
     daimyo_id          INTEGER      NOT NULL REFERENCES daimyo (id),
-    turnover_per_shift INTEGER      NOT NULL
+    turnover_per_shift FLOAT        NOT NULL
 );
 
 CREATE TABLE administrators
@@ -41,9 +41,9 @@ CREATE TABLE administrators
 
 CREATE TABLE daimyo_cards
 (
-    id      INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    daymio_id INTEGER NOT NULL REFERENCES daimyo(id),
-    card_id INTEGER NOT NULL REFERENCES cards (id)
+    id        INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    daymio_id INTEGER NOT NULL REFERENCES daimyo (id),
+    card_id   INTEGER NOT NULL REFERENCES cards (id)
 );
 
 CREATE TABLE replenishment_requests
