@@ -10,16 +10,17 @@ type Deps struct {
 	Transactor storage.Transactor
 
 	DbActionsStorage db_actions.DbActionsStorage
+	AuthStorage      auth.AuthStorage
 }
 
 type Service struct {
-	DbActions   *db_actions.DbActionsService
-	AuthService *auth.AuthService
+	DbActions *db_actions.DbActionsService
+	Auth      *auth.AuthService
 }
 
 func New(deps Deps) *Service {
 	return &Service{
-		DbActions:   db_actions.NewDbActionsService(deps.DbActionsStorage),
-		AuthService: auth.NewAuthService(),
+		DbActions: db_actions.NewDbActionsService(deps.DbActionsStorage),
+		Auth:      auth.NewAuthService(deps.AuthStorage),
 	}
 }

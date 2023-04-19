@@ -1,21 +1,21 @@
 package auth
 
-import "context"
+import (
+	"context"
+)
 
 type AuthStorage interface {
+	CheckAuth(ctx context.Context, username string) (bool, error)
 }
 
 type AuthService struct {
+	storage AuthStorage
 }
 
-func NewAuthService() *AuthService {
-	return &AuthService{}
+func NewAuthService(s AuthStorage) *AuthService {
+	return &AuthService{storage: s}
 }
 
 func (s *AuthService) Auth(ctx context.Context, username string) (bool, error) {
-	if username == "migmatore" {
-		return true, nil
-	} else {
-		return false, nil
-	}
+	return s.storage.CheckAuth(ctx, username)
 }
