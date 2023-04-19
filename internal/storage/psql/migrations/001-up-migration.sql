@@ -60,3 +60,16 @@ CREATE TABLE cash_managers
     nickname                 VARCHAR(255) NOT NULL,
     replenishment_request_id INTEGER      NOT NULL REFERENCES replenishment_requests (id)
 );
+
+CREATE TABLE roles
+(
+    id   INTEGER     NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    name VARCHAR(20) NOT NULL UNIQUE
+);
+
+CREATE TABLE user_roles
+(
+    id      INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    user_id INTEGER NOT NULL,
+    role_id INTEGER NOT NULL REFERENCES roles(id)
+)

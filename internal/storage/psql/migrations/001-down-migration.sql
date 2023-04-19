@@ -13,3 +13,7 @@ DROP TABLE cards CASCADE;
 DROP TABLE daimyo CASCADE;
 
 DROP TABLE shoguns CASCADE;
+
+DROP TABLE user_roles;
+
+DROP TABLE roles;
