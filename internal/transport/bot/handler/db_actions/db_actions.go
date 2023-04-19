@@ -25,8 +25,8 @@ type Menu struct {
 	Read  string
 }
 
-func NewDbWriteHandler(sessionManager *session.Manager[domain.Session], s DbActionsService) *DbActionsHandler {
-	return &DbActionsHandler{sessionManager: sessionManager, service: s}
+func NewDbWriteHandler(sm *session.Manager[domain.Session], s DbActionsService) *DbActionsHandler {
+	return &DbActionsHandler{sessionManager: sm, service: s}
 }
 
 func (h *DbActionsHandler) Menu(ctx context.Context, msg *tgb.MessageUpdate) error {
@@ -68,8 +68,9 @@ func (h *DbActionsHandler) ActionSelect(ctx context.Context, msg *tgb.MessageUpd
 	case "Write":
 		h.sessionManager.Get(ctx).Step = domain.SessionStepWriteData
 	default:
-		h.sessionManager.Get(ctx).Step = domain.SessionStepAcionSelect
+		h.sessionManager.Get(ctx).Step = domain.SessionStepInit
 	}
+	h.sessionManager.Get(ctx).Step = domain.SessionStepInit
 	return msg.Answer(fmt.Sprintf("action selected: %s", msg.Text)).DoVoid(ctx)
 }
 

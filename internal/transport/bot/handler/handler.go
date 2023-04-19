@@ -30,24 +30,15 @@ func New(deps Deps) *Handler {
 	return &Handler{
 		Router:         tgb.NewRouter(),
 		sessionManager: sm.Manager,
-		StartHandler:   start.NewStartHandler(deps.AuthService),
+		StartHandler:   start.NewStartHandler(sm.Manager, deps.AuthService),
 		DbWriteHandler: db_actions.NewDbWriteHandler(sm.Manager, deps.DbActionsService),
 	}
 }
 
-var (
-	genders = []string{
-		"Male",
-		"Female",
-		"Attack Helicopter",
-		"Other",
-	}
-)
-
 func (h *Handler) Init(ctx context.Context) *tgb.Router {
 	h.registerSession()
 	h.registerStartHandler()
-	//h.registerDbActionsHandler()
+	h.registerDbActionsHandler()
 
 	return h.Router
 }

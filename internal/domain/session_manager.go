@@ -3,7 +3,8 @@ package domain
 type SessionStep int8
 
 const (
-	SessionStepInit = iota
+	SessionStepStart = iota
+	SessionStepInit
 	SessionStepAcionSelect
 	SessionStepReadData
 	SessionStepWriteData

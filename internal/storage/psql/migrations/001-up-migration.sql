@@ -70,7 +70,9 @@ CREATE TABLE roles
 CREATE TABLE user_roles
 (
     id       INTEGER      NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    user_id  INTEGER      NOT NULL,
+--     user_id  INTEGER      NOT NULL,
     username VARCHAR(255) NOT NULL UNIQUE,
     role_id  INTEGER      NOT NULL REFERENCES roles (id)
-)
+);
+
+INSERT INTO roles(name) VALUES ('Администратор'), ('Сёгун'), ('Даймё'), ('Самурай'), ('Инкассатор')

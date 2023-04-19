@@ -15,20 +15,20 @@ func NewAuthStorage(pool psql.AtomicPoolClient) *AuthStorage {
 	return &AuthStorage{pool: pool}
 }
 
-func (s *AuthStorage) CheckAuth(ctx context.Context, username string) (bool, error) {
-	q := `select exists(select * from user_roles where username = $1)`
+func (s *AuthStorage) UserRole(ctx context.Context, username string) (string, error) {
+	q := `select name from roles, user_roles where username = $1 and user_roles.role_id = roles.id`
 
-	var isExist bool
+	var role string
 
-	if err := s.pool.QueryRow(ctx, q, username).Scan(&isExist); err != nil {
+	if err := s.pool.QueryRow(ctx, q, username).Scan(&role); err != nil {
 		if err := utils.ParsePgError(err); err != nil {
 			logging.GetLogger(ctx).Errorf("Error: %v", err)
-			return false, err
+			return "", err
 		}
 
 		logging.GetLogger(ctx).Errorf("Query error. %v", err)
-		return false, err
+		return "", err
 	}
 
-	return isExist, nil
+	return role, nil
 }
