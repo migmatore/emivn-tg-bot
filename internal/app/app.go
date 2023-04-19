@@ -39,7 +39,10 @@ func (a *App) Run(ctx context.Context) error {
 		DbActionsStorage: storages.DbActions,
 	})
 
-	handlers := handler.New(handler.Deps{DbActionsService: services.DbActions})
+	handlers := handler.New(handler.Deps{
+		DbActionsService: services.DbActions,
+		AuthService:      services.AuthService,
+	})
 
 	router := handlers.Init(ctx)
 

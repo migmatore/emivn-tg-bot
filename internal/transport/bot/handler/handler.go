@@ -12,6 +12,7 @@ import (
 type Deps struct {
 	sessionManager   *session.Manager[domain.Session]
 	DbActionsService db_actions.DbActionsService
+	AuthService      start.AuthService
 }
 
 type Handler struct {
@@ -29,7 +30,7 @@ func New(deps Deps) *Handler {
 	return &Handler{
 		Router:         tgb.NewRouter(),
 		sessionManager: sm.Manager,
-		StartHandler:   start.NewStartHandler(),
+		StartHandler:   start.NewStartHandler(deps.AuthService),
 		DbWriteHandler: db_actions.NewDbWriteHandler(sm.Manager, deps.DbActionsService),
 	}
 }
@@ -44,15 +45,9 @@ var (
 )
 
 func (h *Handler) Init(ctx context.Context) *tgb.Router {
-	//bot.Use(tgb.MiddlewareFunc(func(next tgb.Handler) tgb.Handler {
-	//	return tgb.HandlerFunc(func(c context.Context, update *tgb.Update) error {
-	//		ctx = logging.ContextWithLogger(ctx)
-	//		return next.Handle(ctx, update)
-	//	})
-	//}))
-
 	h.registerSession()
-	h.registerDbActionsHandler()
+	h.registerStartHandler()
+	//h.registerDbActionsHandler()
 
 	return h.Router
 }
