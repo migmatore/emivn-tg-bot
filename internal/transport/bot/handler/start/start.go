@@ -31,7 +31,8 @@ func (s *StartHandler) Start(ctx context.Context, msg *tgb.MessageUpdate) error 
 	//	return msg.Answer("You are welcome!!!!!").DoVoid(ctx)
 	//}
 	//
-	s.sessionManager.Get(ctx).Step = s.AuthService.Redirect(ctx, string(msg.From.Username))
+	//s.sessionManager.Get(ctx).Step = s.AuthService.Redirect(ctx, string(msg.From.Username))
+	s.sessionManager.Get(ctx).Step = domain.SessionStepAdminRole
 
-	return nil
+	return msg.Update.Reply(ctx, msg.Answer("Menu"))
 }

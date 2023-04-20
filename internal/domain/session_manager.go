@@ -3,11 +3,19 @@ package domain
 type SessionStep int8
 
 const (
-	SessionStepStart = iota
-	SessionStepInit
-	SessionStepAcionSelect
-	SessionStepReadData
-	SessionStepWriteData
+	SessionStepInit = iota
+	SessionStepStart
+	SessionStepAdminRole
+	SessionStepAdminMenuHandler
+	SessionStepCreateEntityButton
+	SessionStepCreateEntityHandler
+	SessionStepBackAdminMenuButton
+	SessionStepCreateShogun
+	SessionStepCreateShogunUsername
+	SessionStepBackCreateEntityMenuStep
+	//SessionStepAcionSelect
+	//SessionStepReadData
+	//SessionStepWriteData
 )
 
 type Session struct {

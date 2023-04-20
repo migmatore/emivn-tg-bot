@@ -37,9 +37,9 @@ func (s *AuthService) Redirect(ctx context.Context, username string) domain.Sess
 	}
 	switch role {
 	case domain.AdminRole.String():
-		return domain.SessionStepStart
+		return domain.SessionStepAdminRole
 	case domain.ShogunRole.String():
-		return domain.SessionStepReadData
+		//return domain.SessionStepReadData
 	}
 
 	return domain.SessionStepStart

@@ -13,7 +13,7 @@ type SessionManager struct {
 func NewSessionManager() *SessionManager {
 	return &SessionManager{
 		session.NewManager(domain.Session{
-			Step: domain.SessionStepStart,
+			Step: domain.SessionStepInit,
 		}),
 	}
 }
