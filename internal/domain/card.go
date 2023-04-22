@@ -1,9 +1,9 @@
 package domain
 
 type Card struct {
-	CardId          int    `json:"card_id"`
-	IssuingBankInfo string `json:"issuing_bank_info"`
-	DailyLimit      int    `json:"daily_limit"`
+	CardId          int
+	IssuingBankInfo string
+	DailyLimit      int
 	//Username string
 	//Nickname string
 }

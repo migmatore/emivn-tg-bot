@@ -10,8 +10,23 @@ const (
 	SessionStepCreateEntityButton
 	SessionStepCreateEntityHandler
 	SessionStepBackAdminMenuButton
-	SessionStepCreateShogun
+
 	SessionStepCreateShogunUsername
+	SessionStepCreateShogun
+
+	SessionStepCreateDaimyoUsername
+	SessionStepCreateDaimyoNickname
+	SessionStepCreateDaimyo
+
+	SessionStepCreateSamuraiUsername
+	SessionStepCreateSamurai
+
+	SessionStepCreateCashManagerUsername
+	SessionStepCreateCashManager
+
+	SessionStepCreateCardBankInfo
+	SessionStepCreateCard
+
 	SessionStepBackCreateEntityMenuStep
 	//SessionStepAcionSelect
 	//SessionStepReadData

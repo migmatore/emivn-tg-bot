@@ -12,8 +12,8 @@ import (
 type Deps struct {
 	sessionManager *session.Manager[domain.Session]
 
-	AuthService      start.AuthService
-	DbActionsService admin.AdminService
+	AuthService   start.AuthService
+	ShogunService admin.ShogunService
 }
 
 type Handler struct {
@@ -32,7 +32,7 @@ func New(deps Deps) *Handler {
 		Router:         tgb.NewRouter(),
 		sessionManager: sm.Manager,
 		StartHandler:   start.NewStartHandler(sm.Manager, deps.AuthService),
-		AdminHandler:   admin.NewDbWriteHandler(sm.Manager, deps.DbActionsService),
+		AdminHandler:   admin.NewDbWriteHandler(sm.Manager, deps.ShogunService),
 	}
 }
 

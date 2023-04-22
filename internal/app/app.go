@@ -35,14 +35,16 @@ func (a *App) Run(ctx context.Context) error {
 	storages := storage.New(pool)
 
 	services := service.New(service.Deps{
-		Transactor:       storages.Transactor,
-		DbActionsStorage: storages.DbActions,
-		AuthStorage:      storages.Auth,
+		Transactor:      storages.Transactor,
+		AuthStorage:     storages.Auth,
+		ShogunStorage:   storages.Shogun,
+		UserRoleStorage: storages.UserRole,
+		RoleStorage:     storages.Role,
 	})
 
 	handlers := handler.New(handler.Deps{
-		DbActionsService: services.DbActions,
-		AuthService:      services.Auth,
+		AuthService:   services.Auth,
+		ShogunService: services.Shogun,
 	})
 
 	router := handlers.Init(ctx)

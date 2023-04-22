@@ -16,7 +16,7 @@ func NewAuthStorage(pool psql.AtomicPoolClient) *AuthStorage {
 }
 
 func (s *AuthStorage) UserRole(ctx context.Context, username string) (string, error) {
-	q := `select name from roles, user_roles where username = $1 and user_roles.role_id = roles.id`
+	q := `SELECT name FROM roles, user_roles WHERE username = $1 AND user_roles.role_id = roles.id`
 
 	var role string
 

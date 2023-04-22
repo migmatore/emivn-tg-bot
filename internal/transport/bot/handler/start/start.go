@@ -35,7 +35,7 @@ func (s *StartHandler) Start(ctx context.Context, msg *tgb.MessageUpdate) error 
 		s.sessionManager.Get(ctx).Step = domain.SessionStepAdminMenuHandler
 
 		return msg.Answer("Пожалуйста, выберите действие").
-			ReplyMarkup(domain.Menu).
+			ReplyMarkup(buildAdminStartMenu()).
 			DoVoid(ctx)
 	default:
 		return nil
