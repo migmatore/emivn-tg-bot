@@ -17,7 +17,7 @@ func NewAuthService(s AuthStorage) *AuthService {
 	return &AuthService{storage: s}
 }
 
-func (s *AuthService) Auth(ctx context.Context, username string, requiredRole domain.Role) (bool, error) {
+func (s *AuthService) CheckAuthRole(ctx context.Context, username string, requiredRole domain.Role) (bool, error) {
 	role, err := s.storage.UserRole(ctx, username)
 	if err != nil {
 		return false, err
@@ -30,17 +30,12 @@ func (s *AuthService) Auth(ctx context.Context, username string, requiredRole do
 	return false, nil
 }
 
-func (s *AuthService) Redirect(ctx context.Context, username string) domain.SessionStep {
+// GetRole returns user role
+func (s *AuthService) GetRole(ctx context.Context, username string) (string, error) {
 	role, err := s.storage.UserRole(ctx, username)
 	if err != nil {
-		return domain.SessionStepStart
-	}
-	switch role {
-	case domain.AdminRole.String():
-		return domain.SessionStepAdminRole
-	case domain.ShogunRole.String():
-		//return domain.SessionStepReadData
+		return "", err
 	}
 
-	return domain.SessionStepStart
+	return role, nil
 }

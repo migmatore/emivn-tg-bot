@@ -19,65 +19,44 @@ type Menu struct {
 
 type AdminHandler struct {
 	sessionManager *session.Manager[domain.Session]
-	menu           Menu
 
 	//	service AdminService
 }
 
 func NewDbWriteHandler(sm *session.Manager[domain.Session], s AdminService) *AdminHandler {
 	return &AdminHandler{
-		menu:           Menu{CreateEntity: "CreateEntity"},
 		sessionManager: sm,
 		//		service:        s,
 	}
 }
 
-func (h *AdminHandler) Menu(ctx context.Context, msg *tgb.MessageUpdate) error {
-	//menu := Menu{
-	//	Write: "Write",
-	//	Read:  "Read",
-	//}
-
-	kb := tg.NewReplyKeyboardMarkup(
-		tg.NewButtonColumn(
-			tg.NewKeyboardButton(h.menu.CreateEntity),
-		)...,
-	).WithResizeKeyboardMarkup()
-
-	h.sessionManager.Get(ctx).Step = domain.SessionStepAdminMenuHandler
-
-	return msg.Answer("Hey, please click a button above").
-		ReplyMarkup(kb).
-		DoVoid(ctx)
-}
-
 func (h *AdminHandler) MenuSelectionHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	switch msg.Text {
-	case h.menu.CreateEntity:
-		h.sessionManager.Get(ctx).Step = domain.SessionStepBackCreateEntityMenuStep
+	case domain.AdminMenu.CreateEntity:
+		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateEntityHandler
 	default:
 		h.sessionManager.Get(ctx).Step = domain.SessionStepInit
 	}
 
-	return msg.Answer(fmt.Sprintf("action selected: %s", msg.Text)).DoVoid(ctx)
-}
+	kb := tg.NewReplyKeyboardMarkup(
+		tg.NewButtonColumn(
+			tg.NewKeyboardButton(domain.AdminCreateEnityMenu.CreateShogun),
+			tg.NewKeyboardButton(domain.AdminCreateEnityMenu.Back),
+		)...,
+	).WithResizeKeyboardMarkup()
 
-func (h *AdminHandler) CreateEntityMenu(ctx context.Context, msg *tgb.MessageUpdate) error {
-	//kb := tg.NewReplyKeyboardMarkup(
-	//	tg.NewButtonColumn(
-	//		tg.NewKeyboardButton(h.menu.CreateEntity),
-	//	)...,
-	//).WithResizeKeyboardMarkup()
-	//
-	//h.sessionManager.Get(ctx).Step = domain.SessionStepAdminMenuHandler
-	//
-	//return msg.Answer("Hey, please click a button above").
-	//	ReplyMarkup(kb).
-	//	DoVoid(ctx)
-	return nil
+	return msg.Answer(fmt.Sprintf("action selected: %s", msg.Text)).ReplyMarkup(kb).DoVoid(ctx)
 }
 
 func (h *AdminHandler) CreateEntityMenuSelectionHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+	switch msg.Text {
+	case domain.AdminCreateEnityMenu.CreateShogun:
+		return msg.Answer("create shogun").DoVoid(ctx)
+	case domain.AdminCreateEnityMenu.Back:
+		h.sessionManager.Get(ctx).Step = domain.SessionStepAdminMenuHandler
+		return msg.Answer("Главное меню").ReplyMarkup(domain.Menu).DoVoid(ctx)
+	}
+
 	return nil
 }
 

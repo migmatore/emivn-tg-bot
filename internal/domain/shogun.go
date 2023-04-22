@@ -5,3 +5,8 @@ type Shogun struct {
 	Username string `json:"username"`
 	Nickname string `json:"nickname"`
 }
+
+type ShogunDTO struct {
+	Username string
+	Nickname string
+}

@@ -8,8 +8,8 @@ import (
 )
 
 type AuthService interface {
-	Auth(ctx context.Context, username string, requiredRole domain.Role) (bool, error)
-	Redirect(ctx context.Context, username string) domain.SessionStep
+	CheckAuthRole(ctx context.Context, username string, requiredRole domain.Role) (bool, error)
+	GetRole(ctx context.Context, username string) (string, error)
 }
 
 type StartHandler struct {
@@ -25,14 +25,19 @@ func NewStartHandler(sm *session.Manager[domain.Session], s AuthService) *StartH
 }
 
 func (s *StartHandler) Start(ctx context.Context, msg *tgb.MessageUpdate) error {
-	//auth, _ := s.AuthService.Auth(ctx, string(msg.From.Username), domain.AdminRole)
-	//
-	//if auth {
-	//	return msg.Answer("You are welcome!!!!!").DoVoid(ctx)
-	//}
-	//
-	//s.sessionManager.Get(ctx).Step = s.AuthService.Redirect(ctx, string(msg.From.Username))
-	s.sessionManager.Get(ctx).Step = domain.SessionStepAdminRole
+	role, err := s.AuthService.GetRole(ctx, string(msg.From.Username))
+	if err != nil {
+		return msg.Answer("Error").DoVoid(ctx)
+	}
 
-	return msg.Update.Reply(ctx, msg.Answer("Menu"))
+	switch role {
+	case domain.AdminRole.String():
+		s.sessionManager.Get(ctx).Step = domain.SessionStepAdminMenuHandler
+
+		return msg.Answer("Пожалуйста, выберите действие").
+			ReplyMarkup(domain.Menu).
+			DoVoid(ctx)
+	default:
+		return nil
+	}
 }
