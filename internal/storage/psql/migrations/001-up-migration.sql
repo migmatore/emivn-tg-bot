@@ -15,17 +15,17 @@ CREATE TABLE shoguns
 
 CREATE TABLE daimyo
 (
-    username      VARCHAR(255) NOT NULL PRIMARY KEY,
-    nickname      VARCHAR(255) NOT NULL UNIQUE,
-    cards_balance FLOAT        NOT NULL DEFAULT 0, -- Остаток на картах под конец смены
-    shogun_id     INTEGER      NOT NULL REFERENCES shoguns (id)
+    username        VARCHAR(255) NOT NULL PRIMARY KEY,
+    nickname        VARCHAR(255) NOT NULL UNIQUE,
+    cards_balance   FLOAT        NOT NULL DEFAULT 0, -- Остаток на картах под конец смены
+    shogun_username VARCHAR(255) NOT NULL REFERENCES shoguns (username)
 );
 
 CREATE TABLE samurai
 (
     username           VARCHAR(255) NOT NULL PRIMARY KEY,
     nickname           VARCHAR(255) NOT NULL UNIQUE,
-    daimyo_id          INTEGER      NOT NULL REFERENCES daimyo (id),
+    daimyo_username    VARCHAR(255) NOT NULL REFERENCES daimyo (username),
     turnover_per_shift FLOAT        NOT NULL DEFAULT 0
 );
 
@@ -37,22 +37,21 @@ CREATE TABLE administrators
 
 CREATE TABLE daimyo_cards
 (
-    id        INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    daymio_id INTEGER NOT NULL REFERENCES daimyo (id),
-    card_id   INTEGER NOT NULL REFERENCES cards (id)
+    id              INTEGER      NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    daymio_username VARCHAR(255) NOT NULL REFERENCES daimyo (username),
+    card_id         INTEGER      NOT NULL REFERENCES cards (id)
 );
 
 CREATE TABLE replenishment_requests
 (
     id        INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    daimyo_id INTEGER NOT NULL REFERENCES daimyo (id),
+    daimyo_username VARCHAR(255) NOT NULL REFERENCES daimyo (username),
     card_id   integer NOT NULL REFERENCES cards (id)
 );
 
 CREATE TABLE cash_managers
 (
-    id                       INTEGER      NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    username                 VARCHAR(255) NOT NULL UNIQUE,
+    username                 VARCHAR(255) NOT NULL PRIMARY KEY,
     nickname                 VARCHAR(255) NOT NULL UNIQUE,
     replenishment_request_id INTEGER      NOT NULL REFERENCES replenishment_requests (id)
 );
@@ -71,4 +70,9 @@ CREATE TABLE user_roles
     role_id  INTEGER      NOT NULL REFERENCES roles (id)
 );
 
-INSERT INTO roles(name) VALUES ('Администратор'), ('Сёгун'), ('Даймё'), ('Самурай'), ('Инкассатор')
+INSERT INTO roles(name)
+VALUES ('Администратор'),
+       ('Сёгун'),
+       ('Даймё'),
+       ('Самурай'),
+       ('Инкассатор')
