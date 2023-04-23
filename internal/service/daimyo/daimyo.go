@@ -70,11 +70,11 @@ func (s *DaimyoService) Create(ctx context.Context, dto domain.DaimyoDTO) error 
 	}
 
 	if err := s.transactor.WithinTransaction(ctx, func(txCtx context.Context) error {
-		if err := s.userRoleStorage.Insert(ctx, userRole); err != nil {
+		if err := s.userRoleStorage.Insert(txCtx, userRole); err != nil {
 			return err
 		}
 
-		if err := s.storage.Insert(ctx, daimyo); err != nil {
+		if err := s.storage.Insert(txCtx, daimyo); err != nil {
 			return err
 		}
 

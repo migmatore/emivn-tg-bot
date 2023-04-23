@@ -59,11 +59,11 @@ func (s *ShogunService) Create(ctx context.Context, dto domain.ShogunDTO) error 
 	}
 
 	if err := s.transactor.WithinTransaction(ctx, func(txCtx context.Context) error {
-		if err := s.userRoleStorage.Insert(ctx, userRole); err != nil {
+		if err := s.userRoleStorage.Insert(txCtx, userRole); err != nil {
 			return err
 		}
 
-		if err := s.storage.Insert(ctx, shogun); err != nil {
+		if err := s.storage.Insert(txCtx, shogun); err != nil {
 			return err
 		}
 
