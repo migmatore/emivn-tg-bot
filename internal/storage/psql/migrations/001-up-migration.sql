@@ -19,7 +19,7 @@ CREATE TABLE daimyo
     id            INTEGER      NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     username      VARCHAR(255) NOT NULL UNIQUE,
     nickname      VARCHAR(255) NOT NULL UNIQUE,
-    cards_balance FLOAT        NOT NULL, -- Остаток на картах под конец смены
+    cards_balance FLOAT        NOT NULL DEFAULT 0, -- Остаток на картах под конец смены
     shogun_id     INTEGER      NOT NULL REFERENCES shoguns (id)
 );
 

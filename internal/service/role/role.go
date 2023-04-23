@@ -1,0 +1,15 @@
+package role
+
+import "context"
+
+type RoleStorage interface {
+	GetIdByName(ctx context.Context, role string) (int, error)
+}
+
+type RoleService struct {
+	storage RoleStorage
+}
+
+func NewRoleService(s RoleStorage) *RoleService {
+	return &RoleService{storage: s}
+}

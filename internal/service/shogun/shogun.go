@@ -9,6 +9,7 @@ import (
 type ShogunStorage interface {
 	Insert(ctx context.Context, shogun domain.Shogun) error
 	GetAll(ctx context.Context) ([]*domain.Shogun, error)
+	GetIdByName(ctx context.Context, username string) (int, error)
 }
 
 type ShogunUserRoleStorage interface {
@@ -16,15 +17,15 @@ type ShogunUserRoleStorage interface {
 }
 
 type ShogunRoleStorage interface {
-	GetByName(ctx context.Context, role string) (int, error)
+	GetIdByName(ctx context.Context, role string) (int, error)
 }
 
 type ShogunService struct {
 	transactor storage.Transactor
 
-	storage  ShogunStorage
-	userRole ShogunUserRoleStorage
-	role     ShogunRoleStorage
+	storage         ShogunStorage
+	userRoleStorage ShogunUserRoleStorage
+	roleStorage     ShogunRoleStorage
 }
 
 func NewShogunService(
@@ -34,10 +35,10 @@ func NewShogunService(
 	role ShogunRoleStorage,
 ) *ShogunService {
 	return &ShogunService{
-		transactor: t,
-		storage:    s,
-		userRole:   userRole,
-		role:       role,
+		transactor:      t,
+		storage:         s,
+		userRoleStorage: userRole,
+		roleStorage:     role,
 	}
 }
 
@@ -47,7 +48,7 @@ func (s *ShogunService) Create(ctx context.Context, dto domain.ShogunDTO) error 
 		Nickname: dto.Nickname,
 	}
 
-	roleId, err := s.role.GetByName(ctx, domain.ShogunRole.String())
+	roleId, err := s.roleStorage.GetIdByName(ctx, domain.ShogunRole.String())
 	if err != nil {
 		return err
 	}
@@ -58,7 +59,7 @@ func (s *ShogunService) Create(ctx context.Context, dto domain.ShogunDTO) error 
 	}
 
 	if err := s.transactor.WithinTransaction(ctx, func(txCtx context.Context) error {
-		if err := s.userRole.Insert(ctx, userRole); err != nil {
+		if err := s.userRoleStorage.Insert(ctx, userRole); err != nil {
 			return err
 		}
 

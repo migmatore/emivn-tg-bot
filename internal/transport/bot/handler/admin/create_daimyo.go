@@ -39,7 +39,7 @@ func (h *AdminHandler) EnterDaimyoNickname(ctx context.Context, msg *tgb.Message
 func (h *AdminHandler) CreateDaimyo(ctx context.Context, msg *tgb.MessageUpdate) error {
 	h.daimyo.ShogunUsername = msg.Text
 
-	if err := h.shogunService.Create(ctx, h.shogun); err != nil {
+	if err := h.daimyoService.Create(ctx, h.daimyo); err != nil {
 		return err
 	}
 

@@ -38,6 +38,7 @@ func (a *App) Run(ctx context.Context) error {
 		Transactor:      storages.Transactor,
 		AuthStorage:     storages.Auth,
 		ShogunStorage:   storages.Shogun,
+		DaimyoStorage:   storages.Daimyo,
 		UserRoleStorage: storages.UserRole,
 		RoleStorage:     storages.Role,
 	})
@@ -45,6 +46,7 @@ func (a *App) Run(ctx context.Context) error {
 	handlers := handler.New(handler.Deps{
 		AuthService:   services.Auth,
 		ShogunService: services.Shogun,
+		DaimyoService: services.Daimyo,
 	})
 
 	router := handlers.Init(ctx)

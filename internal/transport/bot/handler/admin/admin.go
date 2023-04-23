@@ -14,6 +14,10 @@ type ShogunService interface {
 	GetAll(ctx context.Context) ([]*domain.ShogunDTO, error)
 }
 
+type DaimyoService interface {
+	Create(ctx context.Context, dto domain.DaimyoDTO) error
+}
+
 type Menu struct {
 	CreateEntity string
 }
@@ -22,15 +26,21 @@ type AdminHandler struct {
 	sessionManager *session.Manager[domain.Session]
 
 	shogunService ShogunService
+	daimyoService DaimyoService
 
 	shogun domain.ShogunDTO
 	daimyo domain.DaimyoDTO
 }
 
-func NewDbWriteHandler(sm *session.Manager[domain.Session], s ShogunService) *AdminHandler {
+func NewDbWriteHandler(
+	sm *session.Manager[domain.Session],
+	shogunService ShogunService,
+	daimyoService DaimyoService,
+) *AdminHandler {
 	return &AdminHandler{
 		sessionManager: sm,
-		shogunService:  s,
+		shogunService:  shogunService,
+		daimyoService:  daimyoService,
 		shogun:         domain.ShogunDTO{},
 		daimyo:         domain.DaimyoDTO{},
 	}

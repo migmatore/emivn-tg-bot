@@ -15,12 +15,12 @@ func NewRoleStorage(pool psql.AtomicPoolClient) *RoleStorage {
 	return &RoleStorage{pool: pool}
 }
 
-func (s *RoleStorage) GetByName(ctx context.Context, role string) (int, error) {
+func (s *RoleStorage) GetIdByName(ctx context.Context, role string) (int, error) {
 	q := `select id from roles where name=$1`
 
-	var r int
+	var id int
 
-	if err := s.pool.QueryRow(ctx, q, role).Scan(&r); err != nil {
+	if err := s.pool.QueryRow(ctx, q, role).Scan(&id); err != nil {
 		if err := utils.ParsePgError(err); err != nil {
 			logging.GetLogger(ctx).Errorf("Error: %v", err)
 			return 0, err
@@ -30,5 +30,5 @@ func (s *RoleStorage) GetByName(ctx context.Context, role string) (int, error) {
 		return 0, err
 	}
 
-	return r, nil
+	return id, nil
 }

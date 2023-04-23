@@ -14,6 +14,7 @@ type Deps struct {
 
 	AuthService   start.AuthService
 	ShogunService admin.ShogunService
+	DaimyoService admin.DaimyoService
 }
 
 type Handler struct {
@@ -32,7 +33,7 @@ func New(deps Deps) *Handler {
 		Router:         tgb.NewRouter(),
 		sessionManager: sm.Manager,
 		StartHandler:   start.NewStartHandler(sm.Manager, deps.AuthService),
-		AdminHandler:   admin.NewDbWriteHandler(sm.Manager, deps.ShogunService),
+		AdminHandler:   admin.NewDbWriteHandler(sm.Manager, deps.ShogunService, deps.DaimyoService),
 	}
 }
 
