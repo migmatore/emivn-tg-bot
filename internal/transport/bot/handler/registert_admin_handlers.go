@@ -11,5 +11,8 @@ func (h *Handler) registerAdminHandler() {
 		Message(h.AdminHandler.EnterShogunNicknameAndCreate, h.isSessionStep(domain.SessionStepCreateShogun)).
 		Message(h.AdminHandler.EnterDaimyoUsername, h.isSessionStep(domain.SessionStepCreateDaimyoUsername)).
 		Message(h.AdminHandler.EnterDaimyoNickname, h.isSessionStep(domain.SessionStepCreateDaimyoNickname)).
-		Message(h.AdminHandler.CreateDaimyo, h.isSessionStep(domain.SessionStepCreateDaimyo))
+		Message(h.AdminHandler.CreateDaimyo, h.isSessionStep(domain.SessionStepCreateDaimyo)).
+		Message(h.AdminHandler.EnterSamuraiUsername, h.isSessionStep(domain.SessionStepCreateSamuraiUsername)).
+		Message(h.AdminHandler.EnterSamuraiNickname, h.isSessionStep(domain.SessionStepCreateSamuraiNickname)).
+		Message(h.AdminHandler.CreateSamurai, h.isSessionStep(domain.SessionStepCreateSamurai))
 }

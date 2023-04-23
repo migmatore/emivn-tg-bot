@@ -8,6 +8,8 @@ import (
 
 type DaimyoStorage interface {
 	Insert(ctx context.Context, daimyo domain.Daimyo) error
+	GetAll(ctx context.Context) ([]*domain.Daimyo, error)
+	GetIdByName(ctx context.Context, username string) (int, error)
 }
 
 type DaimyoShogunStorage interface {
@@ -84,4 +86,26 @@ func (s *DaimyoService) Create(ctx context.Context, dto domain.DaimyoDTO) error 
 	}
 
 	return nil
+}
+
+func (s *DaimyoService) GetAll(ctx context.Context) ([]*domain.DaimyoDTO, error) {
+	daimyos, err := s.storage.GetAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	daimyoDTOs := make([]*domain.DaimyoDTO, 0)
+
+	for _, item := range daimyos {
+		daimyoDTO := domain.DaimyoDTO{
+			Username:     item.Username,
+			Nickname:     item.Nickname,
+			CardsBalance: item.CardsBalance,
+			// ShogunUsername: TODO: covert shogunId to shogunUsername
+		}
+
+		daimyoDTOs = append(daimyoDTOs, &daimyoDTO)
+	}
+
+	return daimyoDTOs, nil
 }

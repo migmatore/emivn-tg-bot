@@ -39,14 +39,16 @@ func (a *App) Run(ctx context.Context) error {
 		AuthStorage:     storages.Auth,
 		ShogunStorage:   storages.Shogun,
 		DaimyoStorage:   storages.Daimyo,
+		SamuraiStorage:  storages.Samurai,
 		UserRoleStorage: storages.UserRole,
 		RoleStorage:     storages.Role,
 	})
 
 	handlers := handler.New(handler.Deps{
-		AuthService:   services.Auth,
-		ShogunService: services.Shogun,
-		DaimyoService: services.Daimyo,
+		AuthService:    services.Auth,
+		ShogunService:  services.Shogun,
+		DaimyoService:  services.Daimyo,
+		SamuraiService: services.Samurai,
 	})
 
 	router := handlers.Init(ctx)

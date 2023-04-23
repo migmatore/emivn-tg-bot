@@ -9,15 +9,13 @@ CREATE TABLE cards
 
 CREATE TABLE shoguns
 (
-    id       INTEGER      NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    username VARCHAR(255) NOT NULL UNIQUE,
+    username VARCHAR(255) NOT NULL PRIMARY KEY,
     nickname VARCHAR(255) NOT NULL UNIQUE
 );
 
 CREATE TABLE daimyo
 (
-    id            INTEGER      NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    username      VARCHAR(255) NOT NULL UNIQUE,
+    username      VARCHAR(255) NOT NULL PRIMARY KEY,
     nickname      VARCHAR(255) NOT NULL UNIQUE,
     cards_balance FLOAT        NOT NULL DEFAULT 0, -- Остаток на картах под конец смены
     shogun_id     INTEGER      NOT NULL REFERENCES shoguns (id)
@@ -25,17 +23,15 @@ CREATE TABLE daimyo
 
 CREATE TABLE samurai
 (
-    id                 INTEGER      NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    username           VARCHAR(255) NOT NULL UNIQUE,
+    username           VARCHAR(255) NOT NULL PRIMARY KEY,
     nickname           VARCHAR(255) NOT NULL UNIQUE,
     daimyo_id          INTEGER      NOT NULL REFERENCES daimyo (id),
-    turnover_per_shift FLOAT        NOT NULL
+    turnover_per_shift FLOAT        NOT NULL DEFAULT 0
 );
 
 CREATE TABLE administrators
 (
-    id       INTEGER      NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    username VARCHAR(255) NOT NULL UNIQUE,
+    username VARCHAR(255) NOT NULL PRIMARY KEY,
     nickname VARCHAR(255) NOT NULL UNIQUE
 );
 

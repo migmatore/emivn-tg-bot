@@ -16,33 +16,43 @@ type ShogunService interface {
 
 type DaimyoService interface {
 	Create(ctx context.Context, dto domain.DaimyoDTO) error
+	GetAll(ctx context.Context) ([]*domain.DaimyoDTO, error)
 }
 
-type Menu struct {
-	CreateEntity string
+type SamuraiService interface {
+	Create(ctx context.Context, dto domain.SamuraiDTO) error
 }
+
+//type Menu struct {
+//	CreateEntity string
+//}
 
 type AdminHandler struct {
 	sessionManager *session.Manager[domain.Session]
 
-	shogunService ShogunService
-	daimyoService DaimyoService
+	shogunService  ShogunService
+	daimyoService  DaimyoService
+	samuraiService SamuraiService
 
-	shogun domain.ShogunDTO
-	daimyo domain.DaimyoDTO
+	shogun  domain.ShogunDTO
+	daimyo  domain.DaimyoDTO
+	samurai domain.SamuraiDTO
 }
 
-func NewDbWriteHandler(
+func NewAdminHandler(
 	sm *session.Manager[domain.Session],
 	shogunService ShogunService,
 	daimyoService DaimyoService,
+	samuraiService SamuraiService,
 ) *AdminHandler {
 	return &AdminHandler{
 		sessionManager: sm,
 		shogunService:  shogunService,
 		daimyoService:  daimyoService,
+		samuraiService: samuraiService,
 		shogun:         domain.ShogunDTO{},
 		daimyo:         domain.DaimyoDTO{},
+		samurai:        domain.SamuraiDTO{},
 	}
 }
 

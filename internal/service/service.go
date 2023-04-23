@@ -4,6 +4,7 @@ import (
 	"emivn-tg-bot/internal/service/auth"
 	"emivn-tg-bot/internal/service/daimyo"
 	"emivn-tg-bot/internal/service/role"
+	"emivn-tg-bot/internal/service/samurai"
 	"emivn-tg-bot/internal/service/shogun"
 	"emivn-tg-bot/internal/service/user_role"
 	"emivn-tg-bot/internal/storage"
@@ -15,14 +16,16 @@ type Deps struct {
 	AuthStorage     auth.AuthStorage
 	ShogunStorage   shogun.ShogunStorage
 	DaimyoStorage   daimyo.DaimyoStorage
+	SamuraiStorage  samurai.SamuraiStorage
 	UserRoleStorage user_role.UserRoleStorage
 	RoleStorage     role.RoleStorage
 }
 
 type Service struct {
-	Auth   *auth.AuthService
-	Shogun *shogun.ShogunService
-	Daimyo *daimyo.DaimyoService
+	Auth    *auth.AuthService
+	Shogun  *shogun.ShogunService
+	Daimyo  *daimyo.DaimyoService
+	Samurai *samurai.SamuraiService
 }
 
 func New(deps Deps) *Service {
@@ -33,6 +36,13 @@ func New(deps Deps) *Service {
 			deps.Transactor,
 			deps.DaimyoStorage,
 			deps.ShogunStorage,
+			deps.UserRoleStorage,
+			deps.RoleStorage,
+		),
+		Samurai: samurai.NewSamuraiService(
+			deps.Transactor,
+			deps.SamuraiStorage,
+			deps.DaimyoStorage,
 			deps.UserRoleStorage,
 			deps.RoleStorage,
 		),

@@ -19,6 +19,7 @@ const (
 	SessionStepCreateDaimyo
 
 	SessionStepCreateSamuraiUsername
+	SessionStepCreateSamuraiNickname
 	SessionStepCreateSamurai
 
 	SessionStepCreateCashManagerUsername
