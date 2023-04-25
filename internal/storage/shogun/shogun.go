@@ -33,7 +33,7 @@ func (s *ShogunStorage) Insert(ctx context.Context, shogun domain.Shogun) error 
 }
 
 func (s *ShogunStorage) GetAll(ctx context.Context) ([]*domain.Shogun, error) {
-	q := `select id, username, nickname from shoguns`
+	q := `select username, nickname from shoguns`
 
 	shoguns := make([]*domain.Shogun, 0)
 
@@ -48,7 +48,7 @@ func (s *ShogunStorage) GetAll(ctx context.Context) ([]*domain.Shogun, error) {
 	for rows.Next() {
 		var shogun domain.Shogun
 
-		err := rows.Scan(&shogun.ShogunId, &shogun.Username, &shogun.Nickname)
+		err := rows.Scan(&shogun.Username, &shogun.Nickname)
 		if err != nil {
 			logging.GetLogger(ctx).Errorf("Query error. %v", err)
 			return nil, err
@@ -58,22 +58,4 @@ func (s *ShogunStorage) GetAll(ctx context.Context) ([]*domain.Shogun, error) {
 	}
 
 	return shoguns, nil
-}
-
-func (s *ShogunStorage) GetIdByName(ctx context.Context, username string) (int, error) {
-	q := `select id from shoguns where username=$1`
-
-	var id int
-
-	if err := s.pool.QueryRow(ctx, q, username).Scan(&id); err != nil {
-		if err := utils.ParsePgError(err); err != nil {
-			logging.GetLogger(ctx).Errorf("Error: %v", err)
-			return 0, err
-		}
-
-		logging.GetLogger(ctx).Errorf("Query error. %v", err)
-		return 0, err
-	}
-
-	return id, nil
 }

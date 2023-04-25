@@ -8,7 +8,7 @@ import (
 )
 
 type AuthService interface {
-	CheckAuthRole(ctx context.Context, username string, requiredRole domain.Role) (bool, error)
+	//CheckAuthRole(ctx context.Context, username string, requiredRole domain.Role) (bool, error)
 	GetRole(ctx context.Context, username string) (string, error)
 }
 

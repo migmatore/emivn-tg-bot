@@ -17,9 +17,9 @@ func NewSamuraiStorage(pool psql.AtomicPoolClient) *SamuraiStorage {
 }
 
 func (s *SamuraiStorage) Insert(ctx context.Context, samurai domain.Samurai) error {
-	q := `INSERT INTO samurai(username, nickname, daimyo_id) VALUES ($1, $2, $3)`
+	q := `insert into samurai(username, nickname, daimyo_username) values ($1, $2, $3)`
 
-	if _, err := s.pool.Exec(ctx, q, samurai.Username, samurai.Nickname, samurai.DaimyoId); err != nil {
+	if _, err := s.pool.Exec(ctx, q, samurai.Username, samurai.Nickname, samurai.DaimyoUsername); err != nil {
 		if err := utils.ParsePgError(err); err != nil {
 			logging.GetLogger(ctx).Errorf("Error: %v", err)
 			return err

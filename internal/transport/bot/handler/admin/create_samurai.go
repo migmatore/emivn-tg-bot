@@ -9,7 +9,7 @@ import (
 )
 
 func (h *AdminHandler) EnterSamuraiUsername(ctx context.Context, msg *tgb.MessageUpdate) error {
-	h.samurai.Username = msg.Text
+	h.samurai.Username = msg.Text[1:]
 
 	h.sessionManager.Get(ctx).Step = domain.SessionStepCreateSamuraiNickname
 	return msg.Answer("Введите nickname").DoVoid(ctx)

@@ -9,11 +9,6 @@ import (
 type DaimyoStorage interface {
 	Insert(ctx context.Context, daimyo domain.Daimyo) error
 	GetAll(ctx context.Context) ([]*domain.Daimyo, error)
-	GetIdByName(ctx context.Context, username string) (int, error)
-}
-
-type DaimyoShogunStorage interface {
-	GetIdByName(ctx context.Context, username string) (int, error)
 }
 
 type DaimyoUserRoleStorage interface {
@@ -28,7 +23,6 @@ type DaimyoService struct {
 	transactor storage.Transactor
 
 	storage         DaimyoStorage
-	shogunStorage   DaimyoShogunStorage
 	userRoleStorage DaimyoUserRoleStorage
 	roleStorage     DaimyoRoleStorage
 }
@@ -36,29 +30,22 @@ type DaimyoService struct {
 func NewDaimyoService(
 	t storage.Transactor,
 	s DaimyoStorage,
-	shogunStorage DaimyoShogunStorage,
 	userRoleStorage DaimyoUserRoleStorage,
 	roleStorage DaimyoRoleStorage,
 ) *DaimyoService {
 	return &DaimyoService{
 		transactor:      t,
 		storage:         s,
-		shogunStorage:   shogunStorage,
 		userRoleStorage: userRoleStorage,
 		roleStorage:     roleStorage,
 	}
 }
 
 func (s *DaimyoService) Create(ctx context.Context, dto domain.DaimyoDTO) error {
-	shogunId, err := s.shogunStorage.GetIdByName(ctx, dto.ShogunUsername)
-	if err != nil {
-		return err
-	}
-
 	daimyo := domain.Daimyo{
-		Username: dto.Username,
-		Nickname: dto.Nickname,
-		ShogunId: shogunId,
+		Username:       dto.Username,
+		Nickname:       dto.Nickname,
+		ShogunUsername: dto.ShogunUsername,
 	}
 
 	roleId, err := s.roleStorage.GetIdByName(ctx, domain.DaimyoRole.String())

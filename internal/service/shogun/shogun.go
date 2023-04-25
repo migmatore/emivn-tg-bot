@@ -9,7 +9,6 @@ import (
 type ShogunStorage interface {
 	Insert(ctx context.Context, shogun domain.Shogun) error
 	GetAll(ctx context.Context) ([]*domain.Shogun, error)
-	GetIdByName(ctx context.Context, username string) (int, error)
 }
 
 type ShogunUserRoleStorage interface {

@@ -8,7 +8,7 @@ import (
 )
 
 func (h *AdminHandler) EnterShogunUsername(ctx context.Context, msg *tgb.MessageUpdate) error {
-	h.shogun.Username = msg.Text
+	h.shogun.Username = msg.Text[1:]
 
 	h.sessionManager.Get(ctx).Step = domain.SessionStepCreateShogun
 	return msg.Answer("Введите nickname").DoVoid(ctx)

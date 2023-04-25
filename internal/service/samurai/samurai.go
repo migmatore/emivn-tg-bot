@@ -10,10 +10,6 @@ type SamuraiStorage interface {
 	Insert(ctx context.Context, samurai domain.Samurai) error
 }
 
-type SamuraiDaimyoStorage interface {
-	GetIdByName(ctx context.Context, username string) (int, error)
-}
-
 type SamuraiUserRoleStorage interface {
 	Insert(ctx context.Context, user domain.UserRole) error
 }
@@ -26,7 +22,6 @@ type SamuraiService struct {
 	transactor storage.Transactor
 
 	storage         SamuraiStorage
-	daimyoStorage   SamuraiDaimyoStorage
 	userRoleStorage SamuraiUserRoleStorage
 	roleStorage     SamuraiRoleStorage
 }
@@ -34,29 +29,22 @@ type SamuraiService struct {
 func NewSamuraiService(
 	transactor storage.Transactor,
 	s SamuraiStorage,
-	daimyo SamuraiDaimyoStorage,
 	userRole SamuraiUserRoleStorage,
 	role SamuraiRoleStorage,
 ) *SamuraiService {
 	return &SamuraiService{
 		transactor:      transactor,
 		storage:         s,
-		daimyoStorage:   daimyo,
 		userRoleStorage: userRole,
 		roleStorage:     role,
 	}
 }
 
 func (s *SamuraiService) Create(ctx context.Context, dto domain.SamuraiDTO) error {
-	daimyoId, err := s.daimyoStorage.GetIdByName(ctx, dto.DaimyoUsername)
-	if err != nil {
-		return err
-	}
-
 	samurai := domain.Samurai{
-		Username: dto.Username,
-		Nickname: dto.Nickname,
-		DaimyoId: daimyoId,
+		Username:       dto.Username,
+		Nickname:       dto.Nickname,
+		DaimyoUsername: dto.DaimyoUsername,
 	}
 
 	roleId, err := s.roleStorage.GetIdByName(ctx, domain.SamuraiRole.String())

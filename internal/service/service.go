@@ -35,14 +35,12 @@ func New(deps Deps) *Service {
 		Daimyo: daimyo.NewDaimyoService(
 			deps.Transactor,
 			deps.DaimyoStorage,
-			deps.ShogunStorage,
 			deps.UserRoleStorage,
 			deps.RoleStorage,
 		),
 		Samurai: samurai.NewSamuraiService(
 			deps.Transactor,
 			deps.SamuraiStorage,
-			deps.DaimyoStorage,
 			deps.UserRoleStorage,
 			deps.RoleStorage,
 		),

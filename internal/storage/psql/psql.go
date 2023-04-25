@@ -41,9 +41,9 @@ func NewPostgres(ctx context.Context, maxAttempts int, cfg *config.Config) (*Ato
 	)
 
 	err = utils.DoWithTries(func() error {
-		ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-		defer cancel()
-		//ctx := context.Background()
+		//ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+		//defer cancel()
+		ctx := context.Background()
 
 		pool, err = pgxpool.Connect(ctx, dsn)
 		if err != nil {

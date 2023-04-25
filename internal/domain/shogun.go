@@ -1,7 +1,6 @@
 package domain
 
 type Shogun struct {
-	ShogunId int
 	Username string
 	Nickname string
 }
