@@ -42,18 +42,26 @@ CREATE TABLE daimyo_cards
     card_id         INTEGER      NOT NULL REFERENCES cards (id)
 );
 
-CREATE TABLE replenishment_requests
-(
-    id        INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    daimyo_username VARCHAR(255) NOT NULL REFERENCES daimyo (username),
-    card_id   integer NOT NULL REFERENCES cards (id)
-);
-
 CREATE TABLE cash_managers
 (
     username                 VARCHAR(255) NOT NULL PRIMARY KEY,
-    nickname                 VARCHAR(255) NOT NULL UNIQUE,
-    replenishment_request_id INTEGER      NOT NULL REFERENCES replenishment_requests (id)
+    nickname                 VARCHAR(255) NOT NULL UNIQUE
+--     replenishment_request_id INTEGER      NOT NULL REFERENCES replenishment_requests (id)
+);
+
+CREATE TABLE replenishment_request_status
+(
+    id INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    name varchar(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE replenishment_requests
+(
+    id        INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    cash_manager_username VARCHAR(255) NOT NULL REFERENCES cash_managers(username),
+    daimyo_username VARCHAR(255) NOT NULL REFERENCES daimyo (username),
+    card_id   INTEGER NOT NULL REFERENCES cards (id),
+    status_id INTEGER NOT NULL REFERENCES replenishment_request_status(id)
 );
 
 CREATE TABLE roles

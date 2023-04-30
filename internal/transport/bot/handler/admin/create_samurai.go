@@ -6,10 +6,12 @@ import (
 	"fmt"
 	"github.com/mr-linch/go-tg"
 	"github.com/mr-linch/go-tg/tgb"
+	"strings"
 )
 
 func (h *AdminHandler) EnterSamuraiUsername(ctx context.Context, msg *tgb.MessageUpdate) error {
-	h.samurai.Username = msg.Text[1:]
+	// TODO: create regular expression to check the username is correct
+	h.samurai.Username = strings.ReplaceAll(msg.Text, "@", "")
 
 	h.sessionManager.Get(ctx).Step = domain.SessionStepCreateSamuraiNickname
 	return msg.Answer("Введите nickname").DoVoid(ctx)
@@ -37,7 +39,8 @@ func (h *AdminHandler) EnterSamuraiNickname(ctx context.Context, msg *tgb.Messag
 }
 
 func (h *AdminHandler) CreateSamurai(ctx context.Context, msg *tgb.MessageUpdate) error {
-	h.samurai.DaimyoUsername = msg.Text
+	// TODO: create regular expression to check the username is correct
+	h.samurai.DaimyoUsername = strings.ReplaceAll(msg.Text, "@", "")
 
 	if err := h.samuraiService.Create(ctx, h.samurai); err != nil {
 		return err

@@ -12,10 +12,11 @@ import (
 type Deps struct {
 	sessionManager *session.Manager[domain.Session]
 
-	AuthService    start.AuthService
-	ShogunService  admin.ShogunService
-	DaimyoService  admin.DaimyoService
-	SamuraiService admin.SamuraiService
+	AuthService        start.AuthService
+	ShogunService      admin.ShogunService
+	DaimyoService      admin.DaimyoService
+	SamuraiService     admin.SamuraiService
+	CashManagerService admin.CashManagerService
 }
 
 type Handler struct {
@@ -34,7 +35,13 @@ func New(deps Deps) *Handler {
 		Router:         tgb.NewRouter(),
 		sessionManager: sm.Manager,
 		StartHandler:   start.NewStartHandler(sm.Manager, deps.AuthService),
-		AdminHandler:   admin.NewAdminHandler(sm.Manager, deps.ShogunService, deps.DaimyoService, deps.SamuraiService),
+		AdminHandler: admin.NewAdminHandler(
+			sm.Manager,
+			deps.ShogunService,
+			deps.DaimyoService,
+			deps.SamuraiService,
+			deps.CashManagerService,
+		),
 	}
 }
 

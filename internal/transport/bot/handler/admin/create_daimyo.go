@@ -6,10 +6,12 @@ import (
 	"fmt"
 	"github.com/mr-linch/go-tg"
 	"github.com/mr-linch/go-tg/tgb"
+	"strings"
 )
 
 func (h *AdminHandler) EnterDaimyoUsername(ctx context.Context, msg *tgb.MessageUpdate) error {
-	h.daimyo.Username = msg.Text[1:]
+	// TODO: create regular expression to check the username is correct
+	h.daimyo.Username = strings.ReplaceAll(msg.Text, "@", "")
 
 	h.sessionManager.Get(ctx).Step = domain.SessionStepCreateDaimyoNickname
 	return msg.Answer("Введите nickname").DoVoid(ctx)
@@ -37,7 +39,8 @@ func (h *AdminHandler) EnterDaimyoNickname(ctx context.Context, msg *tgb.Message
 }
 
 func (h *AdminHandler) CreateDaimyo(ctx context.Context, msg *tgb.MessageUpdate) error {
-	h.daimyo.ShogunUsername = msg.Text
+	// TODO: create regular expression to check the username is correct
+	h.daimyo.ShogunUsername = strings.ReplaceAll(msg.Text, "@", "")
 
 	if err := h.daimyoService.Create(ctx, h.daimyo); err != nil {
 		return err

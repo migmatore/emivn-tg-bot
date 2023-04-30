@@ -25,7 +25,7 @@ func NewStartHandler(sm *session.Manager[domain.Session], s AuthService) *StartH
 }
 
 func (s *StartHandler) Start(ctx context.Context, msg *tgb.MessageUpdate) error {
-	role, err := s.AuthService.GetRole(ctx, string(msg.From.Username))
+	role, err := s.AuthService.GetRole(ctx, string(msg.Chat.Username))
 	if err != nil {
 		return msg.Answer("Error").DoVoid(ctx)
 	}

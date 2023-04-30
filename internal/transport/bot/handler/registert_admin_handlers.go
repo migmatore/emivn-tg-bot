@@ -7,12 +7,18 @@ import (
 func (h *Handler) registerAdminHandler() {
 	h.Message(h.AdminHandler.MenuSelectionHandler, h.isSessionStep(domain.SessionStepAdminMenuHandler)).
 		Message(h.AdminHandler.CreateEntityMenuSelectionHandler, h.isSessionStep(domain.SessionStepCreateEntityHandler)).
+		// shogun
 		Message(h.AdminHandler.EnterShogunUsername, h.isSessionStep(domain.SessionStepCreateShogunUsername)).
 		Message(h.AdminHandler.EnterShogunNicknameAndCreate, h.isSessionStep(domain.SessionStepCreateShogun)).
+		// daimyo
 		Message(h.AdminHandler.EnterDaimyoUsername, h.isSessionStep(domain.SessionStepCreateDaimyoUsername)).
 		Message(h.AdminHandler.EnterDaimyoNickname, h.isSessionStep(domain.SessionStepCreateDaimyoNickname)).
 		Message(h.AdminHandler.CreateDaimyo, h.isSessionStep(domain.SessionStepCreateDaimyo)).
+		// samurai
 		Message(h.AdminHandler.EnterSamuraiUsername, h.isSessionStep(domain.SessionStepCreateSamuraiUsername)).
 		Message(h.AdminHandler.EnterSamuraiNickname, h.isSessionStep(domain.SessionStepCreateSamuraiNickname)).
-		Message(h.AdminHandler.CreateSamurai, h.isSessionStep(domain.SessionStepCreateSamurai))
+		Message(h.AdminHandler.CreateSamurai, h.isSessionStep(domain.SessionStepCreateSamurai)).
+		// cash manager
+		Message(h.AdminHandler.EnterCashManagerUsername, h.isSessionStep(domain.SessionStepCreateCashManagerUsername)).
+		Message(h.AdminHandler.EnterCashManagerNicknameAndCreate, h.isSessionStep(domain.SessionStepCreateCashManager))
 }

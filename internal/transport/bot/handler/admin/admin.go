@@ -23,20 +23,22 @@ type SamuraiService interface {
 	Create(ctx context.Context, dto domain.SamuraiDTO) error
 }
 
-//type Menu struct {
-//	CreateEntity string
-//}
+type CashManagerService interface {
+	Create(ctx context.Context, dto domain.CashManagerDTO) error
+}
 
 type AdminHandler struct {
 	sessionManager *session.Manager[domain.Session]
 
-	shogunService  ShogunService
-	daimyoService  DaimyoService
-	samuraiService SamuraiService
+	shogunService      ShogunService
+	daimyoService      DaimyoService
+	samuraiService     SamuraiService
+	cashManagerService CashManagerService
 
-	shogun  domain.ShogunDTO
-	daimyo  domain.DaimyoDTO
-	samurai domain.SamuraiDTO
+	shogun      domain.ShogunDTO
+	daimyo      domain.DaimyoDTO
+	samurai     domain.SamuraiDTO
+	cashManager domain.CashManagerDTO
 }
 
 func NewAdminHandler(
@@ -44,15 +46,18 @@ func NewAdminHandler(
 	shogunService ShogunService,
 	daimyoService DaimyoService,
 	samuraiService SamuraiService,
+	cashManagerService CashManagerService,
 ) *AdminHandler {
 	return &AdminHandler{
-		sessionManager: sm,
-		shogunService:  shogunService,
-		daimyoService:  daimyoService,
-		samuraiService: samuraiService,
-		shogun:         domain.ShogunDTO{},
-		daimyo:         domain.DaimyoDTO{},
-		samurai:        domain.SamuraiDTO{},
+		sessionManager:     sm,
+		shogunService:      shogunService,
+		daimyoService:      daimyoService,
+		samuraiService:     samuraiService,
+		cashManagerService: cashManagerService,
+		shogun:             domain.ShogunDTO{},
+		daimyo:             domain.DaimyoDTO{},
+		samurai:            domain.SamuraiDTO{},
+		cashManager:        domain.CashManagerDTO{},
 	}
 }
 

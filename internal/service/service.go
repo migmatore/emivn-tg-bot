@@ -2,6 +2,7 @@ package service
 
 import (
 	"emivn-tg-bot/internal/service/auth"
+	"emivn-tg-bot/internal/service/cash_manager"
 	"emivn-tg-bot/internal/service/daimyo"
 	"emivn-tg-bot/internal/service/role"
 	"emivn-tg-bot/internal/service/samurai"
@@ -13,19 +14,21 @@ import (
 type Deps struct {
 	Transactor storage.Transactor
 
-	AuthStorage     auth.AuthStorage
-	ShogunStorage   shogun.ShogunStorage
-	DaimyoStorage   daimyo.DaimyoStorage
-	SamuraiStorage  samurai.SamuraiStorage
-	UserRoleStorage user_role.UserRoleStorage
-	RoleStorage     role.RoleStorage
+	AuthStorage        auth.AuthStorage
+	ShogunStorage      shogun.ShogunStorage
+	DaimyoStorage      daimyo.DaimyoStorage
+	SamuraiStorage     samurai.SamuraiStorage
+	CashManagerStorage cash_manager.CashManagerStorage
+	UserRoleStorage    user_role.UserRoleStorage
+	RoleStorage        role.RoleStorage
 }
 
 type Service struct {
-	Auth    *auth.AuthService
-	Shogun  *shogun.ShogunService
-	Daimyo  *daimyo.DaimyoService
-	Samurai *samurai.SamuraiService
+	Auth        *auth.AuthService
+	Shogun      *shogun.ShogunService
+	Daimyo      *daimyo.DaimyoService
+	Samurai     *samurai.SamuraiService
+	CashManager *cash_manager.CashManagerService
 }
 
 func New(deps Deps) *Service {
@@ -41,6 +44,12 @@ func New(deps Deps) *Service {
 		Samurai: samurai.NewSamuraiService(
 			deps.Transactor,
 			deps.SamuraiStorage,
+			deps.UserRoleStorage,
+			deps.RoleStorage,
+		),
+		CashManager: cash_manager.NewCashManagerService(
+			deps.Transactor,
+			deps.CashManagerStorage,
 			deps.UserRoleStorage,
 			deps.RoleStorage,
 		),
