@@ -24,5 +24,5 @@ func (h *AdminHandler) EnterCashManagerNicknameAndCreate(ctx context.Context, ms
 	}
 
 	h.sessionManager.Get(ctx).Step = domain.SessionStepInit
-	return msg.Answer("Даймё успешно создан. Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
+	return msg.Answer("Инкассатор успешно создан. Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
 }

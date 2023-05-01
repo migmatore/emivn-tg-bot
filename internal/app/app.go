@@ -43,6 +43,7 @@ func (a *App) Run(ctx context.Context) error {
 		CashManagerStorage: storages.CashManager,
 		UserRoleStorage:    storages.UserRole,
 		RoleStorage:        storages.Role,
+		CardStorage:        storages.Card,
 	})
 
 	handlers := handler.New(handler.Deps{
@@ -51,6 +52,7 @@ func (a *App) Run(ctx context.Context) error {
 		DaimyoService:      services.Daimyo,
 		SamuraiService:     services.Samurai,
 		CashManagerService: services.CashManager,
+		CardService:        services.Card,
 	})
 
 	router := handlers.Init(ctx)

@@ -2,6 +2,7 @@ package storage
 
 import (
 	"emivn-tg-bot/internal/storage/auth"
+	"emivn-tg-bot/internal/storage/card"
 	"emivn-tg-bot/internal/storage/cash_manager"
 	"emivn-tg-bot/internal/storage/daimyo"
 	"emivn-tg-bot/internal/storage/psql"
@@ -19,8 +20,10 @@ type Storage struct {
 	Daimyo      *daimyo.DaimyoStorage
 	Samurai     *samurai.SamuraiStorage
 	CashManager *cash_manager.CashManagerStorage
-	UserRole    *user_role.UserRoleStorage
-	Role        *role.RoleStorage
+	Card        *card.CardStorage
+
+	UserRole *user_role.UserRoleStorage
+	Role     *role.RoleStorage
 }
 
 func New(pool psql.AtomicPoolClient) *Storage {
@@ -31,6 +34,7 @@ func New(pool psql.AtomicPoolClient) *Storage {
 		Daimyo:      daimyo.NewDaimyoStorage(pool),
 		Samurai:     samurai.NewSamuraiStorage(pool),
 		CashManager: cash_manager.NewCashManagerStorage(pool),
+		Card:        card.NewCardStorage(pool),
 		UserRole:    user_role.NewUserRoleStorage(pool),
 		Role:        role.NewRoleStorage(pool),
 	}

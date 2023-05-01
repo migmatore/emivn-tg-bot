@@ -2,6 +2,7 @@ package service
 
 import (
 	"emivn-tg-bot/internal/service/auth"
+	"emivn-tg-bot/internal/service/card"
 	"emivn-tg-bot/internal/service/cash_manager"
 	"emivn-tg-bot/internal/service/daimyo"
 	"emivn-tg-bot/internal/service/role"
@@ -19,6 +20,7 @@ type Deps struct {
 	DaimyoStorage      daimyo.DaimyoStorage
 	SamuraiStorage     samurai.SamuraiStorage
 	CashManagerStorage cash_manager.CashManagerStorage
+	CardStorage        card.CardStorage
 	UserRoleStorage    user_role.UserRoleStorage
 	RoleStorage        role.RoleStorage
 }
@@ -29,6 +31,7 @@ type Service struct {
 	Daimyo      *daimyo.DaimyoService
 	Samurai     *samurai.SamuraiService
 	CashManager *cash_manager.CashManagerService
+	Card        *card.CardService
 }
 
 func New(deps Deps) *Service {
@@ -53,5 +56,6 @@ func New(deps Deps) *Service {
 			deps.UserRoleStorage,
 			deps.RoleStorage,
 		),
+		Card: card.NewCardService(deps.Transactor, deps.CardStorage),
 	}
 }

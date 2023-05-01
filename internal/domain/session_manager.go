@@ -25,7 +25,9 @@ const (
 	SessionStepCreateCashManagerUsername
 	SessionStepCreateCashManager
 
-	SessionStepCreateCardBankInfo
+	SessionStepCreateCardName
+	SessionStepCreateCardLastDigits
+	SessionStepCreateCardDailyLimit
 	SessionStepCreateCard
 
 	SessionStepBackCreateEntityMenuStep

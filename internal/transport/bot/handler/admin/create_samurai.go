@@ -28,7 +28,7 @@ func (h *AdminHandler) EnterSamuraiNickname(ctx context.Context, msg *tgb.Messag
 	var str string
 
 	for _, daimyo := range daimyos {
-		str += daimyo.Username + "\n"
+		str += "@" + daimyo.Username + "\n"
 	}
 
 	h.sessionManager.Get(ctx).Step = domain.SessionStepCreateSamurai

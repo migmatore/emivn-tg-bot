@@ -17,6 +17,7 @@ type Deps struct {
 	DaimyoService      admin.DaimyoService
 	SamuraiService     admin.SamuraiService
 	CashManagerService admin.CashManagerService
+	CardService        admin.CardService
 }
 
 type Handler struct {
@@ -41,6 +42,7 @@ func New(deps Deps) *Handler {
 			deps.DaimyoService,
 			deps.SamuraiService,
 			deps.CashManagerService,
+			deps.CardService,
 		),
 	}
 }

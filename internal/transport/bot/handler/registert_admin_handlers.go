@@ -20,5 +20,10 @@ func (h *Handler) registerAdminHandler() {
 		Message(h.AdminHandler.CreateSamurai, h.isSessionStep(domain.SessionStepCreateSamurai)).
 		// cash manager
 		Message(h.AdminHandler.EnterCashManagerUsername, h.isSessionStep(domain.SessionStepCreateCashManagerUsername)).
-		Message(h.AdminHandler.EnterCashManagerNicknameAndCreate, h.isSessionStep(domain.SessionStepCreateCashManager))
+		Message(h.AdminHandler.EnterCashManagerNicknameAndCreate, h.isSessionStep(domain.SessionStepCreateCashManager)).
+		// card
+		Message(h.AdminHandler.EnterCardName, h.isSessionStep(domain.SessionStepCreateCardName)).
+		Message(h.AdminHandler.EnterCardLastDigits, h.isSessionStep(domain.SessionStepCreateCardLastDigits)).
+		Message(h.AdminHandler.EnterCardDailyLimit, h.isSessionStep(domain.SessionStepCreateCardDailyLimit)).
+		Message(h.AdminHandler.EnterCardDaimyoUsernameAndCreate, h.isSessionStep(domain.SessionStepCreateCard))
 }

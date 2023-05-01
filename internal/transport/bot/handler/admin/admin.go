@@ -27,6 +27,10 @@ type CashManagerService interface {
 	Create(ctx context.Context, dto domain.CashManagerDTO) error
 }
 
+type CardService interface {
+	Create(ctx context.Context, dto domain.CardDTO) error
+}
+
 type AdminHandler struct {
 	sessionManager *session.Manager[domain.Session]
 
@@ -34,11 +38,13 @@ type AdminHandler struct {
 	daimyoService      DaimyoService
 	samuraiService     SamuraiService
 	cashManagerService CashManagerService
+	cardService        CardService
 
 	shogun      domain.ShogunDTO
 	daimyo      domain.DaimyoDTO
 	samurai     domain.SamuraiDTO
 	cashManager domain.CashManagerDTO
+	card        domain.CardDTO
 }
 
 func NewAdminHandler(
@@ -47,6 +53,7 @@ func NewAdminHandler(
 	daimyoService DaimyoService,
 	samuraiService SamuraiService,
 	cashManagerService CashManagerService,
+	cardService CardService,
 ) *AdminHandler {
 	return &AdminHandler{
 		sessionManager:     sm,
@@ -54,6 +61,7 @@ func NewAdminHandler(
 		daimyoService:      daimyoService,
 		samuraiService:     samuraiService,
 		cashManagerService: cashManagerService,
+		cardService:        cardService,
 		shogun:             domain.ShogunDTO{},
 		daimyo:             domain.DaimyoDTO{},
 		samurai:            domain.SamuraiDTO{},
@@ -116,9 +124,9 @@ func (h *AdminHandler) CreateEntityMenuSelectionHandler(ctx context.Context, msg
 			DoVoid(ctx)
 
 	case domain.AdminCreateEnityMenu.CreateCard:
-		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateCardBankInfo
+		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateCardName
 
-		return msg.Answer(fmt.Sprintf("Введите информацию о банке эмитенте")).
+		return msg.Answer(fmt.Sprintf("Введите название карты")).
 			ReplyMarkup(tg.NewReplyKeyboardRemove()).
 			DoVoid(ctx)
 	//case domain.AdminCreateEnityMenu.Back:
