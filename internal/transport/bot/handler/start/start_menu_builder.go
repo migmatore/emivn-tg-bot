@@ -12,3 +12,11 @@ func buildAdminStartMenu() *tg.ReplyKeyboardMarkup {
 		)...,
 	).WithResizeKeyboardMarkup()
 }
+
+func buildDaimyoStartMenu() *tg.ReplyKeyboardMarkup {
+	return tg.NewReplyKeyboardMarkup(
+		tg.NewButtonColumn(
+			tg.NewKeyboardButton(domain.DaimyoMenu.MakeReplenishmentRequest),
+		)...,
+	).WithResizeKeyboardMarkup()
+}

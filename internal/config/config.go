@@ -25,7 +25,7 @@ type Config struct {
 	}
 	AppConfig struct {
 		LogLevel string `env:"LOG_LEVEL" env-default:"info"`
-		Token    string `env:"BOT_TOKEN" env-default:"5939059730:AAGIB1OnSj6-Ne4IDCAXx1KtZK1Q2Yo_skI"`
+		Token    string `env:"BOT_TOKEN" env-default:""`
 		BaseURL  string `env:"BASE_URL" env-default:""`
 	}
 }

@@ -24,6 +24,12 @@ var AdminCreateEnityMenu = struct {
 	//Back:              "Назад",
 }
 
+var DaimyoMenu = struct {
+	MakeReplenishmentRequest string
+}{
+	MakeReplenishmentRequest: "Сделать запрос на пополнение карты",
+}
+
 //var Menu = tg.NewReplyKeyboardMarkup(
 //	tg.NewButtonColumn(
 //		tg.NewKeyboardButton(AdminMenu.CreateEntity),

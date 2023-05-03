@@ -4,12 +4,11 @@ type SessionStep int8
 
 const (
 	SessionStepInit = iota
-	SessionStepStart
-	SessionStepAdminRole
+
+	// admin steps
 	SessionStepAdminMenuHandler
-	SessionStepCreateEntityButton
+
 	SessionStepCreateEntityHandler
-	SessionStepBackAdminMenuButton
 
 	SessionStepCreateShogunUsername
 	SessionStepCreateShogun
@@ -31,9 +30,10 @@ const (
 	SessionStepCreateCard
 
 	SessionStepBackCreateEntityMenuStep
-	//SessionStepAcionSelect
-	//SessionStepReadData
-	//SessionStepWriteData
+
+	// diamyo steps
+	SessionStepDaimyoMenuHandler
+	SessionStepMakeReplenishmentRequest
 )
 
 type Session struct {

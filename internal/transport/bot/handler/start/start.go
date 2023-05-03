@@ -37,6 +37,12 @@ func (s *StartHandler) Start(ctx context.Context, msg *tgb.MessageUpdate) error 
 		return msg.Answer("Пожалуйста, выберите действие").
 			ReplyMarkup(buildAdminStartMenu()).
 			DoVoid(ctx)
+	case domain.DaimyoRole.String():
+		s.sessionManager.Get(ctx).Step = domain.SessionStepDaimyoMenuHandler
+
+		return msg.Answer("Пожалуйста, выберите действие").
+			ReplyMarkup(buildDaimyoStartMenu()).
+			DoVoid(ctx)
 	default:
 		return nil
 	}
