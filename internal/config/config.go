@@ -40,7 +40,7 @@ func GetConfig(ctx context.Context) *Config {
 		instance = &Config{}
 
 		if err := cleanenv.ReadEnv(instance); err != nil {
-			var title = "Bakery management system"
+			var title = "EMIVN tg bot"
 			help, _ := cleanenv.GetDescription(instance, &title)
 
 			logging.GetLogger(ctx).Info(help)
