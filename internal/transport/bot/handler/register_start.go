@@ -6,7 +6,7 @@ import (
 	"github.com/mr-linch/go-tg/tgb"
 )
 
-func (h *Handler) registerStartHandler() {
+func (h *Handler) registerStartHandlers() {
 	h.Message(h.StartHandler.Start, tgb.Command("start")).
 		Message(func(ctx context.Context, mu *tgb.MessageUpdate) error {
 			return mu.Update.Reply(ctx, mu.Answer("Напишите /start"))

@@ -4,7 +4,7 @@ import (
 	"emivn-tg-bot/internal/domain"
 )
 
-func (h *Handler) registerAdminHandler() {
+func (h *Handler) registerAdminHandlers() {
 	h.Message(h.AdminHandler.MenuSelectionHandler, h.isSessionStep(domain.SessionStepAdminMenuHandler)).
 		Message(h.AdminHandler.CreateEntityMenuSelectionHandler, h.isSessionStep(domain.SessionStepCreateEntityHandler)).
 		// shogun

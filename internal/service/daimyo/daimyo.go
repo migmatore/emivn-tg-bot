@@ -85,10 +85,10 @@ func (s *DaimyoService) GetAll(ctx context.Context) ([]*domain.DaimyoDTO, error)
 
 	for _, item := range daimyos {
 		daimyoDTO := domain.DaimyoDTO{
-			Username:     item.Username,
-			Nickname:     item.Nickname,
-			CardsBalance: item.CardsBalance,
-			// ShogunUsername: TODO: covert shogunId to shogunUsername
+			Username:       item.Username,
+			Nickname:       item.Nickname,
+			CardsBalance:   item.CardsBalance,
+			ShogunUsername: item.ShogunUsername,
 		}
 
 		daimyoDTOs = append(daimyoDTOs, &daimyoDTO)

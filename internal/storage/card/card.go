@@ -31,3 +31,31 @@ func (s *CardStorage) Insert(ctx context.Context, card domain.Card) error {
 
 	return nil
 }
+
+func (s *CardStorage) GetByUsername(ctx context.Context, daimyoUsername string) ([]*domain.Card, error) {
+	q := `select id, name, last_digits, daily_limit, daimyo_username from cards where daimyo_username=$1`
+
+	cards := make([]*domain.Card, 0)
+
+	rows, err := s.pool.Query(ctx, q, daimyoUsername)
+	if err != nil {
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var card domain.Card
+
+		err := rows.Scan(&card.CardId, &card.Name, &card.LastDigits, &card.DailyLimit, &card.DaimyoUsername)
+		if err != nil {
+			logging.GetLogger(ctx).Errorf("Query error. %v", err)
+			return nil, err
+		}
+
+		cards = append(cards, &card)
+	}
+
+	return cards, nil
+}

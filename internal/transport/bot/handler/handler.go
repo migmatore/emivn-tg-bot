@@ -4,11 +4,13 @@ import (
 	"context"
 	"emivn-tg-bot/internal/domain"
 	"emivn-tg-bot/internal/transport/bot/handler/admin"
+	"emivn-tg-bot/internal/transport/bot/handler/daimyo"
 	"emivn-tg-bot/internal/transport/bot/handler/start"
 	"github.com/mr-linch/go-tg/tgb"
 	"github.com/mr-linch/go-tg/tgb/session"
 )
 
+// TODO: Refactor DI
 type Deps struct {
 	sessionManager *session.Manager[domain.Session]
 
@@ -24,8 +26,9 @@ type Handler struct {
 	*tgb.Router
 	sessionManager *session.Manager[domain.Session]
 
-	StartHandler *start.StartHandler
-	AdminHandler *admin.AdminHandler
+	StartHandler  *start.StartHandler
+	AdminHandler  *admin.AdminHandler
+	DaimyoHandler *daimyo.DaimyoHandler
 }
 
 func New(deps Deps) *Handler {
@@ -44,13 +47,14 @@ func New(deps Deps) *Handler {
 			deps.CashManagerService,
 			deps.CardService,
 		),
+		DaimyoHandler: daimyo.NewDaimyoHandler(sm.Manager),
 	}
 }
 
 func (h *Handler) Init(ctx context.Context) *tgb.Router {
 	h.registerSession()
-	h.registerStartHandler()
-	h.registerAdminHandler()
+	h.registerStartHandlers()
+	h.registerAdminHandlers()
 
 	//h.Message(h.StartHandler.Start, tgb.Command("start")).
 	//	Message(func(ctx context.Context, mu *tgb.MessageUpdate) error {

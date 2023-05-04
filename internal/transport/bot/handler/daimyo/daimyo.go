@@ -9,25 +9,43 @@ import (
 	"github.com/mr-linch/go-tg/tgb/session"
 )
 
+type CardService interface {
+	GetByUsername(ctx context.Context, daimyoUsername string) ([]*domain.CardDTO, error)
+}
+
 type DaimyoHandler struct {
 	sessionManager *session.Manager[domain.Session]
+
+	cardService CardService
 }
 
 func NewDaimyoHandler(
 	sm *session.Manager[domain.Session],
+	cardService CardService,
 ) *DaimyoHandler {
 	return &DaimyoHandler{
 		sessionManager: sm,
+		cardService:    cardService,
 	}
 }
 
 func (h *DaimyoHandler) MenuSelectionHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	switch msg.Text {
 	case domain.DaimyoMenu.MakeReplenishmentRequest:
+		cards, err := h.cardService.GetByUsername(ctx, string(msg.Chat.Username))
+		if err != nil {
+			return err
+		}
+
+		var str string
+
+		for i, card := range cards {
+			str += fmt.Sprintf("%d. %s\n", i, card.Name)
+		}
+
 		h.sessionManager.Get(ctx).Step = domain.SessionStepMakeReplenishmentRequest
 
-		//return msg.Answer(fmt.Sprintf("Введите telegram username")).ReplyMarkup(kb).DoVoid(ctx)
-		return msg.Answer("").DoVoid(ctx)
+		return msg.Answer(fmt.Sprintf("Введите название карты из списка, которую хотите пополнить: \n%s", str)).DoVoid(ctx)
 	default:
 		h.sessionManager.Get(ctx).Step = domain.SessionStepInit
 		return msg.Answer("Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
