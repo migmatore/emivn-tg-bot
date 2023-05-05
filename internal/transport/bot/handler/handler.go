@@ -96,15 +96,5 @@ func (h *Handler) Init(ctx context.Context) *tgb.Router {
 	h.registerAdminHandlers()
 	h.registerDaimyoHandler()
 
-	//h.Message(h.StartHandler.Start, tgb.Command("start")).
-	//	Message(func(ctx context.Context, mu *tgb.MessageUpdate) error {
-	//		return mu.Update.Reply(ctx, mu.Answer("Напишите /start"))
-	//	}, h.isSessionStep(domain.SessionStepInit)).
-	//	Message(h.AdminHandler.Menu, h.isSessionStep(domain.SessionStepAdminRole)).
-	//	Message(h.AdminHandler.MenuSelectionHandler, h.isSessionStep(domain.SessionStepAdminMenuHandler)).
-	//	Message(h.AdminHandler.CreateEntityMenu, h.isSessionStep(domain.SessionStepCreateEntityButton)).
-	//	Message(h.AdminHandler.CreateEntityMenuSelectionHandler, h.isSessionStep(domain.SessionStepCreateEntityHandler)).
-	//	Message(h.AdminHandler.CreateShogun, h.isSessionStep(domain.SessionStepCreateShogun))
-
 	return h.Router
 }
