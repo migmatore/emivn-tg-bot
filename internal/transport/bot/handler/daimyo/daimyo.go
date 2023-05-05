@@ -40,7 +40,7 @@ func (h *DaimyoHandler) MenuSelectionHandler(ctx context.Context, msg *tgb.Messa
 		var str string
 
 		for i, card := range cards {
-			str += fmt.Sprintf("%d. %s\n", i, card.Name)
+			str += fmt.Sprintf("%d. %s\n", i+1, card.Name)
 		}
 
 		h.sessionManager.Get(ctx).Step = domain.SessionStepMakeReplenishmentRequest
@@ -52,47 +52,48 @@ func (h *DaimyoHandler) MenuSelectionHandler(ctx context.Context, msg *tgb.Messa
 	}
 }
 
-func (h *DaimyoHandler) CreateEntityMenuSelectionHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
-	switch msg.Text {
-	case domain.AdminCreateEnityMenu.CreateShogun:
-		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateShogunUsername
-
-		return msg.Answer(fmt.Sprintf("Введите telegram username")).
-			ReplyMarkup(tg.NewReplyKeyboardRemove()).
-			DoVoid(ctx)
-
-	case domain.AdminCreateEnityMenu.CreateDaimyo:
-		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateDaimyoUsername
-
-		return msg.Answer(fmt.Sprintf("Введите telegram username")).
-			ReplyMarkup(tg.NewReplyKeyboardRemove()).
-			DoVoid(ctx)
-
-	case domain.AdminCreateEnityMenu.CreateSamurai:
-		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateSamuraiUsername
-
-		return msg.Answer(fmt.Sprintf("Введите telegram username")).
-			ReplyMarkup(tg.NewReplyKeyboardRemove()).
-			DoVoid(ctx)
-
-	case domain.AdminCreateEnityMenu.CreateCashManager:
-		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateCashManagerUsername
-
-		return msg.Answer(fmt.Sprintf("Введите telegram username")).
-			ReplyMarkup(tg.NewReplyKeyboardRemove()).
-			DoVoid(ctx)
-
-	case domain.AdminCreateEnityMenu.CreateCard:
-		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateCardName
-
-		return msg.Answer(fmt.Sprintf("Введите название карты")).
-			ReplyMarkup(tg.NewReplyKeyboardRemove()).
-			DoVoid(ctx)
-	//case domain.AdminCreateEnityMenu.Back:
-	//	h.sessionManager.Get(ctx).Step = domain.SessionStepInit
-	//	return msg.Answer("Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
-	default:
-		h.sessionManager.Get(ctx).Step = domain.SessionStepInit
-		return msg.Answer("Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
-	}
-}
+//
+//func (h *DaimyoHandler) CreateEntityMenuSelectionHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+//	switch msg.Text {
+//	case domain.AdminCreateEnityMenu.CreateShogun:
+//		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateShogunUsername
+//
+//		return msg.Answer(fmt.Sprintf("Введите telegram username")).
+//			ReplyMarkup(tg.NewReplyKeyboardRemove()).
+//			DoVoid(ctx)
+//
+//	case domain.AdminCreateEnityMenu.CreateDaimyo:
+//		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateDaimyoUsername
+//
+//		return msg.Answer(fmt.Sprintf("Введите telegram username")).
+//			ReplyMarkup(tg.NewReplyKeyboardRemove()).
+//			DoVoid(ctx)
+//
+//	case domain.AdminCreateEnityMenu.CreateSamurai:
+//		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateSamuraiUsername
+//
+//		return msg.Answer(fmt.Sprintf("Введите telegram username")).
+//			ReplyMarkup(tg.NewReplyKeyboardRemove()).
+//			DoVoid(ctx)
+//
+//	case domain.AdminCreateEnityMenu.CreateCashManager:
+//		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateCashManagerUsername
+//
+//		return msg.Answer(fmt.Sprintf("Введите telegram username")).
+//			ReplyMarkup(tg.NewReplyKeyboardRemove()).
+//			DoVoid(ctx)
+//
+//	case domain.AdminCreateEnityMenu.CreateCard:
+//		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateCardName
+//
+//		return msg.Answer(fmt.Sprintf("Введите название карты")).
+//			ReplyMarkup(tg.NewReplyKeyboardRemove()).
+//			DoVoid(ctx)
+//	//case domain.AdminCreateEnityMenu.Back:
+//	//	h.sessionManager.Get(ctx).Step = domain.SessionStepInit
+//	//	return msg.Answer("Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
+//	default:
+//		h.sessionManager.Get(ctx).Step = domain.SessionStepInit
+//		return msg.Answer("Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
+//	}
+//}

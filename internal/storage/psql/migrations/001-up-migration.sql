@@ -62,6 +62,7 @@ CREATE TABLE replenishment_requests
     cash_manager_username VARCHAR(255) NOT NULL REFERENCES cash_managers (username),
     daimyo_username       VARCHAR(255) NOT NULL REFERENCES daimyo (username),
     card_id               INTEGER      NOT NULL REFERENCES cards (id),
+    amount                DECIMAL      NOT NULL DEFAULT 0,
     status_id             INTEGER      NOT NULL REFERENCES replenishment_request_status (id)
 );
 
