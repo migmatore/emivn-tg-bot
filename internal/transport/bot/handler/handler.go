@@ -8,18 +8,48 @@ import (
 	"emivn-tg-bot/internal/transport/bot/handler/start"
 	"github.com/mr-linch/go-tg/tgb"
 	"github.com/mr-linch/go-tg/tgb/session"
+	"log"
+	"time"
 )
+
+type AuthService interface {
+	//CheckAuthRole(ctx context.Context, username string, requiredRole domain.Role) (bool, error)
+	GetRole(ctx context.Context, username string) (string, error)
+}
+
+type ShogunService interface {
+	Create(ctx context.Context, dto domain.ShogunDTO) error
+	GetAll(ctx context.Context) ([]*domain.ShogunDTO, error)
+}
+
+type DaimyoService interface {
+	Create(ctx context.Context, dto domain.DaimyoDTO) error
+	GetAll(ctx context.Context) ([]*domain.DaimyoDTO, error)
+}
+
+type SamuraiService interface {
+	Create(ctx context.Context, dto domain.SamuraiDTO) error
+}
+
+type CashManagerService interface {
+	Create(ctx context.Context, dto domain.CashManagerDTO) error
+}
+
+type CardService interface {
+	Create(ctx context.Context, dto domain.CardDTO) error
+	GetByUsername(ctx context.Context, daimyoUsername string) ([]*domain.CardDTO, error)
+}
 
 // TODO: Refactor DI
 type Deps struct {
 	sessionManager *session.Manager[domain.Session]
 
-	AuthService        start.AuthService
-	ShogunService      admin.ShogunService
-	DaimyoService      admin.DaimyoService
-	SamuraiService     admin.SamuraiService
-	CashManagerService admin.CashManagerService
-	CardService        admin.CardService
+	AuthService        AuthService
+	ShogunService      ShogunService
+	DaimyoService      DaimyoService
+	SamuraiService     SamuraiService
+	CashManagerService CashManagerService
+	CardService        CardService
 }
 
 type Handler struct {
@@ -47,14 +77,24 @@ func New(deps Deps) *Handler {
 			deps.CashManagerService,
 			deps.CardService,
 		),
-		DaimyoHandler: daimyo.NewDaimyoHandler(sm.Manager),
+		DaimyoHandler: daimyo.NewDaimyoHandler(sm.Manager, deps.CardService),
 	}
 }
 
 func (h *Handler) Init(ctx context.Context) *tgb.Router {
+	h.Router.Use(tgb.MiddlewareFunc(func(next tgb.Handler) tgb.Handler {
+		return tgb.HandlerFunc(func(ctx context.Context, update *tgb.Update) error {
+			defer func(started time.Time) {
+				log.Printf("%#v [%s]", update, time.Since(started))
+			}(time.Now())
+
+			return next.Handle(ctx, update)
+		})
+	}))
 	h.registerSession()
 	h.registerStartHandlers()
 	h.registerAdminHandlers()
+	h.registerDaimyoHandler()
 
 	//h.Message(h.StartHandler.Start, tgb.Command("start")).
 	//	Message(func(ctx context.Context, mu *tgb.MessageUpdate) error {
