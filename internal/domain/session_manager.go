@@ -22,6 +22,7 @@ const (
 	SessionStepCreateSamurai
 
 	SessionStepCreateCashManagerUsername
+	SessionStepCreateCashManagerNickname
 	SessionStepCreateCashManager
 
 	SessionStepCreateCardName
