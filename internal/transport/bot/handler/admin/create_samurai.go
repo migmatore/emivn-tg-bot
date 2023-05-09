@@ -10,15 +10,18 @@ import (
 )
 
 func (h *AdminHandler) EnterSamuraiUsername(ctx context.Context, msg *tgb.MessageUpdate) error {
-	// TODO: create regular expression to check the username is correct
-	h.samurai.Username = strings.ReplaceAll(msg.Text, "@", "")
+	sessionManager := h.sessionManager.Get(ctx)
 
-	h.sessionManager.Get(ctx).Step = domain.SessionStepCreateSamuraiNickname
+	// TODO: create regular expression to check the username is correct
+	sessionManager.Samurai.Username = strings.ReplaceAll(msg.Text, "@", "")
+
+	sessionManager.Step = domain.SessionStepCreateSamuraiNickname
 	return msg.Answer("Введите nickname").DoVoid(ctx)
 }
 
 func (h *AdminHandler) EnterSamuraiNickname(ctx context.Context, msg *tgb.MessageUpdate) error {
-	h.samurai.Nickname = msg.Text
+	sessionManager := h.sessionManager.Get(ctx)
+	sessionManager.Samurai.Nickname = msg.Text
 
 	daimyos, err := h.daimyoService.GetAll(ctx)
 	if err != nil {
@@ -31,21 +34,21 @@ func (h *AdminHandler) EnterSamuraiNickname(ctx context.Context, msg *tgb.Messag
 		str += "@" + daimyo.Username + "\n"
 	}
 
-	h.sessionManager.Get(ctx).Step = domain.SessionStepCreateSamurai
+	sessionManager.Step = domain.SessionStepCreateSamurai
 
 	return msg.Answer(fmt.Sprintf("Введите username даймё, к которому будет привязан самурай. \nСписок даёме: \n%s", str)).
-		ReplyMarkup(tg.NewReplyKeyboardRemove()).
 		DoVoid(ctx)
 }
 
 func (h *AdminHandler) CreateSamurai(ctx context.Context, msg *tgb.MessageUpdate) error {
+	sessionManager := h.sessionManager.Get(ctx)
 	// TODO: create regular expression to check the username is correct
-	h.samurai.DaimyoUsername = strings.ReplaceAll(msg.Text, "@", "")
+	sessionManager.Samurai.DaimyoUsername = strings.ReplaceAll(msg.Text, "@", "")
 
-	if err := h.samuraiService.Create(ctx, h.samurai); err != nil {
+	if err := h.samuraiService.Create(ctx, sessionManager.Samurai); err != nil {
 		return err
 	}
 
-	h.sessionManager.Get(ctx).Step = domain.SessionStepInit
+	h.sessionManager.Reset(sessionManager)
 	return msg.Answer("Самурай успешно создан. Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
 }

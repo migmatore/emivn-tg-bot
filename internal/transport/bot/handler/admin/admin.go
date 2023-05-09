@@ -40,11 +40,11 @@ type AdminHandler struct {
 	cashManagerService CashManagerService
 	cardService        CardService
 
-	shogun      domain.ShogunDTO
-	daimyo      domain.DaimyoDTO
-	samurai     domain.SamuraiDTO
-	cashManager domain.CashManagerDTO
-	card        domain.CardDTO
+	//shogun      domain.ShogunDTO
+	//daimyo      domain.DaimyoDTO
+	//samurai     domain.SamuraiDTO
+	//cashManager domain.CashManagerDTO
+	//card        domain.CardDTO
 }
 
 func NewAdminHandler(
@@ -62,10 +62,11 @@ func NewAdminHandler(
 		samuraiService:     samuraiService,
 		cashManagerService: cashManagerService,
 		cardService:        cardService,
-		shogun:             domain.ShogunDTO{},
-		daimyo:             domain.DaimyoDTO{},
-		samurai:            domain.SamuraiDTO{},
-		cashManager:        domain.CashManagerDTO{},
+		//shogun:             domain.ShogunDTO{},
+		//daimyo:             domain.DaimyoDTO{},
+		//samurai:            domain.SamuraiDTO{},
+		//cashManager:        domain.CashManagerDTO{},
+		//card:               domain.CardDTO{},
 	}
 }
 
@@ -84,7 +85,6 @@ func (h *AdminHandler) MenuSelectionHandler(ctx context.Context, msg *tgb.Messag
 			)...,
 		).WithResizeKeyboardMarkup()
 
-		//return msg.Answer(fmt.Sprintf("Введите telegram username")).ReplyMarkup(kb).DoVoid(ctx)
 		return msg.Update.Reply(ctx, msg.Answer(fmt.Sprintf("Выберите сущность, которую хотите создать")).
 			ReplyMarkup(kb))
 	default:

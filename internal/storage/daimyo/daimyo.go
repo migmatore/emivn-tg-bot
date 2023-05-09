@@ -59,3 +59,26 @@ func (s *DaimyoStorage) GetAll(ctx context.Context) ([]*domain.Daimyo, error) {
 
 	return daimyos, nil
 }
+
+func (s *DaimyoStorage) GetByUsername(ctx context.Context, username string) (domain.Daimyo, error) {
+	q := `select username, nickname, cards_balance, shogun_username from daimyo where username=$1`
+
+	daimyo := domain.Daimyo{}
+
+	if err := s.pool.QueryRow(ctx, q, username).Scan(
+		&daimyo.Username,
+		&daimyo.Nickname,
+		&daimyo.CardsBalance,
+		&daimyo.ShogunUsername,
+	); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			logging.GetLogger(ctx).Errorf("Error: %v", err)
+			return daimyo, err
+		}
+
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return daimyo, err
+	}
+
+	return daimyo, nil
+}

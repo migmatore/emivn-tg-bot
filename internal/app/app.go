@@ -35,24 +35,27 @@ func (a *App) Run(ctx context.Context) error {
 	storages := storage.New(pool)
 
 	services := service.New(service.Deps{
-		Transactor:         storages.Transactor,
-		AuthStorage:        storages.Auth,
-		ShogunStorage:      storages.Shogun,
-		DaimyoStorage:      storages.Daimyo,
-		SamuraiStorage:     storages.Samurai,
-		CashManagerStorage: storages.CashManager,
-		UserRoleStorage:    storages.UserRole,
-		RoleStorage:        storages.Role,
-		CardStorage:        storages.Card,
+		Transactor:                        storages.Transactor,
+		AuthStorage:                       storages.Auth,
+		ShogunStorage:                     storages.Shogun,
+		DaimyoStorage:                     storages.Daimyo,
+		SamuraiStorage:                    storages.Samurai,
+		CashManagerStorage:                storages.CashManager,
+		UserRoleStorage:                   storages.UserRole,
+		RoleStorage:                       storages.Role,
+		CardStorage:                       storages.Card,
+		ReplenishmentRequestStorage:       storages.ReplenishmentRequest,
+		ReplenishmentRequestStatusStorage: storages.ReplenishmentRequestStatusStorage,
 	})
 
 	handlers := handler.New(handler.Deps{
-		AuthService:        services.Auth,
-		ShogunService:      services.Shogun,
-		DaimyoService:      services.Daimyo,
-		SamuraiService:     services.Samurai,
-		CashManagerService: services.CashManager,
-		CardService:        services.Card,
+		AuthService:                 services.Auth,
+		ShogunService:               services.Shogun,
+		DaimyoService:               services.Daimyo,
+		SamuraiService:              services.Samurai,
+		CashManagerService:          services.CashManager,
+		CardService:                 services.Card,
+		ReplenishmentRequestService: services.ReplenishmentRequest,
 	})
 
 	router := handlers.Init(ctx)

@@ -6,6 +6,7 @@ import (
 	"emivn-tg-bot/internal/transport/bot/handler/admin"
 	"emivn-tg-bot/internal/transport/bot/handler/daimyo"
 	"emivn-tg-bot/internal/transport/bot/handler/start"
+	"github.com/mr-linch/go-tg"
 	"github.com/mr-linch/go-tg/tgb"
 	"github.com/mr-linch/go-tg/tgb/session"
 	"log"
@@ -40,16 +41,21 @@ type CardService interface {
 	GetByUsername(ctx context.Context, daimyoUsername string) ([]*domain.CardDTO, error)
 }
 
+type ReplenishmentRequestService interface {
+	Create(ctx context.Context, dto domain.ReplenishmentRequestDTO) (tg.ChatID, error)
+}
+
 // TODO: Refactor DI
 type Deps struct {
 	sessionManager *session.Manager[domain.Session]
 
-	AuthService        AuthService
-	ShogunService      ShogunService
-	DaimyoService      DaimyoService
-	SamuraiService     SamuraiService
-	CashManagerService CashManagerService
-	CardService        CardService
+	AuthService                 AuthService
+	ShogunService               ShogunService
+	DaimyoService               DaimyoService
+	SamuraiService              SamuraiService
+	CashManagerService          CashManagerService
+	CardService                 CardService
+	ReplenishmentRequestService ReplenishmentRequestService
 }
 
 type Handler struct {
@@ -77,7 +83,12 @@ func New(deps Deps) *Handler {
 			deps.CashManagerService,
 			deps.CardService,
 		),
-		DaimyoHandler: daimyo.NewDaimyoHandler(sm.Manager, deps.CardService),
+		DaimyoHandler: daimyo.NewDaimyoHandler(
+			sm.Manager,
+			deps.CardService,
+			deps.ReplenishmentRequestService,
+			deps.CashManagerService,
+		),
 	}
 }
 

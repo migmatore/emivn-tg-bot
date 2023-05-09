@@ -9,6 +9,7 @@ import (
 type DaimyoStorage interface {
 	Insert(ctx context.Context, daimyo domain.Daimyo) error
 	GetAll(ctx context.Context) ([]*domain.Daimyo, error)
+	GetByUsername(ctx context.Context, username string) (domain.Daimyo, error)
 }
 
 type DaimyoUserRoleStorage interface {

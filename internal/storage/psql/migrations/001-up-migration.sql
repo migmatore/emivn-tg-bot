@@ -46,8 +46,8 @@ CREATE TABLE cash_managers
 (
     username        VARCHAR(255) NOT NULL PRIMARY KEY,
     nickname        VARCHAR(255) NOT NULL UNIQUE,
-    shogun_username VARCHAR(255) NOT NULL REFERENCES shoguns (username),
-    chat_id         INTEGER      NOT NULL
+    shogun_username VARCHAR(255) NOT NULL UNIQUE REFERENCES shoguns (username),
+    chat_id         BIGINT       NOT NULL
 --     replenishment_request_id INTEGER      NOT NULL REFERENCES replenishment_requests (id)
 );
 
@@ -89,5 +89,5 @@ VALUES ('Администратор'),
        ('Инкассатор');
 
 INSERT INTO replenishment_request_status(name)
-VALUES ('Выполняется'),
-       ('Завершен')
+VALUES ('Активный'),
+       ('Спорный')

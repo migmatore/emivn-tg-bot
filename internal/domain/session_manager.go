@@ -34,13 +34,17 @@ const (
 
 	// diamyo steps
 	SessionStepDaimyoMenuHandler
+	SessionStepEnterReplenishmentRequestAmount
 	SessionStepMakeReplenishmentRequest
 )
 
 type Session struct {
 	Step SessionStep
 
-	Name   string
-	Age    int
-	Gender string
+	Shogun               ShogunDTO
+	Daimyo               DaimyoDTO
+	Samurai              SamuraiDTO
+	CashManager          CashManagerDTO
+	Card                 CardDTO
+	ReplenishmentRequest ReplenishmentRequestDTO
 }

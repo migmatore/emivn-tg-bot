@@ -22,7 +22,7 @@ func (r Role) String() string {
 		return "Самурай"
 	case CashManagerRole:
 		return "Инкассатор"
+	default:
+		return ""
 	}
-
-	return ""
 }

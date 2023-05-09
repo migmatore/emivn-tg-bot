@@ -8,6 +8,7 @@ import (
 
 type CashManagerStorage interface {
 	Insert(ctx context.Context, cashManager domain.CashManager) error
+	GetByShogunUsername(ctx context.Context, username string) (domain.CashManager, error)
 }
 
 type CashManagerUserRoleStorage interface {

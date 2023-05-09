@@ -13,19 +13,36 @@ type CardService interface {
 	GetByUsername(ctx context.Context, daimyoUsername string) ([]*domain.CardDTO, error)
 }
 
+type ReplenishmentRequestService interface {
+	Create(ctx context.Context, dto domain.ReplenishmentRequestDTO) (tg.ChatID, error)
+}
+
+type CashManagerService interface {
+	//GetByDaimyoUsername(ctx context.Context, username string) (domain.CashManagerDTO, error)
+}
+
 type DaimyoHandler struct {
 	sessionManager *session.Manager[domain.Session]
 
-	cardService CardService
+	cardService                 CardService
+	replenishmentRequestService ReplenishmentRequestService
+	cashManagerService          CashManagerService
+
+	//replenishmentRequest domain.ReplenishmentRequestDTO
 }
 
 func NewDaimyoHandler(
 	sm *session.Manager[domain.Session],
 	cardService CardService,
+	replenishmentRequestService ReplenishmentRequestService,
+	cashManagerService CashManagerService,
 ) *DaimyoHandler {
 	return &DaimyoHandler{
-		sessionManager: sm,
-		cardService:    cardService,
+		sessionManager:              sm,
+		cardService:                 cardService,
+		replenishmentRequestService: replenishmentRequestService,
+		cashManagerService:          cashManagerService,
+		//replenishmentRequest:        domain.ReplenishmentRequestDTO{},
 	}
 }
 
@@ -43,7 +60,7 @@ func (h *DaimyoHandler) MenuSelectionHandler(ctx context.Context, msg *tgb.Messa
 			str += fmt.Sprintf("%d. %s\n", i+1, card.Name)
 		}
 
-		h.sessionManager.Get(ctx).Step = domain.SessionStepMakeReplenishmentRequest
+		h.sessionManager.Get(ctx).Step = domain.SessionStepEnterReplenishmentRequestAmount
 
 		return msg.Answer(fmt.Sprintf("Введите название карты из списка, которую хотите пополнить: \n%s", str)).DoVoid(ctx)
 	default:

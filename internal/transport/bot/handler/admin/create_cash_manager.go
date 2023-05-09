@@ -10,15 +10,17 @@ import (
 )
 
 func (h *AdminHandler) EnterCashManagerUsername(ctx context.Context, msg *tgb.MessageUpdate) error {
+	sessionManager := h.sessionManager.Get(ctx)
 	// TODO: create regular expression to check the username is correct
-	h.cashManager.Username = strings.ReplaceAll(msg.Text, "@", "")
+	sessionManager.CashManager.Username = strings.ReplaceAll(msg.Text, "@", "")
 
-	h.sessionManager.Get(ctx).Step = domain.SessionStepCreateCashManagerNickname
+	sessionManager.Step = domain.SessionStepCreateCashManagerNickname
 	return msg.Answer("Введите nickname").DoVoid(ctx)
 }
 
 func (h *AdminHandler) EnterCashManagerNickname(ctx context.Context, msg *tgb.MessageUpdate) error {
-	h.cashManager.Nickname = msg.Text
+	sessionManager := h.sessionManager.Get(ctx)
+	sessionManager.CashManager.Nickname = msg.Text
 
 	shoguns, err := h.shogunService.GetAll(ctx)
 	if err != nil {
@@ -31,7 +33,7 @@ func (h *AdminHandler) EnterCashManagerNickname(ctx context.Context, msg *tgb.Me
 		str += "@" + shogun.Username + "\n"
 	}
 
-	h.sessionManager.Get(ctx).Step = domain.SessionStepCreateCashManager
+	sessionManager.Step = domain.SessionStepCreateCashManager
 
 	return msg.Answer(fmt.Sprintf("Введите username сёгуна, к которому будет привязан инкассатор. \nСписок сёгунов: \n%s", str)).
 		ReplyMarkup(tg.NewReplyKeyboardRemove()).
@@ -39,12 +41,14 @@ func (h *AdminHandler) EnterCashManagerNickname(ctx context.Context, msg *tgb.Me
 }
 
 func (h *AdminHandler) CreateCashManager(ctx context.Context, msg *tgb.MessageUpdate) error {
-	h.cashManager.ShogunUsername = strings.ReplaceAll(msg.Text, "@", "")
+	sessionManager := h.sessionManager.Get(ctx)
+	sessionManager.CashManager.ShogunUsername = strings.ReplaceAll(msg.Text, "@", "")
+	sessionManager.CashManager.ChatId = int(msg.Chat.ID)
 
-	if err := h.cashManagerService.Create(ctx, h.cashManager); err != nil {
+	if err := h.cashManagerService.Create(ctx, sessionManager.CashManager); err != nil {
 		return err
 	}
 
-	h.sessionManager.Get(ctx).Step = domain.SessionStepInit
+	h.sessionManager.Reset(sessionManager)
 	return msg.Answer("Инкассатор успешно создан. Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
 }

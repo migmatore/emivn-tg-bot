@@ -59,3 +59,27 @@ func (s *CardStorage) GetByUsername(ctx context.Context, daimyoUsername string) 
 
 	return cards, nil
 }
+
+func (s *CardStorage) GetByName(ctx context.Context, name string) (domain.Card, error) {
+	q := `select id, name, last_digits, daily_limit, daimyo_username from cards where name=$1`
+
+	card := domain.Card{}
+
+	if err := s.pool.QueryRow(ctx, q, name).Scan(
+		&card.CardId,
+		&card.Name,
+		&card.LastDigits,
+		&card.DailyLimit,
+		&card.DaimyoUsername,
+	); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			logging.GetLogger(ctx).Errorf("Error: %v", err)
+			return card, err
+		}
+
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return card, err
+	}
+
+	return card, nil
+}

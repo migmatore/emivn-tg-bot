@@ -31,3 +31,26 @@ func (s *CashManagerStorage) Insert(ctx context.Context, cashManager domain.Cash
 
 	return nil
 }
+
+func (s *CashManagerStorage) GetByShogunUsername(ctx context.Context, username string) (domain.CashManager, error) {
+	q := `select username, nickname, shogun_username, chat_id from cash_managers where shogun_username=$1`
+
+	cashManager := domain.CashManager{}
+
+	if err := s.pool.QueryRow(ctx, q, username).Scan(
+		&cashManager.Username,
+		&cashManager.Nickname,
+		&cashManager.ShogunUsername,
+		&cashManager.ChatId,
+	); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			logging.GetLogger(ctx).Errorf("Error: %v", err)
+			return cashManager, err
+		}
+
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return cashManager, err
+	}
+
+	return cashManager, nil
+}

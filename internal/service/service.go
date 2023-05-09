@@ -5,6 +5,8 @@ import (
 	"emivn-tg-bot/internal/service/card"
 	"emivn-tg-bot/internal/service/cash_manager"
 	"emivn-tg-bot/internal/service/daimyo"
+	"emivn-tg-bot/internal/service/replenishment_request"
+	"emivn-tg-bot/internal/service/replenishment_request_status"
 	"emivn-tg-bot/internal/service/role"
 	"emivn-tg-bot/internal/service/samurai"
 	"emivn-tg-bot/internal/service/shogun"
@@ -15,23 +17,26 @@ import (
 type Deps struct {
 	Transactor storage.Transactor
 
-	AuthStorage        auth.AuthStorage
-	ShogunStorage      shogun.ShogunStorage
-	DaimyoStorage      daimyo.DaimyoStorage
-	SamuraiStorage     samurai.SamuraiStorage
-	CashManagerStorage cash_manager.CashManagerStorage
-	CardStorage        card.CardStorage
-	UserRoleStorage    user_role.UserRoleStorage
-	RoleStorage        role.RoleStorage
+	AuthStorage                       auth.AuthStorage
+	ShogunStorage                     shogun.ShogunStorage
+	DaimyoStorage                     daimyo.DaimyoStorage
+	SamuraiStorage                    samurai.SamuraiStorage
+	CashManagerStorage                cash_manager.CashManagerStorage
+	CardStorage                       card.CardStorage
+	ReplenishmentRequestStorage       replenishment_request.ReplenishmentRequestStorage
+	ReplenishmentRequestStatusStorage replenishment_request_status.ReplenishmentRequestStatusStorage
+	UserRoleStorage                   user_role.UserRoleStorage
+	RoleStorage                       role.RoleStorage
 }
 
 type Service struct {
-	Auth        *auth.AuthService
-	Shogun      *shogun.ShogunService
-	Daimyo      *daimyo.DaimyoService
-	Samurai     *samurai.SamuraiService
-	CashManager *cash_manager.CashManagerService
-	Card        *card.CardService
+	Auth                 *auth.AuthService
+	Shogun               *shogun.ShogunService
+	Daimyo               *daimyo.DaimyoService
+	Samurai              *samurai.SamuraiService
+	CashManager          *cash_manager.CashManagerService
+	Card                 *card.CardService
+	ReplenishmentRequest *replenishment_request.ReplenishmentRequestService
 }
 
 func New(deps Deps) *Service {
@@ -57,5 +62,12 @@ func New(deps Deps) *Service {
 			deps.RoleStorage,
 		),
 		Card: card.NewCardService(deps.Transactor, deps.CardStorage),
+		ReplenishmentRequest: replenishment_request.NewReplenishmentRequestService(
+			deps.ReplenishmentRequestStorage,
+			deps.CashManagerStorage,
+			deps.DaimyoStorage,
+			deps.CardStorage,
+			deps.ReplenishmentRequestStatusStorage,
+		),
 	}
 }

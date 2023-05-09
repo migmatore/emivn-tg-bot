@@ -9,6 +9,7 @@ import (
 type CardStorage interface {
 	Insert(ctx context.Context, card domain.Card) error
 	GetByUsername(ctx context.Context, daimyoUsername string) ([]*domain.Card, error)
+	GetByName(ctx context.Context, name string) (domain.Card, error)
 }
 
 type CardService struct {

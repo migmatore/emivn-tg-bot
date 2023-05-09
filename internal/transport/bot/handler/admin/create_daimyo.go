@@ -10,15 +10,17 @@ import (
 )
 
 func (h *AdminHandler) EnterDaimyoUsername(ctx context.Context, msg *tgb.MessageUpdate) error {
+	sessionManager := h.sessionManager.Get(ctx)
 	// TODO: create regular expression to check the username is correct
-	h.daimyo.Username = strings.ReplaceAll(msg.Text, "@", "")
+	sessionManager.Daimyo.Username = strings.ReplaceAll(msg.Text, "@", "")
 
-	h.sessionManager.Get(ctx).Step = domain.SessionStepCreateDaimyoNickname
+	sessionManager.Step = domain.SessionStepCreateDaimyoNickname
 	return msg.Answer("Введите nickname").DoVoid(ctx)
 }
 
 func (h *AdminHandler) EnterDaimyoNickname(ctx context.Context, msg *tgb.MessageUpdate) error {
-	h.daimyo.Nickname = msg.Text
+	sessionManager := h.sessionManager.Get(ctx)
+	sessionManager.Daimyo.Nickname = msg.Text
 
 	shoguns, err := h.shogunService.GetAll(ctx)
 	if err != nil {
@@ -31,21 +33,21 @@ func (h *AdminHandler) EnterDaimyoNickname(ctx context.Context, msg *tgb.Message
 		str += "@" + shogun.Username + "\n"
 	}
 
-	h.sessionManager.Get(ctx).Step = domain.SessionStepCreateDaimyo
+	sessionManager.Step = domain.SessionStepCreateDaimyo
 
 	return msg.Answer(fmt.Sprintf("Введите username сёгуна, к которому будет привязан даймё. \nСписок сёгунов: \n%s", str)).
-		ReplyMarkup(tg.NewReplyKeyboardRemove()).
 		DoVoid(ctx)
 }
 
 func (h *AdminHandler) CreateDaimyo(ctx context.Context, msg *tgb.MessageUpdate) error {
+	sessionManager := h.sessionManager.Get(ctx)
 	// TODO: create regular expression to check the username is correct
-	h.daimyo.ShogunUsername = strings.ReplaceAll(msg.Text, "@", "")
+	sessionManager.Daimyo.ShogunUsername = strings.ReplaceAll(msg.Text, "@", "")
 
-	if err := h.daimyoService.Create(ctx, h.daimyo); err != nil {
+	if err := h.daimyoService.Create(ctx, sessionManager.Daimyo); err != nil {
 		return err
 	}
 
-	h.sessionManager.Get(ctx).Step = domain.SessionStepInit
+	h.sessionManager.Reset(sessionManager)
 	return msg.Answer("Даймё успешно создан. Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
 }
