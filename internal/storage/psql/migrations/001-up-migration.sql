@@ -12,13 +12,20 @@ CREATE TABLE daimyo
     shogun_username VARCHAR(255) NOT NULL REFERENCES shoguns (username)
 );
 
+CREATE TABLE bank_types
+(
+    id   INTEGER     NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    name varchar(50) NOT NULL UNIQUE
+);
+
 CREATE TABLE cards
 (
     id              INTEGER      NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     name            VARCHAR(50)  NOT NULL,
     last_digits     INTEGER      NOT NULL UNIQUE,
     daily_limit     INTEGER      NOT NULL DEFAULT 2000000,
-    daimyo_username VARCHAR(255) NOT NULL REFERENCES daimyo (username)
+    daimyo_username VARCHAR(255) NOT NULL REFERENCES daimyo (username),
+    bank_type_id    INTEGER      NOT NULL REFERENCES bank_types (id)
 );
 
 CREATE TABLE samurai
@@ -90,4 +97,8 @@ VALUES ('Администратор'),
 
 INSERT INTO replenishment_request_status(name)
 VALUES ('Активный'),
-       ('Спорный')
+       ('Спорный');
+
+INSERT INTO bank_types(name)
+VALUES ('Тинькофф'),
+       ('Сбербанк');
