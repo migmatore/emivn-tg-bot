@@ -88,6 +88,19 @@ CREATE TABLE user_roles
     role_id  INTEGER      NOT NULL REFERENCES roles (id)
 );
 
+CREATE TABLE tasks
+(
+    id INTEGER      NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    alias VARCHAR(50) NOT NULL,
+    name VARCHAR(50) NOT NULL,
+    arguments TEXT NULL,
+    status INT NOT NULL DEFAULT 0,
+    schedule INT NOT NULL,
+    scheduled_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL
+);
+
 INSERT INTO roles(name)
 VALUES ('Администратор'),
        ('Сёгун'),
