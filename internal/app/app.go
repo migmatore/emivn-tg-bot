@@ -32,6 +32,9 @@ func (a *App) Run(ctx context.Context) error {
 		return err
 	}
 
+	logging.GetLogger(ctx).Info("Database reconnection goroutine initializing...")
+	go pool.Reconnect(ctx, a.config)
+
 	storages := storage.New(pool)
 
 	services := service.New(service.Deps{
