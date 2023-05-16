@@ -21,15 +21,6 @@ const (
 	MinimalSleepDuration = 1 * time.Second
 )
 
-type (
-	TaskPlan map[string]uint
-
-	TaskFunc func(args domain.FuncArgs) (status domain.TaskStatus, when interface{})
-
-	// TaskFuncsMap - list by TaskFunc's (key - task alias, value - TaskFunc)
-	TaskFuncsMap map[string]TaskFunc
-)
-
 var ErrFuncNotFoundInTaskFuncsMap = errors.New("function not found in TaskFuncsMap")
 
 type SchedulerService struct {
@@ -37,17 +28,29 @@ type SchedulerService struct {
 	storage    SchedulerStorage
 
 	sync.RWMutex
-	listeners     TaskFuncsMap
+	listeners     domain.TaskFuncsMap
 	sleepDuration time.Duration
 }
 
-func New(t storage.Transactor, storage SchedulerStorage, listeners TaskFuncsMap, sleepDuration time.Duration) *SchedulerService {
+func New(t storage.Transactor, storage SchedulerStorage) *SchedulerService {
+
+	return &SchedulerService{
+		transactor:    t,
+		storage:       storage,
+		listeners:     make(map[string]domain.TaskFunc, 0),
+		sleepDuration: DefaultSleepDuration,
+	}
+}
+
+func (s *SchedulerService) Configure(listeners domain.TaskFuncsMap, sleepDuration time.Duration) {
+	s.listeners = listeners
+
 	sleep := sleepDuration
 	if sleep == 0 {
 		sleep = DefaultSleepDuration
 	}
 
-	return &SchedulerService{transactor: t, storage: storage, listeners: listeners, sleepDuration: sleep}
+	s.sleepDuration = sleep
 }
 
 func (s *SchedulerService) Add(ctx context.Context, dto domain.TaskDTO) error {
@@ -97,7 +100,7 @@ func (s *SchedulerService) Run(ctx context.Context) error {
 	}
 }
 
-func (s *SchedulerService) exec(ctx context.Context, task *domain.Task, fn TaskFunc) {
+func (s *SchedulerService) exec(ctx context.Context, task *domain.Task, fn domain.TaskFunc) {
 	funcArgs := task.ParseArgs()
 
 	status, when := fn(funcArgs)

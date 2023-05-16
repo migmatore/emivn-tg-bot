@@ -4,6 +4,8 @@ import (
 	"context"
 	"emivn-tg-bot/internal/domain"
 	"emivn-tg-bot/internal/storage"
+	"log"
+	"time"
 )
 
 type DaimyoStorage interface {
@@ -96,4 +98,15 @@ func (s *DaimyoService) GetAll(ctx context.Context) ([]*domain.DaimyoDTO, error)
 	}
 
 	return daimyoDTOs, nil
+}
+
+func (s *DaimyoService) Notify(args domain.FuncArgs) (status domain.TaskStatus, when interface{}) {
+	if name, ok := args["name"]; ok {
+		log.Println("PrintWithArgs:", time.Now(), name)
+		return domain.TaskStatusDeferred, time.Now().Add(time.Second * 10)
+	}
+
+	log.Print("Not found name arg in func args")
+
+	return domain.TaskStatusDeferred, time.Now().Add(time.Second * 10)
 }

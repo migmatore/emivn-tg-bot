@@ -26,6 +26,7 @@ type ShogunService interface {
 type DaimyoService interface {
 	Create(ctx context.Context, dto domain.DaimyoDTO) error
 	GetAll(ctx context.Context) ([]*domain.DaimyoDTO, error)
+	Notify(args domain.FuncArgs) (status domain.TaskStatus, when interface{})
 }
 
 type SamuraiService interface {
@@ -45,6 +46,12 @@ type ReplenishmentRequestService interface {
 	Create(ctx context.Context, dto domain.ReplenishmentRequestDTO) (tg.ChatID, error)
 }
 
+type SchedulerService interface {
+	Configure(listeners domain.TaskFuncsMap, sleepDuration time.Duration)
+	Add(ctx context.Context, dto domain.TaskDTO) error
+	Run(ctx context.Context) error
+}
+
 // TODO: Refactor DI
 type Deps struct {
 	sessionManager *session.Manager[domain.Session]
@@ -56,6 +63,7 @@ type Deps struct {
 	CashManagerService          CashManagerService
 	CardService                 CardService
 	ReplenishmentRequestService ReplenishmentRequestService
+	SchedulerService            SchedulerService
 }
 
 type Handler struct {
@@ -68,6 +76,15 @@ type Handler struct {
 }
 
 func New(deps Deps) *Handler {
+	listenersMap := domain.TaskFuncsMap{
+		"notify_samurai": deps.DaimyoService.Notify,
+	}
+
+	deps.SchedulerService.Configure(listenersMap, time.Second*1)
+
+	if err := deps.SchedulerService.Run(context.Background()); err != nil {
+		log.Printf("scheduler error %v", err)
+	}
 
 	sm := NewSessionManager()
 
@@ -88,6 +105,7 @@ func New(deps Deps) *Handler {
 			deps.CardService,
 			deps.ReplenishmentRequestService,
 			deps.CashManagerService,
+			deps.SchedulerService,
 		),
 	}
 }

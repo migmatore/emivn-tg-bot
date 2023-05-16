@@ -15,7 +15,15 @@ const (
 	TaskStatusDone
 )
 
-type FuncArgs map[string]interface{}
+type (
+	FuncArgs map[string]interface{}
+	TaskPlan map[string]uint
+
+	TaskFunc func(args FuncArgs) (status TaskStatus, when interface{})
+
+	// TaskFuncsMap - list by TaskFunc's (key - task alias, value - TaskFunc)
+	TaskFuncsMap map[string]TaskFunc
+)
 
 type Task struct {
 	TaskId      int
@@ -48,7 +56,6 @@ type TaskDTO struct {
 	Alias           string
 	Name            string
 	Arguments       FuncArgs
-	Status          TaskStatus
 	IntervalMinutes uint
 	RunAt           time.Time
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/mr-linch/go-tg"
 	"github.com/mr-linch/go-tg/tgb"
 	"github.com/mr-linch/go-tg/tgb/session"
+	"time"
 )
 
 type CardService interface {
@@ -21,6 +22,10 @@ type CashManagerService interface {
 	//GetByDaimyoUsername(ctx context.Context, username string) (domain.CashManagerDTO, error)
 }
 
+type SchedulerService interface {
+	Add(ctx context.Context, dto domain.TaskDTO) error
+}
+
 type DaimyoHandler struct {
 	sessionManager *session.Manager[domain.Session]
 
@@ -28,7 +33,7 @@ type DaimyoHandler struct {
 	replenishmentRequestService ReplenishmentRequestService
 	cashManagerService          CashManagerService
 
-	//replenishmentRequest domain.ReplenishmentRequestDTO
+	schedulerService SchedulerService
 }
 
 func NewDaimyoHandler(
@@ -36,17 +41,28 @@ func NewDaimyoHandler(
 	cardService CardService,
 	replenishmentRequestService ReplenishmentRequestService,
 	cashManagerService CashManagerService,
+	schedulerService SchedulerService,
 ) *DaimyoHandler {
 	return &DaimyoHandler{
 		sessionManager:              sm,
 		cardService:                 cardService,
 		replenishmentRequestService: replenishmentRequestService,
 		cashManagerService:          cashManagerService,
-		//replenishmentRequest:        domain.ReplenishmentRequestDTO{},
+		schedulerService:            schedulerService,
 	}
 }
 
 func (h *DaimyoHandler) MenuSelectionHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+	if err := h.schedulerService.Add(ctx, domain.TaskDTO{
+		Alias:           "notify_samurai",
+		Name:            fmt.Sprintf("notify_samurai %s", msg.From.Username),
+		Arguments:       domain.FuncArgs{"chatId": msg.Chat.ID},
+		IntervalMinutes: 0,
+		RunAt:           time.Now().Add(time.Second * 10),
+	}); err != nil {
+		return err
+	}
+
 	switch msg.Text {
 	case domain.DaimyoMenu.MakeReplenishmentRequest:
 		cards, err := h.cardService.GetByUsername(ctx, string(msg.Chat.Username))
