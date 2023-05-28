@@ -7,6 +7,7 @@ import (
 	"github.com/mr-linch/go-tg"
 	"github.com/mr-linch/go-tg/tgb"
 	"github.com/mr-linch/go-tg/tgb/session"
+	"log"
 	"time"
 )
 
@@ -83,6 +84,17 @@ func (h *DaimyoHandler) MenuSelectionHandler(ctx context.Context, msg *tgb.Messa
 		h.sessionManager.Get(ctx).Step = domain.SessionStepInit
 		return msg.Answer("Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
 	}
+}
+
+func (h *DaimyoHandler) Notify(args domain.FuncArgs) (status domain.TaskStatus, when interface{}) {
+	if name, ok := args["name"]; ok {
+		log.Println("PrintWithArgs:", time.Now(), name)
+		return domain.TaskStatusDeferred, time.Now().Add(time.Second * 10)
+	}
+
+	log.Print("Not found name arg in func args")
+
+	return domain.TaskStatusDeferred, time.Now().Add(time.Second * 10)
 }
 
 //

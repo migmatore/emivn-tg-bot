@@ -73,19 +73,11 @@ type Handler struct {
 	StartHandler  *start.StartHandler
 	AdminHandler  *admin.AdminHandler
 	DaimyoHandler *daimyo.DaimyoHandler
+
+	schedulerService SchedulerService
 }
 
 func New(deps Deps) *Handler {
-	listenersMap := domain.TaskFuncsMap{
-		"notify_samurai": deps.DaimyoService.Notify,
-	}
-
-	deps.SchedulerService.Configure(listenersMap, time.Second*1)
-
-	if err := deps.SchedulerService.Run(context.Background()); err != nil {
-		log.Printf("scheduler error %v", err)
-	}
-
 	sm := NewSessionManager()
 
 	return &Handler{
@@ -107,6 +99,7 @@ func New(deps Deps) *Handler {
 			deps.CashManagerService,
 			deps.SchedulerService,
 		),
+		schedulerService: deps.SchedulerService,
 	}
 }
 
@@ -124,6 +117,16 @@ func (h *Handler) Init(ctx context.Context) *tgb.Router {
 	h.registerStartHandlers()
 	h.registerAdminHandlers()
 	h.registerDaimyoHandler()
+
+	listenersMap := domain.TaskFuncsMap{
+		"notify_samurai": h.DaimyoHandler.Notify,
+	}
+
+	h.schedulerService.Configure(listenersMap, time.Second*1)
+
+	if err := h.schedulerService.Run(context.Background()); err != nil {
+		log.Printf("scheduler error %v", err)
+	}
 
 	return h.Router
 }
