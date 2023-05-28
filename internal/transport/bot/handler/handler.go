@@ -26,7 +26,7 @@ type ShogunService interface {
 type DaimyoService interface {
 	Create(ctx context.Context, dto domain.DaimyoDTO) error
 	GetAll(ctx context.Context) ([]*domain.DaimyoDTO, error)
-	Notify(args domain.FuncArgs) (status domain.TaskStatus, when interface{})
+	//Notify(args domain.FuncArgs) (status domain.TaskStatus, when interface{})
 }
 
 type SamuraiService interface {
@@ -118,15 +118,15 @@ func (h *Handler) Init(ctx context.Context) *tgb.Router {
 	h.registerAdminHandlers()
 	h.registerDaimyoHandler()
 
-	listenersMap := domain.TaskFuncsMap{
-		"notify_samurai": h.DaimyoHandler.Notify,
-	}
-
-	h.schedulerService.Configure(listenersMap, time.Second*1)
-
-	if err := h.schedulerService.Run(context.Background()); err != nil {
-		log.Printf("scheduler error %v", err)
-	}
+	//listenersMap := domain.TaskFuncsMap{
+	//	"notify_samurai": h.DaimyoHandler.Notify,
+	//}
+	//
+	//h.schedulerService.Configure(listenersMap, time.Second*1)
+	//
+	//if err := h.schedulerService.Run(context.Background()); err != nil {
+	//	log.Printf("scheduler error %v", err)
+	//}
 
 	return h.Router
 }
