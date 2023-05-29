@@ -17,9 +17,16 @@ func NewCashManagerStorage(pool psql.AtomicPoolClient) *CashManagerStorage {
 }
 
 func (s *CashManagerStorage) Insert(ctx context.Context, cashManager domain.CashManager) error {
-	q := `insert into cash_managers(username, nickname) values ($1, $2)`
+	q := `insert into cash_managers(username, nickname, shogun_username, chat_id) values ($1, $2, $3, $4)`
 
-	if _, err := s.pool.Exec(ctx, q, cashManager.Username, cashManager.Nickname); err != nil {
+	if _, err := s.pool.Exec(
+		ctx,
+		q,
+		cashManager.Username,
+		cashManager.Nickname,
+		cashManager.ShogunUsername,
+		cashManager.ChatId,
+	); err != nil {
 		if err := utils.ParsePgError(err); err != nil {
 			logging.GetLogger(ctx).Errorf("Error: %v", err)
 			return err

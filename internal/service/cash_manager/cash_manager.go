@@ -43,8 +43,10 @@ func NewCashManagerService(
 
 func (s *CashManagerService) Create(ctx context.Context, dto domain.CashManagerDTO) error {
 	cashManager := domain.CashManager{
-		Username: dto.Username,
-		Nickname: dto.Nickname,
+		Username:       dto.Username,
+		Nickname:       dto.Nickname,
+		ShogunUsername: dto.ShogunUsername,
+		ChatId:         dto.ChatId,
 	}
 
 	roleId, err := s.roleStorage.GetIdByName(ctx, domain.CashManagerRole.String())

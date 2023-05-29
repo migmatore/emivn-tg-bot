@@ -7,6 +7,7 @@ import (
 	"github.com/mr-linch/go-tg"
 	"github.com/mr-linch/go-tg/tgb"
 	"strconv"
+	"strings"
 )
 
 func (h *AdminHandler) EnterCardName(ctx context.Context, msg *tgb.MessageUpdate) error {
@@ -60,7 +61,7 @@ func (h *AdminHandler) EnterCardDailyLimit(ctx context.Context, msg *tgb.Message
 
 func (h *AdminHandler) EnterCardDaimyoUsernameAndCreate(ctx context.Context, msg *tgb.MessageUpdate) error {
 	sessionManager := h.sessionManager.Get(ctx)
-	sessionManager.Card.DaimyoUsername = msg.Text
+	sessionManager.Card.DaimyoUsername = strings.ReplaceAll(msg.Text, "@", "")
 
 	if err := h.cardService.Create(ctx, sessionManager.Card); err != nil {
 		return err

@@ -54,15 +54,15 @@ func NewDaimyoHandler(
 }
 
 func (h *DaimyoHandler) MenuSelectionHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
-	if err := h.schedulerService.Add(ctx, domain.TaskDTO{
-		Alias:           "notify_samurai",
-		Name:            fmt.Sprintf("notify_samurai %s", msg.From.Username),
-		Arguments:       domain.FuncArgs{"chatId": msg.Chat.ID},
-		IntervalMinutes: 0,
-		RunAt:           time.Now().Add(time.Second * 10),
-	}); err != nil {
-		return err
-	}
+	//if err := h.schedulerService.Add(ctx, domain.TaskDTO{
+	//	Alias:           "notify_samurai",
+	//	Name:            fmt.Sprintf("notify_samurai %s", msg.From.Username),
+	//	Arguments:       domain.FuncArgs{"chatId": msg.Chat.ID},
+	//	IntervalMinutes: 0,
+	//	RunAt:           time.Now().Add(time.Second * 10),
+	//}); err != nil {
+	//	return err
+	//}
 
 	switch msg.Text {
 	case domain.DaimyoMenu.MakeReplenishmentRequest:
