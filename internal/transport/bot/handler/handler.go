@@ -13,6 +13,10 @@ import (
 	"time"
 )
 
+type TransactorService interface {
+	WithinTransaction(ctx context.Context, txFunc func(context context.Context) error) error
+}
+
 type AuthService interface {
 	//CheckAuthRole(ctx context.Context, username string, requiredRole domain.Role) (bool, error)
 	GetRole(ctx context.Context, username string) (string, error)
@@ -46,12 +50,6 @@ type ReplenishmentRequestService interface {
 	Create(ctx context.Context, dto domain.ReplenishmentRequestDTO) (tg.ChatID, error)
 }
 
-type SchedulerService interface {
-	Configure(listeners domain.TaskFuncsMap, sleepDuration time.Duration)
-	Add(ctx context.Context, dto domain.TaskDTO) error
-	Run(ctx context.Context) error
-}
-
 // TODO: Refactor DI
 type Deps struct {
 	sessionManager *session.Manager[domain.Session]
@@ -63,7 +61,9 @@ type Deps struct {
 	CashManagerService          CashManagerService
 	CardService                 CardService
 	ReplenishmentRequestService ReplenishmentRequestService
-	SchedulerService            SchedulerService
+
+	TransactorService TransactorService
+	SchedulerService  SchedulerService
 }
 
 type Handler struct {
@@ -74,7 +74,7 @@ type Handler struct {
 	AdminHandler  *admin.AdminHandler
 	DaimyoHandler *daimyo.DaimyoHandler
 
-	schedulerService SchedulerService
+	scheduler *Scheduler
 }
 
 func New(deps Deps) *Handler {
@@ -83,6 +83,7 @@ func New(deps Deps) *Handler {
 	return &Handler{
 		Router:         tgb.NewRouter(),
 		sessionManager: sm.Manager,
+		scheduler:      NewScheduler(deps.TransactorService, deps.SchedulerService),
 		StartHandler:   start.NewStartHandler(sm.Manager, deps.AuthService),
 		AdminHandler: admin.NewAdminHandler(
 			sm.Manager,
@@ -97,9 +98,7 @@ func New(deps Deps) *Handler {
 			deps.CardService,
 			deps.ReplenishmentRequestService,
 			deps.CashManagerService,
-			deps.SchedulerService,
 		),
-		schedulerService: deps.SchedulerService,
 	}
 }
 

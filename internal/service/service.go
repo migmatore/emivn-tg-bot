@@ -32,6 +32,8 @@ type Deps struct {
 }
 
 type Service struct {
+	Transactor *TransactorService
+
 	Auth                 *auth.AuthService
 	Shogun               *shogun.ShogunService
 	Daimyo               *daimyo.DaimyoService
@@ -44,6 +46,8 @@ type Service struct {
 
 func New(deps Deps) *Service {
 	return &Service{
+		Transactor: NewTransactorService(deps.Transactor),
+
 		Auth:   auth.NewAuthService(deps.AuthStorage),
 		Shogun: shogun.NewShogunService(deps.Transactor, deps.ShogunStorage, deps.UserRoleStorage, deps.RoleStorage),
 		Daimyo: daimyo.NewDaimyoService(

@@ -42,14 +42,12 @@ func NewDaimyoHandler(
 	cardService CardService,
 	replenishmentRequestService ReplenishmentRequestService,
 	cashManagerService CashManagerService,
-	schedulerService SchedulerService,
 ) *DaimyoHandler {
 	return &DaimyoHandler{
 		sessionManager:              sm,
 		cardService:                 cardService,
 		replenishmentRequestService: replenishmentRequestService,
 		cashManagerService:          cashManagerService,
-		schedulerService:            schedulerService,
 	}
 }
 

@@ -52,6 +52,7 @@ func (a *App) Run(ctx context.Context) error {
 	})
 
 	handlers := handler.New(handler.Deps{
+		TransactorService:           services.Transactor,
 		AuthService:                 services.Auth,
 		ShogunService:               services.Shogun,
 		DaimyoService:               services.Daimyo,
