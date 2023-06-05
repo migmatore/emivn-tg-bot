@@ -43,7 +43,6 @@ func (h *AdminHandler) EnterCashManagerNickname(ctx context.Context, msg *tgb.Me
 func (h *AdminHandler) CreateCashManager(ctx context.Context, msg *tgb.MessageUpdate) error {
 	sessionManager := h.sessionManager.Get(ctx)
 	sessionManager.CashManager.ShogunUsername = strings.ReplaceAll(msg.Text, "@", "")
-	sessionManager.CashManager.ChatId = int(msg.Chat.ID)
 
 	if err := h.cashManagerService.Create(ctx, sessionManager.CashManager); err != nil {
 		return err

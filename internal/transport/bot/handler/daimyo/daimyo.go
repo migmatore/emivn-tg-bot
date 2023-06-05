@@ -102,43 +102,43 @@ func (h *DaimyoHandler) Notify(args domain.FuncArgs) (status domain.TaskStatus, 
 }
 
 //
-//func (h *DaimyoHandler) CreateEntityMenuSelectionHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+//func (h *DaimyoHandler) CreateEntityMenuHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 //	switch msg.Text {
-//	case domain.AdminCreateEnityMenu.CreateShogun:
+//	case domain.AdminCreateEntityMenu.CreateShogun:
 //		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateShogunUsername
 //
 //		return msg.Answer(fmt.Sprintf("Введите telegram username")).
 //			ReplyMarkup(tg.NewReplyKeyboardRemove()).
 //			DoVoid(ctx)
 //
-//	case domain.AdminCreateEnityMenu.CreateDaimyo:
+//	case domain.AdminCreateEntityMenu.CreateDaimyo:
 //		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateDaimyoUsername
 //
 //		return msg.Answer(fmt.Sprintf("Введите telegram username")).
 //			ReplyMarkup(tg.NewReplyKeyboardRemove()).
 //			DoVoid(ctx)
 //
-//	case domain.AdminCreateEnityMenu.CreateSamurai:
+//	case domain.AdminCreateEntityMenu.CreateSamurai:
 //		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateSamuraiUsername
 //
 //		return msg.Answer(fmt.Sprintf("Введите telegram username")).
 //			ReplyMarkup(tg.NewReplyKeyboardRemove()).
 //			DoVoid(ctx)
 //
-//	case domain.AdminCreateEnityMenu.CreateCashManager:
+//	case domain.AdminCreateEntityMenu.CreateCashManager:
 //		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateCashManagerUsername
 //
 //		return msg.Answer(fmt.Sprintf("Введите telegram username")).
 //			ReplyMarkup(tg.NewReplyKeyboardRemove()).
 //			DoVoid(ctx)
 //
-//	case domain.AdminCreateEnityMenu.CreateCard:
+//	case domain.AdminCreateEntityMenu.CreateCard:
 //		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateCardName
 //
 //		return msg.Answer(fmt.Sprintf("Введите название карты")).
 //			ReplyMarkup(tg.NewReplyKeyboardRemove()).
 //			DoVoid(ctx)
-//	//case domain.AdminCreateEnityMenu.Back:
+//	//case domain.AdminCreateEntityMenu.Back:
 //	//	h.sessionManager.Get(ctx).Step = domain.SessionStepInit
 //	//	return msg.Answer("Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
 //	default:

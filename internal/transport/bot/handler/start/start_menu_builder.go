@@ -8,7 +8,12 @@ import (
 func buildAdminStartMenu() *tg.ReplyKeyboardMarkup {
 	return tg.NewReplyKeyboardMarkup(
 		tg.NewButtonColumn(
-			tg.NewKeyboardButton(domain.AdminMenu.CreateEntity),
+			tg.NewKeyboardButton(domain.AdminMainMenu.RequestsList),
+			tg.NewKeyboardButton(domain.AdminMainMenu.Cards),
+			tg.NewKeyboardButton(domain.AdminMainMenu.Report),
+			tg.NewKeyboardButton(domain.AdminMainMenu.Hierarchy),
+			tg.NewKeyboardButton(domain.AdminMainMenu.UploadData),
+			tg.NewKeyboardButton(domain.AdminMainMenu.Deposits),
 		)...,
 	).WithResizeKeyboardMarkup()
 }

@@ -32,13 +32,25 @@ func (s *StartHandler) Start(ctx context.Context, msg *tgb.MessageUpdate) error 
 
 	switch role {
 	case domain.AdminRole.String():
-		s.sessionManager.Get(ctx).Step = domain.SessionStepAdminMenuHandler
+		s.sessionManager.Get(ctx).Step = domain.SessionStepAdminMainMenuHandler
 
 		return msg.Answer("Пожалуйста, выберите действие").
 			ReplyMarkup(buildAdminStartMenu()).
 			DoVoid(ctx)
 	case domain.DaimyoRole.String():
 		s.sessionManager.Get(ctx).Step = domain.SessionStepDaimyoMenuHandler
+
+		return msg.Answer("Пожалуйста, выберите действие").
+			ReplyMarkup(buildDaimyoStartMenu()).
+			DoVoid(ctx)
+	case domain.SamuraiRole.String():
+		s.sessionManager.Get(ctx).Step = domain.SessionStepSamuraiMenuHandler
+
+		return msg.Answer("Пожалуйста, выберите действие").
+			ReplyMarkup(buildDaimyoStartMenu()).
+			DoVoid(ctx)
+	case domain.CashManagerRole.String():
+		s.sessionManager.Get(ctx).Step = domain.SessionStepCashManagerMenuHandler
 
 		return msg.Answer("Пожалуйста, выберите действие").
 			ReplyMarkup(buildDaimyoStartMenu()).

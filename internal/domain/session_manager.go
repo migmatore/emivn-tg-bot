@@ -6,7 +6,8 @@ const (
 	SessionStepInit = iota
 
 	// admin steps
-	SessionStepAdminMenuHandler
+	SessionStepAdminMainMenuHandler
+	SessionStepHierarchyMenuHandler
 
 	SessionStepCreateEntityHandler
 
@@ -38,6 +39,10 @@ const (
 	SessionStepEnterReplenishmentRequestCardName
 	SessionStepEnterReplenishmentRequestAmount
 	SessionStepMakeReplenishmentRequest
+
+	SessionStepSamuraiMenuHandler
+
+	SessionStepCashManagerMenuHandler
 )
 
 type Session struct {

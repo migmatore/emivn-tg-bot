@@ -40,12 +40,6 @@ type AdminHandler struct {
 	samuraiService     SamuraiService
 	cashManagerService CashManagerService
 	cardService        CardService
-
-	//shogun      domain.ShogunDTO
-	//daimyo      domain.DaimyoDTO
-	//samurai     domain.SamuraiDTO
-	//cashManager domain.CashManagerDTO
-	//card        domain.CardDTO
 }
 
 func NewAdminHandler(
@@ -63,68 +57,83 @@ func NewAdminHandler(
 		samuraiService:     samuraiService,
 		cashManagerService: cashManagerService,
 		cardService:        cardService,
-		//shogun:             domain.ShogunDTO{},
-		//daimyo:             domain.DaimyoDTO{},
-		//samurai:            domain.SamuraiDTO{},
-		//cashManager:        domain.CashManagerDTO{},
-		//card:               domain.CardDTO{},
 	}
 }
 
-func (h *AdminHandler) MenuSelectionHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+func (h *AdminHandler) MainMenuHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	switch msg.Text {
-	case domain.AdminMenu.CreateEntity:
-		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateEntityHandler
+	case domain.AdminMainMenu.Hierarchy:
+		h.sessionManager.Get(ctx).Step = domain.SessionStepHierarchyMenuHandler
 
 		kb := tg.NewReplyKeyboardMarkup(
 			tg.NewButtonColumn(
-				tg.NewKeyboardButton(domain.AdminCreateEnityMenu.CreateShogun),
-				tg.NewKeyboardButton(domain.AdminCreateEnityMenu.CreateDaimyo),
-				tg.NewKeyboardButton(domain.AdminCreateEnityMenu.CreateSamurai),
-				tg.NewKeyboardButton(domain.AdminCreateEnityMenu.CreateCashManager),
-				tg.NewKeyboardButton(domain.AdminCreateEnityMenu.CreateCard),
+				tg.NewKeyboardButton(domain.AdminMainMenu.Hierarchy),
+				tg.NewKeyboardButton(domain.AdminCreateEntityMenu.CreateDaimyo),
 			)...,
 		).WithResizeKeyboardMarkup()
 
-		return msg.Update.Reply(ctx, msg.Answer(fmt.Sprintf("Выберите сущность, которую хотите создать")).
-			ReplyMarkup(kb))
+		return msg.Answer("Выберите действие").ReplyMarkup(kb).DoVoid(ctx)
+
 	default:
 		h.sessionManager.Get(ctx).Step = domain.SessionStepInit
 		return msg.Answer("Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
 	}
 }
 
-func (h *AdminHandler) CreateEntityMenuSelectionHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+func (h *AdminHandler) HierarchyMenuHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	switch msg.Text {
-	case domain.AdminCreateEnityMenu.CreateShogun:
+	case domain.AdminHierarchyMenu.CreateEntity:
+		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateEntityHandler
+
+		kb := tg.NewReplyKeyboardMarkup(
+			tg.NewButtonColumn(
+				tg.NewKeyboardButton(domain.AdminCreateEntityMenu.CreateShogun),
+				tg.NewKeyboardButton(domain.AdminCreateEntityMenu.CreateDaimyo),
+				tg.NewKeyboardButton(domain.AdminCreateEntityMenu.CreateSamurai),
+				tg.NewKeyboardButton(domain.AdminCreateEntityMenu.CreateCashManager),
+				tg.NewKeyboardButton(domain.AdminCreateEntityMenu.CreateCard),
+			)...,
+		).WithResizeKeyboardMarkup()
+
+		return msg.Answer("Выберите сущность, которую хотите создать").ReplyMarkup(kb).DoVoid(ctx)
+
+	default:
+		h.sessionManager.Get(ctx).Step = domain.SessionStepInit
+		return msg.Answer("Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
+	}
+}
+
+func (h *AdminHandler) CreateEntityMenuHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+	switch msg.Text {
+	case domain.AdminCreateEntityMenu.CreateShogun:
 		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateShogunUsername
 
 		return msg.Answer(fmt.Sprintf("Введите telegram username")).
 			ReplyMarkup(tg.NewReplyKeyboardRemove()).
 			DoVoid(ctx)
 
-	case domain.AdminCreateEnityMenu.CreateDaimyo:
+	case domain.AdminCreateEntityMenu.CreateDaimyo:
 		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateDaimyoUsername
 
 		return msg.Answer(fmt.Sprintf("Введите telegram username")).
 			ReplyMarkup(tg.NewReplyKeyboardRemove()).
 			DoVoid(ctx)
 
-	case domain.AdminCreateEnityMenu.CreateSamurai:
+	case domain.AdminCreateEntityMenu.CreateSamurai:
 		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateSamuraiUsername
 
 		return msg.Answer(fmt.Sprintf("Введите telegram username")).
 			ReplyMarkup(tg.NewReplyKeyboardRemove()).
 			DoVoid(ctx)
 
-	case domain.AdminCreateEnityMenu.CreateCashManager:
+	case domain.AdminCreateEntityMenu.CreateCashManager:
 		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateCashManagerUsername
 
 		return msg.Answer(fmt.Sprintf("Введите telegram username")).
 			ReplyMarkup(tg.NewReplyKeyboardRemove()).
 			DoVoid(ctx)
 
-	case domain.AdminCreateEnityMenu.CreateCard:
+	case domain.AdminCreateEntityMenu.CreateCard:
 		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateCardBank
 
 		banks, err := h.cardService.GetBankNames(ctx)
@@ -147,7 +156,7 @@ func (h *AdminHandler) CreateEntityMenuSelectionHandler(ctx context.Context, msg
 		return msg.Answer(fmt.Sprintf("Выберите банк")).
 			ReplyMarkup(kb).
 			DoVoid(ctx)
-	//case domain.AdminCreateEnityMenu.Back:
+	//case domain.AdminCreateEntityMenu.Back:
 	//	h.sessionManager.Get(ctx).Step = domain.SessionStepInit
 	//	return msg.Answer("Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
 	default:

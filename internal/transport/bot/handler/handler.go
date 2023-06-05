@@ -4,7 +4,10 @@ import (
 	"context"
 	"emivn-tg-bot/internal/domain"
 	"emivn-tg-bot/internal/transport/bot/handler/admin"
+	"emivn-tg-bot/internal/transport/bot/handler/cash_manager"
 	"emivn-tg-bot/internal/transport/bot/handler/daimyo"
+	"emivn-tg-bot/internal/transport/bot/handler/samurai"
+	"emivn-tg-bot/internal/transport/bot/handler/shogun"
 	"emivn-tg-bot/internal/transport/bot/handler/start"
 	"github.com/mr-linch/go-tg"
 	"github.com/mr-linch/go-tg/tgb"
@@ -69,9 +72,12 @@ type Handler struct {
 	*tgb.Router
 	sessionManager *session.Manager[domain.Session]
 
-	StartHandler  *start.StartHandler
-	AdminHandler  *admin.AdminHandler
-	DaimyoHandler *daimyo.DaimyoHandler
+	StartHandler       *start.StartHandler
+	AdminHandler       *admin.AdminHandler
+	DaimyoHandler      *daimyo.DaimyoHandler
+	CashManagerHandler *cash_manager.CashManagerHandler
+	SamuraiHandler     *samurai.SamuraiHandler
+	ShogunHandler      *shogun.ShogunHandler
 
 	scheduler *Scheduler
 }
@@ -99,6 +105,9 @@ func New(deps Deps) *Handler {
 			deps.ReplenishmentRequestService,
 			deps.CashManagerService,
 		),
+		CashManagerHandler: cash_manager.NewCashManagerHandler(sm.Manager),
+		SamuraiHandler:     samurai.NewSamuraiHandler(sm.Manager),
+		ShogunHandler:      shogun.NewShogunHandler(sm.Manager),
 	}
 }
 

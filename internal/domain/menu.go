@@ -2,13 +2,31 @@ package domain
 
 // TODO: menu code refactoring(with back button)
 
-var AdminMenu = struct {
-	CreateEntity string
+var AdminMainMenu = struct {
+	Cards        string
+	RequestsList string
+	Report       string
+	Hierarchy    string
+	UploadData   string
+	Deposits     string
 }{
-	CreateEntity: "Создать сущность",
+	Cards:        "Карты",
+	RequestsList: "Список заявок",
+	Report:       "Запросить отчет",
+	Hierarchy:    "Иерархия",
+	UploadData:   "Выгрузить данные",
+	Deposits:     "Пополнения",
 }
 
-var AdminCreateEnityMenu = struct {
+var AdminHierarchyMenu = struct {
+	CreateEntity    string
+	InSubordination string
+}{
+	CreateEntity:    "Создать",
+	InSubordination: "В подчинении",
+}
+
+var AdminCreateEntityMenu = struct {
 	CreateShogun      string
 	CreateDaimyo      string
 	CreateSamurai     string
@@ -29,9 +47,3 @@ var DaimyoMenu = struct {
 }{
 	MakeReplenishmentRequest: "Сделать запрос на пополнение карты",
 }
-
-//var Menu = tg.NewReplyKeyboardMarkup(
-//	tg.NewButtonColumn(
-//		tg.NewKeyboardButton(AdminMenu.CreateEntity),
-//	)...,
-//).WithResizeKeyboardMarkup()
