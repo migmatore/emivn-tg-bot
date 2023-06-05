@@ -25,6 +25,7 @@ const (
 	SessionStepCreateCashManagerNickname
 	SessionStepCreateCashManager
 
+	SessionStepCreateCardBank
 	SessionStepCreateCardName
 	SessionStepCreateCardLastDigits
 	SessionStepCreateCardDailyLimit
@@ -34,6 +35,7 @@ const (
 
 	// diamyo steps
 	SessionStepDaimyoMenuHandler
+	SessionStepEnterReplenishmentRequestCardName
 	SessionStepEnterReplenishmentRequestAmount
 	SessionStepMakeReplenishmentRequest
 )

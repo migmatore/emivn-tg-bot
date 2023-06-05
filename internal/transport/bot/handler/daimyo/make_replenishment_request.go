@@ -3,10 +3,30 @@ package daimyo
 import (
 	"context"
 	"emivn-tg-bot/internal/domain"
+	"fmt"
 	"github.com/mr-linch/go-tg"
 	"github.com/mr-linch/go-tg/tgb"
 	"strconv"
 )
+
+func (h *DaimyoHandler) EnterCardName(ctx context.Context, msg *tgb.MessageUpdate) error {
+	cards, err := h.cardService.GetByUsername(ctx, msg.Text, string(msg.Chat.Username))
+	if err != nil {
+		return err
+	}
+
+	var str string
+
+	for i, card := range cards {
+		str += fmt.Sprintf("%d. %s\n", i+1, card.Name)
+	}
+
+	h.sessionManager.Get(ctx).Step = domain.SessionStepEnterReplenishmentRequestAmount
+
+	return msg.Answer(fmt.Sprintf("Введите название карты из списка, которую хотите пополнить: \n%s", str)).
+		ReplyMarkup(tg.NewReplyKeyboardRemove()).
+		DoVoid(ctx)
+}
 
 func (h *DaimyoHandler) EnterReplenishmentRequestAmount(ctx context.Context, msg *tgb.MessageUpdate) error {
 	sessionManager := h.sessionManager.Get(ctx)
@@ -34,7 +54,7 @@ func (h *DaimyoHandler) MakeReplenishmentRequest(ctx context.Context, msg *tgb.M
 	}
 
 	if err := msg.Client.SendMessage(chatId, "RepReq").DoVoid(ctx); err != nil {
-		return err
+		// TODO
 	}
 
 	h.sessionManager.Reset(sessionManager)

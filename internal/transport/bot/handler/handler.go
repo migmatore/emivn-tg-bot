@@ -9,8 +9,6 @@ import (
 	"github.com/mr-linch/go-tg"
 	"github.com/mr-linch/go-tg/tgb"
 	"github.com/mr-linch/go-tg/tgb/session"
-	"log"
-	"time"
 )
 
 type TransactorService interface {
@@ -43,7 +41,8 @@ type CashManagerService interface {
 
 type CardService interface {
 	Create(ctx context.Context, dto domain.CardDTO) error
-	GetByUsername(ctx context.Context, daimyoUsername string) ([]*domain.CardDTO, error)
+	GetByUsername(ctx context.Context, bankName string, daimyoUsername string) ([]*domain.CardDTO, error)
+	GetBankNames(ctx context.Context) ([]*domain.BankDTO, error)
 }
 
 type ReplenishmentRequestService interface {
@@ -79,11 +78,12 @@ type Handler struct {
 
 func New(deps Deps) *Handler {
 	sm := NewSessionManager()
+	scheduler := NewScheduler(deps.TransactorService, deps.SchedulerService)
 
 	return &Handler{
 		Router:         tgb.NewRouter(),
 		sessionManager: sm.Manager,
-		scheduler:      NewScheduler(deps.TransactorService, deps.SchedulerService),
+		scheduler:      scheduler,
 		StartHandler:   start.NewStartHandler(sm.Manager, deps.AuthService),
 		AdminHandler: admin.NewAdminHandler(
 			sm.Manager,
@@ -103,15 +103,21 @@ func New(deps Deps) *Handler {
 }
 
 func (h *Handler) Init(ctx context.Context) *tgb.Router {
-	h.Router.Use(tgb.MiddlewareFunc(func(next tgb.Handler) tgb.Handler {
-		return tgb.HandlerFunc(func(ctx context.Context, update *tgb.Update) error {
-			defer func(started time.Time) {
-				log.Printf("%#v [%s]", update, time.Since(started))
-			}(time.Now())
+	//listenersMap := domain.TaskFuncsMap{
+	//	"notify_samurai": h.DaimyoHandler.Notify,
+	//}
+	//
+	//h.scheduler.Configure()
 
-			return next.Handle(ctx, update)
-		})
-	}))
+	//h.Router.Use(tgb.MiddlewareFunc(func(next tgb.Handler) tgb.Handler {
+	//	return tgb.HandlerFunc(func(ctx context.Context, update *tgb.Update) error {
+	//		defer func(started time.Time) {
+	//			log.Printf("%#v [%s]", update, time.Since(started))
+	//		}(time.Now())
+	//
+	//		return next.Handle(ctx, update)
+	//	})
+	//}))
 	h.registerSession()
 	h.registerStartHandlers()
 	h.registerAdminHandlers()

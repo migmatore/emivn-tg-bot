@@ -17,9 +17,17 @@ func NewCardStorage(pool psql.AtomicPoolClient) *CardStorage {
 }
 
 func (s *CardStorage) Insert(ctx context.Context, card domain.Card) error {
-	q := `insert into cards(name, last_digits, daily_limit, daimyo_username) values ($1, $2, $3, $4)`
+	q := `insert into cards(name, last_digits, daily_limit, daimyo_username, bank_type_id) values ($1, $2, $3, $4, $5)`
 
-	if _, err := s.pool.Exec(ctx, q, card.Name, card.LastDigits, card.DailyLimit, card.DaimyoUsername); err != nil {
+	if _, err := s.pool.Exec(
+		ctx,
+		q,
+		card.Name,
+		card.LastDigits,
+		card.DailyLimit,
+		card.DaimyoUsername,
+		card.BankTypeId,
+	); err != nil {
 		if err := utils.ParsePgError(err); err != nil {
 			logging.GetLogger(ctx).Errorf("Error: %v", err)
 			return err
@@ -32,12 +40,13 @@ func (s *CardStorage) Insert(ctx context.Context, card domain.Card) error {
 	return nil
 }
 
-func (s *CardStorage) GetByUsername(ctx context.Context, daimyoUsername string) ([]*domain.Card, error) {
-	q := `select id, name, last_digits, daily_limit, daimyo_username from cards where daimyo_username=$1`
+func (s *CardStorage) GetByUsername(ctx context.Context, bankId int, daimyoUsername string) ([]*domain.Card, error) {
+	q := `select id, name, last_digits, daily_limit, daimyo_username, bank_type_id from cards where daimyo_username=$1 
+                                                                        and bank_type_id=$2`
 
 	cards := make([]*domain.Card, 0)
 
-	rows, err := s.pool.Query(ctx, q, daimyoUsername)
+	rows, err := s.pool.Query(ctx, q, daimyoUsername, bankId)
 	if err != nil {
 		logging.GetLogger(ctx).Errorf("Query error. %v", err)
 		return nil, err
@@ -48,7 +57,14 @@ func (s *CardStorage) GetByUsername(ctx context.Context, daimyoUsername string) 
 	for rows.Next() {
 		var card domain.Card
 
-		err := rows.Scan(&card.CardId, &card.Name, &card.LastDigits, &card.DailyLimit, &card.DaimyoUsername)
+		err := rows.Scan(
+			&card.CardId,
+			&card.Name,
+			&card.LastDigits,
+			&card.DailyLimit,
+			&card.DaimyoUsername,
+			&card.BankTypeId,
+		)
 		if err != nil {
 			logging.GetLogger(ctx).Errorf("Query error. %v", err)
 			return nil, err
@@ -82,4 +98,50 @@ func (s *CardStorage) GetByName(ctx context.Context, name string) (domain.Card, 
 	}
 
 	return card, nil
+}
+
+func (s *CardStorage) GetBankNames(ctx context.Context) ([]*domain.Bank, error) {
+	q := `select id, name from bank_types`
+
+	banks := make([]*domain.Bank, 0)
+
+	rows, err := s.pool.Query(ctx, q)
+	if err != nil {
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var bank domain.Bank
+
+		err := rows.Scan(&bank.BankId, &bank.Name)
+		if err != nil {
+			logging.GetLogger(ctx).Errorf("Query error. %v", err)
+			return nil, err
+		}
+
+		banks = append(banks, &bank)
+	}
+
+	return banks, nil
+}
+
+func (s *CardStorage) GetBankIdByName(ctx context.Context, bankName string) (int, error) {
+	q := `select id from bank_types where name=$1`
+
+	var id int
+
+	if err := s.pool.QueryRow(ctx, q, bankName).Scan(&id); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			logging.GetLogger(ctx).Errorf("Error: %v", err)
+			return id, err
+		}
+
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return id, err
+	}
+
+	return id, nil
 }

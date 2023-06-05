@@ -29,6 +29,7 @@ type CashManagerService interface {
 
 type CardService interface {
 	Create(ctx context.Context, dto domain.CardDTO) error
+	GetBankNames(ctx context.Context) ([]*domain.BankDTO, error)
 }
 
 type AdminHandler struct {
@@ -124,10 +125,27 @@ func (h *AdminHandler) CreateEntityMenuSelectionHandler(ctx context.Context, msg
 			DoVoid(ctx)
 
 	case domain.AdminCreateEnityMenu.CreateCard:
-		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateCardName
+		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateCardBank
 
-		return msg.Answer(fmt.Sprintf("Введите название карты")).
-			ReplyMarkup(tg.NewReplyKeyboardRemove()).
+		banks, err := h.cardService.GetBankNames(ctx)
+		if err != nil {
+			return err
+		}
+
+		buttons := make([]tg.KeyboardButton, 0)
+
+		for _, item := range banks {
+			buttons = append(buttons, tg.NewKeyboardButton(item.Name))
+		}
+
+		kb := tg.NewReplyKeyboardMarkup(
+			tg.NewButtonColumn(
+				buttons...,
+			)...,
+		).WithResizeKeyboardMarkup()
+
+		return msg.Answer(fmt.Sprintf("Выберите банк")).
+			ReplyMarkup(kb).
 			DoVoid(ctx)
 	//case domain.AdminCreateEnityMenu.Back:
 	//	h.sessionManager.Get(ctx).Step = domain.SessionStepInit

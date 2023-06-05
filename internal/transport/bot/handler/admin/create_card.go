@@ -10,6 +10,18 @@ import (
 	"strings"
 )
 
+func (h *AdminHandler) CardBank(ctx context.Context, msg *tgb.MessageUpdate) error {
+	sessionManager := h.sessionManager.Get(ctx)
+
+	sessionManager.Card.BankType = msg.Text
+
+	sessionManager.Step = domain.SessionStepCreateCardName
+
+	return msg.Answer(fmt.Sprintf("Введите название карты")).
+		ReplyMarkup(tg.NewReplyKeyboardRemove()).
+		DoVoid(ctx)
+}
+
 func (h *AdminHandler) EnterCardName(ctx context.Context, msg *tgb.MessageUpdate) error {
 	sessionManager := h.sessionManager.Get(ctx)
 	sessionManager.Card.Name = msg.Text

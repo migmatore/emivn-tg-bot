@@ -3,9 +3,6 @@ package scheduler
 import (
 	"context"
 	"emivn-tg-bot/internal/domain"
-	"emivn-tg-bot/internal/storage"
-	"errors"
-	"sync"
 	"time"
 )
 
@@ -15,50 +12,17 @@ type SchedulerStorage interface {
 	Update(ctx context.Context, task *domain.Task) error
 }
 
-const (
-	DefaultSleepDuration = 30 * time.Second
-	MinimalSleepDuration = 1 * time.Second
-)
-
-var ErrFuncNotFoundInTaskFuncsMap = errors.New("function not found in TaskFuncsMap")
-
 type SchedulerService struct {
-	transactor storage.Transactor
-	storage    SchedulerStorage
-
-	sync.RWMutex
-	listeners     domain.TaskFuncsMap
-	sleepDuration time.Duration
+	storage SchedulerStorage
 }
 
-func New(t storage.Transactor, storage SchedulerStorage) *SchedulerService {
-
+func New(storage SchedulerStorage) *SchedulerService {
 	return &SchedulerService{
-		transactor:    t,
-		storage:       storage,
-		listeners:     make(map[string]domain.TaskFunc, 0),
-		sleepDuration: DefaultSleepDuration,
+		storage: storage,
 	}
 }
 
-func (s *SchedulerService) Configure(listeners domain.TaskFuncsMap, sleepDuration time.Duration) {
-	s.listeners = listeners
-
-	sleep := sleepDuration
-	if sleep == 0 {
-		sleep = DefaultSleepDuration
-	}
-
-	s.sleepDuration = sleep
-}
-
-func (s *SchedulerService) Add(ctx context.Context, dto domain.TaskDTO) error {
-	s.RLock()
-	defer s.RUnlock()
-	if _, ok := s.listeners[dto.Alias]; !ok {
-		return ErrFuncNotFoundInTaskFuncsMap
-	}
-
+func (s *SchedulerService) Create(ctx context.Context, dto domain.TaskDTO) error {
 	task := domain.Task{
 		Alias:       dto.Alias,
 		Name:        dto.Name,
@@ -69,4 +33,12 @@ func (s *SchedulerService) Add(ctx context.Context, dto domain.TaskDTO) error {
 	}
 
 	return s.storage.Insert(ctx, task)
+}
+
+func (s *SchedulerService) UpdateTime(ctx context.Context, time time.Time, status domain.TaskStatus) (domain.Task, error) {
+	return s.storage.UpdateTime(ctx, time, status)
+}
+
+func (s *SchedulerService) Update(ctx context.Context, task *domain.Task) error {
+	return s.storage.Update(ctx, task)
 }

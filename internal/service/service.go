@@ -76,6 +76,6 @@ func New(deps Deps) *Service {
 			deps.CardStorage,
 			deps.ReplenishmentRequestStatusStorage,
 		),
-		SchedulerService: scheduler.New(deps.Transactor, deps.SchedulerStorage),
+		SchedulerService: scheduler.New(deps.SchedulerStorage),
 	}
 }

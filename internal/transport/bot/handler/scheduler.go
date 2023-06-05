@@ -4,6 +4,7 @@ import (
 	"context"
 	"emivn-tg-bot/internal/domain"
 	"emivn-tg-bot/pkg/logging"
+	"errors"
 	"sync"
 	"time"
 )
@@ -13,8 +14,10 @@ const (
 	MinimalSleepDuration = 1 * time.Second
 )
 
+var ErrFuncNotFoundInTaskFuncsMap = errors.New("function not found in TaskFuncsMap")
+
 type SchedulerService interface {
-	Add(ctx context.Context, dto domain.TaskDTO) error
+	Create(ctx context.Context, dto domain.TaskDTO) error
 
 	UpdateTime(ctx context.Context, time time.Time, status domain.TaskStatus) (domain.Task, error)
 	Update(ctx context.Context, task *domain.Task) error
@@ -45,6 +48,16 @@ func (s *Scheduler) Configure(listeners domain.TaskFuncsMap, sleepDuration time.
 	}
 
 	s.sleepDuration = sleep
+}
+
+func (s *Scheduler) Add(ctx context.Context, dto domain.TaskDTO) error {
+	s.RLock()
+	defer s.RUnlock()
+	if _, ok := s.listeners[dto.Alias]; !ok {
+		return ErrFuncNotFoundInTaskFuncsMap
+	}
+
+	return s.schedulerService.Create(ctx, dto)
 }
 
 func (s *Scheduler) Run(ctx context.Context) error {
@@ -79,7 +92,7 @@ func (s *Scheduler) exec(ctx context.Context, task *domain.Task, fn domain.TaskF
 	funcArgs := task.ParseArgs()
 
 	status, when := fn(funcArgs)
-	switch status { // nolint:exhaustive TaskStatusInProgress = default
+	switch status {
 	case domain.TaskStatusDone, domain.TaskStatusWait, domain.TaskStatusDeferred:
 		task.Status = status
 	default:

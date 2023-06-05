@@ -6,6 +6,7 @@ type Card struct {
 	LastDigits     int
 	DailyLimit     int
 	DaimyoUsername string
+	BankTypeId     int
 }
 
 type CardDTO struct {
@@ -13,4 +14,5 @@ type CardDTO struct {
 	LastDigits     int
 	DailyLimit     int
 	DaimyoUsername string
+	BankType       string
 }

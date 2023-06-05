@@ -23,6 +23,7 @@ func (h *Handler) registerAdminHandlers() {
 		Message(h.AdminHandler.EnterCashManagerNickname, h.isSessionStep(domain.SessionStepCreateCashManagerNickname)).
 		Message(h.AdminHandler.CreateCashManager, h.isSessionStep(domain.SessionStepCreateCashManager)).
 		// card
+		Message(h.AdminHandler.CardBank, h.isSessionStep(domain.SessionStepCreateCardBank)).
 		Message(h.AdminHandler.EnterCardName, h.isSessionStep(domain.SessionStepCreateCardName)).
 		Message(h.AdminHandler.EnterCardLastDigits, h.isSessionStep(domain.SessionStepCreateCardLastDigits)).
 		Message(h.AdminHandler.EnterCardDailyLimit, h.isSessionStep(domain.SessionStepCreateCardDailyLimit)).

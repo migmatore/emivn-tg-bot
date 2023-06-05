@@ -3,7 +3,6 @@ package daimyo
 import (
 	"context"
 	"emivn-tg-bot/internal/domain"
-	"fmt"
 	"github.com/mr-linch/go-tg"
 	"github.com/mr-linch/go-tg/tgb"
 	"github.com/mr-linch/go-tg/tgb/session"
@@ -12,7 +11,8 @@ import (
 )
 
 type CardService interface {
-	GetByUsername(ctx context.Context, daimyoUsername string) ([]*domain.CardDTO, error)
+	GetByUsername(ctx context.Context, bankName string, daimyoUsername string) ([]*domain.CardDTO, error)
+	GetBankNames(ctx context.Context) ([]*domain.BankDTO, error)
 }
 
 type ReplenishmentRequestService interface {
@@ -64,20 +64,26 @@ func (h *DaimyoHandler) MenuSelectionHandler(ctx context.Context, msg *tgb.Messa
 
 	switch msg.Text {
 	case domain.DaimyoMenu.MakeReplenishmentRequest:
-		cards, err := h.cardService.GetByUsername(ctx, string(msg.Chat.Username))
+		banks, err := h.cardService.GetBankNames(ctx)
 		if err != nil {
 			return err
 		}
 
-		var str string
+		buttons := make([]tg.KeyboardButton, 0)
 
-		for i, card := range cards {
-			str += fmt.Sprintf("%d. %s\n", i+1, card.Name)
+		for _, item := range banks {
+			buttons = append(buttons, tg.NewKeyboardButton(item.Name))
 		}
 
-		h.sessionManager.Get(ctx).Step = domain.SessionStepEnterReplenishmentRequestAmount
+		kb := tg.NewReplyKeyboardMarkup(
+			tg.NewButtonColumn(
+				buttons...,
+			)...,
+		).WithResizeKeyboardMarkup()
 
-		return msg.Answer(fmt.Sprintf("Введите название карты из списка, которую хотите пополнить: \n%s", str)).DoVoid(ctx)
+		h.sessionManager.Get(ctx).Step = domain.SessionStepEnterReplenishmentRequestCardName
+
+		return msg.Answer("Выберите банк").ReplyMarkup(kb).DoVoid(ctx)
 	default:
 		h.sessionManager.Get(ctx).Step = domain.SessionStepInit
 		return msg.Answer("Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
