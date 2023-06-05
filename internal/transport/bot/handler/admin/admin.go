@@ -61,14 +61,15 @@ func NewAdminHandler(
 }
 
 func (h *AdminHandler) MainMenuHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+
 	switch msg.Text {
 	case domain.AdminMainMenu.Hierarchy:
 		h.sessionManager.Get(ctx).Step = domain.SessionStepHierarchyMenuHandler
 
 		kb := tg.NewReplyKeyboardMarkup(
 			tg.NewButtonColumn(
-				tg.NewKeyboardButton(domain.AdminMainMenu.Hierarchy),
-				tg.NewKeyboardButton(domain.AdminCreateEntityMenu.CreateDaimyo),
+				tg.NewKeyboardButton(domain.AdminHierarchyMenu.CreateEntity),
+				tg.NewKeyboardButton(domain.AdminHierarchyMenu.InSubordination),
 			)...,
 		).WithResizeKeyboardMarkup()
 

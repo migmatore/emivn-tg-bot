@@ -83,5 +83,5 @@ func (s *ReplenishmentRequestService) Create(ctx context.Context, dto domain.Rep
 		return 0, err
 	}
 
-	return tg.ChatID(cashManager.ChatId), nil
+	return tg.ChatID(*cashManager.ChatId), nil
 }
