@@ -12,6 +12,7 @@ import (
 	"github.com/mr-linch/go-tg"
 	"github.com/mr-linch/go-tg/tgb"
 	"github.com/mr-linch/go-tg/tgb/session"
+	"time"
 )
 
 type TransactorService interface {
@@ -31,7 +32,6 @@ type ShogunService interface {
 type DaimyoService interface {
 	Create(ctx context.Context, dto domain.DaimyoDTO) error
 	GetAll(ctx context.Context) ([]*domain.DaimyoDTO, error)
-	//Notify(args domain.FuncArgs) (status domain.TaskStatus, when interface{})
 }
 
 type SamuraiService interface {
@@ -97,6 +97,7 @@ func New(deps Deps) *Handler {
 			deps.AuthService,
 			deps.SamuraiService,
 			deps.CashManagerService,
+			scheduler,
 		),
 		AdminHandler: admin.NewAdminHandler(
 			sm.Manager,
@@ -118,12 +119,15 @@ func New(deps Deps) *Handler {
 	}
 }
 
-func (h *Handler) Init(ctx context.Context) *tgb.Router {
-	//listenersMap := domain.TaskFuncsMap{
-	//	"notify_samurai": h.DaimyoHandler.Notify,
+func (h *Handler) Init(ctx context.Context) (*tgb.Router, *Scheduler) {
+	listenersMap := domain.TaskFuncsMap{
+		"notify_samurai": h.SamuraiHandler.Notify,
+	}
+
+	h.scheduler.Configure(listenersMap, time.Second*1)
+	//if err := h.scheduler.Run(ctx); err != nil {
+	//	logging.GetLogger(ctx).Errorf("scheduler error %v", err)
 	//}
-	//
-	//h.scheduler.Configure()
 
 	//h.Router.Use(tgb.MiddlewareFunc(func(next tgb.Handler) tgb.Handler {
 	//	return tgb.HandlerFunc(func(ctx context.Context, update *tgb.Update) error {
@@ -139,15 +143,5 @@ func (h *Handler) Init(ctx context.Context) *tgb.Router {
 	h.registerAdminHandlers()
 	h.registerDaimyoHandler()
 
-	//listenersMap := domain.TaskFuncsMap{
-	//	"notify_samurai": h.DaimyoHandler.Notify,
-	//}
-	//
-	//h.schedulerService.Configure(listenersMap, time.Second*1)
-	//
-	//if err := h.schedulerService.Run(context.Background()); err != nil {
-	//	log.Printf("scheduler error %v", err)
-	//}
-
-	return h.Router
+	return h.Router, h.scheduler
 }

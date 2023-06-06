@@ -49,6 +49,7 @@ func (a *App) Run(ctx context.Context) error {
 		CardStorage:                       storages.Card,
 		ReplenishmentRequestStorage:       storages.ReplenishmentRequest,
 		ReplenishmentRequestStatusStorage: storages.ReplenishmentRequestStatusStorage,
+		SchedulerStorage:                  storages.Scheduler,
 	})
 
 	handlers := handler.New(handler.Deps{
@@ -60,11 +61,12 @@ func (a *App) Run(ctx context.Context) error {
 		CashManagerService:          services.CashManager,
 		CardService:                 services.Card,
 		ReplenishmentRequestService: services.ReplenishmentRequest,
+		SchedulerService:            services.SchedulerService,
 	})
 
-	router := handlers.Init(ctx)
+	router, scheduler := handlers.Init(ctx)
 
-	bot := bot.New(router, pool, a.config)
+	bot := bot.New(router, pool, a.config, scheduler)
 
 	if err := bot.Run(ctx); err != nil {
 		return fmt.Errorf("Init bot failed with %w", err)

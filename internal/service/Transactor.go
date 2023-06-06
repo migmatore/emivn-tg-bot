@@ -15,5 +15,5 @@ func NewTransactorService(storage TransactorStorage) *TransactorService {
 }
 
 func (s *TransactorService) WithinTransaction(ctx context.Context, txFunc func(context context.Context) error) error {
-	return s.WithinTransaction(ctx, txFunc)
+	return s.storage.WithinTransaction(ctx, txFunc)
 }

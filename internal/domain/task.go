@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"time"
@@ -19,7 +20,7 @@ type (
 	FuncArgs map[string]interface{}
 	TaskPlan map[string]uint
 
-	TaskFunc func(args FuncArgs) (status TaskStatus, when interface{})
+	TaskFunc func(ctx context.Context, args FuncArgs) (status TaskStatus, when interface{})
 
 	// TaskFuncsMap - list by TaskFunc's (key - task alias, value - TaskFunc)
 	TaskFuncsMap map[string]TaskFunc
@@ -36,6 +37,8 @@ type Task struct {
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
+
+type TaskKey struct{}
 
 func (t *Task) ParseArgs() FuncArgs {
 	if t.Arguments == "" {

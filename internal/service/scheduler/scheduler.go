@@ -9,7 +9,7 @@ import (
 type SchedulerStorage interface {
 	Insert(ctx context.Context, task domain.Task) error
 	UpdateTime(ctx context.Context, time time.Time, status domain.TaskStatus) (domain.Task, error)
-	Update(ctx context.Context, task *domain.Task) error
+	Update(ctx context.Context, task domain.Task) error
 }
 
 type SchedulerService struct {
@@ -39,6 +39,6 @@ func (s *SchedulerService) UpdateTime(ctx context.Context, time time.Time, statu
 	return s.storage.UpdateTime(ctx, time, status)
 }
 
-func (s *SchedulerService) Update(ctx context.Context, task *domain.Task) error {
+func (s *SchedulerService) Update(ctx context.Context, task domain.Task) error {
 	return s.storage.Update(ctx, task)
 }

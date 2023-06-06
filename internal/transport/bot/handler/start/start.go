@@ -6,6 +6,7 @@ import (
 	"github.com/mr-linch/go-tg"
 	"github.com/mr-linch/go-tg/tgb"
 	"github.com/mr-linch/go-tg/tgb/session"
+	"time"
 )
 
 type AuthService interface {
@@ -21,12 +22,17 @@ type CashManagerService interface {
 	SetChatId(ctx context.Context, username string, id tg.ChatID) error
 }
 
+type Scheduler interface {
+	Add(ctx context.Context, dto domain.TaskDTO) error
+}
+
 type StartHandler struct {
 	sessionManager *session.Manager[domain.Session]
 
 	AuthService        AuthService
 	SamuraiService     SamuraiService
 	CashManagerService CashManagerService
+	scheduler          Scheduler
 }
 
 func NewStartHandler(
@@ -34,12 +40,14 @@ func NewStartHandler(
 	authService AuthService,
 	samuraiService SamuraiService,
 	cashManagerService CashManagerService,
+	scheduler Scheduler,
 ) *StartHandler {
 	return &StartHandler{
 		sessionManager:     sm,
 		AuthService:        authService,
 		SamuraiService:     samuraiService,
 		CashManagerService: cashManagerService,
+		scheduler:          scheduler,
 	}
 }
 
@@ -52,6 +60,16 @@ func (s *StartHandler) Start(ctx context.Context, msg *tgb.MessageUpdate) error 
 	switch role {
 	case domain.AdminRole.String():
 		s.sessionManager.Get(ctx).Step = domain.SessionStepAdminMainMenuHandler
+
+		if err := s.scheduler.Add(ctx, domain.TaskDTO{
+			Alias:           "notify_samurai",
+			Name:            "test task",
+			Arguments:       nil,
+			IntervalMinutes: 0,
+			RunAt:           time.Now(),
+		}); err != nil {
+			return msg.Answer(err.Error()).DoVoid(ctx)
+		}
 
 		return msg.Answer("Пожалуйста, выберите действие").
 			ReplyMarkup(buildAdminStartMenu()).

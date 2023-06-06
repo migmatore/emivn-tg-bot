@@ -3,9 +3,11 @@ package bot
 import (
 	"context"
 	"emivn-tg-bot/internal/config"
+	"emivn-tg-bot/internal/domain"
 	"emivn-tg-bot/internal/storage/psql"
+	"emivn-tg-bot/internal/transport/bot/handler"
+	"emivn-tg-bot/pkg/logging"
 	"fmt"
-	"github.com/migmatore/bakery-shop-api/pkg/logging"
 	"github.com/mr-linch/go-tg"
 	"github.com/mr-linch/go-tg/tgb"
 	"net/http"
@@ -14,16 +16,18 @@ import (
 )
 
 type Bot struct {
-	router *tgb.Router
-	pool   psql.AtomicPoolClient
-	config *config.Config
+	router    *tgb.Router
+	pool      psql.AtomicPoolClient
+	config    *config.Config
+	scheduler *handler.Scheduler
 }
 
-func New(router *tgb.Router, pool psql.AtomicPoolClient, config *config.Config) *Bot {
+func New(router *tgb.Router, pool psql.AtomicPoolClient, config *config.Config, scheduler *handler.Scheduler) *Bot {
 	return &Bot{
-		router: router,
-		pool:   pool,
-		config: config,
+		router:    router,
+		pool:      pool,
+		config:    config,
+		scheduler: scheduler,
 	}
 }
 
@@ -55,12 +59,19 @@ func (b *Bot) Run(ctx context.Context) error {
 	} else {
 		logging.GetLogger(ctx).Info("start polling...")
 
-		return tgb.NewPoller(
+		go b.scheduler.Run(context.WithValue(ctx, domain.TaskKey{}, botClient))
+
+		err := tgb.NewPoller(
 			b.router,
 			botClient,
 		).Run(
 			ctx,
 		)
+		if err != nil {
+			return err
+		}
+
+		return nil
 	}
 }
 

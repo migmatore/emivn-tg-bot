@@ -10,6 +10,7 @@ import (
 	"emivn-tg-bot/internal/storage/replenishment_request_status"
 	"emivn-tg-bot/internal/storage/role"
 	"emivn-tg-bot/internal/storage/samurai"
+	"emivn-tg-bot/internal/storage/scheduler"
 	"emivn-tg-bot/internal/storage/shogun"
 	"emivn-tg-bot/internal/storage/user_role"
 )
@@ -27,6 +28,8 @@ type Storage struct {
 	ReplenishmentRequestStatusStorage *replenishment_request_status.ReplenishmentRequestStatusStorage
 	UserRole                          *user_role.UserRoleStorage
 	Role                              *role.RoleStorage
+
+	Scheduler *scheduler.SchedulerStorage
 }
 
 func New(pool psql.AtomicPoolClient) *Storage {
@@ -42,5 +45,6 @@ func New(pool psql.AtomicPoolClient) *Storage {
 		ReplenishmentRequestStatusStorage: replenishment_request_status.NewReplenishmentRequestStatusStorage(pool),
 		UserRole:                          user_role.NewUserRoleStorage(pool),
 		Role:                              role.NewRoleStorage(pool),
+		Scheduler:                         scheduler.NewSchedulerStorage(pool),
 	}
 }

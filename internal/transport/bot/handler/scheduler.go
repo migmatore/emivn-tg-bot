@@ -20,7 +20,7 @@ type SchedulerService interface {
 	Create(ctx context.Context, dto domain.TaskDTO) error
 
 	UpdateTime(ctx context.Context, time time.Time, status domain.TaskStatus) (domain.Task, error)
-	Update(ctx context.Context, task *domain.Task) error
+	Update(ctx context.Context, task domain.Task) error
 }
 
 type Scheduler struct {
@@ -52,46 +52,52 @@ func (s *Scheduler) Configure(listeners domain.TaskFuncsMap, sleepDuration time.
 
 func (s *Scheduler) Add(ctx context.Context, dto domain.TaskDTO) error {
 	s.RLock()
-	defer s.RUnlock()
 	if _, ok := s.listeners[dto.Alias]; !ok {
 		return ErrFuncNotFoundInTaskFuncsMap
 	}
+	s.RUnlock()
 
 	return s.schedulerService.Create(ctx, dto)
 }
 
 func (s *Scheduler) Run(ctx context.Context) error {
 	for {
-		if err := s.transactorService.WithinTransaction(ctx, func(txCtx context.Context) error {
-			task, err := s.schedulerService.UpdateTime(txCtx, time.Now(), domain.TaskStatusWait)
-			if err != nil {
-				return err
-			}
+		func(ctx context.Context) {
+			if err := s.transactorService.WithinTransaction(ctx, func(txCtx context.Context) error {
+				task, err := s.schedulerService.UpdateTime(txCtx, time.Now(), domain.TaskStatusWait)
+				if err != nil {
+					logging.GetLogger(ctx).Errorf("%v", err)
+					return err
+				}
 
-			if task.TaskId == 0 {
-				time.Sleep(s.sleepDuration)
-			} else {
-				if fn, ok := s.listeners[task.Alias]; ok {
-					go s.exec(txCtx, &task, fn)
+				if task.TaskId == 0 {
+					time.Sleep(s.sleepDuration)
 				} else {
-					task.Status = domain.TaskStatusDeferred
-					if err := s.schedulerService.Update(txCtx, &task); err != nil {
-						return err
+					if fn, ok := s.listeners[task.Alias]; ok {
+						go s.exec(txCtx, &task, fn)
+					} else {
+						task.Status = domain.TaskStatusDeferred
+						if err := s.schedulerService.Update(txCtx, task); err != nil {
+							logging.GetLogger(ctx).Errorf("%v", err)
+							return err
+						}
 					}
 				}
-			}
 
-			return nil
-		}); err != nil {
-			return err
-		}
+				return nil
+			}); err != nil {
+				logging.GetLogger(ctx).Errorf("%v", err)
+				//return err
+			}
+		}(ctx)
+
 	}
 }
 
 func (s *Scheduler) exec(ctx context.Context, task *domain.Task, fn domain.TaskFunc) {
 	funcArgs := task.ParseArgs()
 
-	status, when := fn(funcArgs)
+	status, when := fn(ctx, funcArgs)
 	switch status {
 	case domain.TaskStatusDone, domain.TaskStatusWait, domain.TaskStatusDeferred:
 		task.Status = status
@@ -113,7 +119,7 @@ func (s *Scheduler) exec(ctx context.Context, task *domain.Task, fn domain.TaskF
 		}
 	}
 
-	if err := s.schedulerService.Update(ctx, task); err != nil {
+	if err := s.schedulerService.Update(ctx, *task); err != nil {
 		logging.GetLogger(ctx).Errorf("Scheduler error: %v", err)
 	}
 }
