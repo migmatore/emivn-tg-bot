@@ -21,7 +21,7 @@ func buildAdminStartMenu() *tg.ReplyKeyboardMarkup {
 func buildDaimyoStartMenu() *tg.ReplyKeyboardMarkup {
 	return tg.NewReplyKeyboardMarkup(
 		tg.NewButtonColumn(
-			tg.NewKeyboardButton(domain.DaimyoMenu.MakeReplenishmentRequest),
+			tg.NewKeyboardButton(domain.DaimyoMainMenu.MakeReplenishmentRequest),
 		)...,
 	).WithResizeKeyboardMarkup()
 }

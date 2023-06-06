@@ -33,7 +33,8 @@ CREATE TABLE samurai
     username           VARCHAR(255) NOT NULL PRIMARY KEY,
     nickname           VARCHAR(255) NOT NULL UNIQUE,
     daimyo_username    VARCHAR(255) NOT NULL REFERENCES daimyo (username),
-    turnover_per_shift FLOAT        NOT NULL DEFAULT 0
+    turnover_per_shift FLOAT        NOT NULL DEFAULT 0,
+    chat_id            BIGINT       NULL
 );
 
 CREATE TABLE administrators
@@ -41,13 +42,6 @@ CREATE TABLE administrators
     username VARCHAR(255) NOT NULL PRIMARY KEY,
     nickname VARCHAR(255) NOT NULL UNIQUE
 );
-
--- CREATE TABLE daimyo_cards
--- (
---     id              INTEGER      NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
---     daymio_username VARCHAR(255) NOT NULL REFERENCES daimyo (username),
---     card_id         INTEGER      NOT NULL REFERENCES cards (id)
--- );
 
 CREATE TABLE cash_managers
 (
@@ -58,7 +52,7 @@ CREATE TABLE cash_managers
 --     replenishment_request_id INTEGER      NOT NULL REFERENCES replenishment_requests (id)
 );
 
-CREATE TABLE replenishment_request_status
+CREATE TABLE replenishment_request_status_groups
 (
     id   INTEGER     NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     name varchar(50) NOT NULL UNIQUE
@@ -71,7 +65,7 @@ CREATE TABLE replenishment_requests
     daimyo_username       VARCHAR(255) NOT NULL REFERENCES daimyo (username),
     card_id               INTEGER      NOT NULL REFERENCES cards (id),
     amount                DECIMAL      NOT NULL DEFAULT 0,
-    status_id             INTEGER      NOT NULL REFERENCES replenishment_request_status (id)
+    status_id             INTEGER      NOT NULL REFERENCES replenishment_request_status_groups (id)
 );
 
 CREATE TABLE roles
@@ -90,15 +84,15 @@ CREATE TABLE user_roles
 
 CREATE TABLE tasks
 (
-    id INTEGER      NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    alias VARCHAR(50) NOT NULL,
-    name VARCHAR(50) NOT NULL,
-    arguments TEXT NULL,
-    status INT NOT NULL DEFAULT 0,
-    schedule INT NOT NULL,
-    scheduled_at TIMESTAMP NOT NULL,
-    created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL
+    id           INTEGER     NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    alias        VARCHAR(50) NOT NULL,
+    name         VARCHAR(50) NOT NULL,
+    arguments    TEXT        NULL,
+    status       INT         NOT NULL DEFAULT 0,
+    schedule     INT         NOT NULL,
+    scheduled_at TIMESTAMP   NOT NULL,
+    created_at   TIMESTAMP   NOT NULL,
+    updated_at   TIMESTAMP   NOT NULL
 );
 
 INSERT INTO roles(name)
@@ -108,9 +102,9 @@ VALUES ('Администратор'),
        ('Самурай'),
        ('Инкассатор');
 
-INSERT INTO replenishment_request_status(name)
-VALUES ('Активный'),
-       ('Спорный');
+INSERT INTO replenishment_request_status_groups(name)
+VALUES ('Активные заявки'),
+       ('Спорные заявки');
 
 INSERT INTO bank_types(name)
 VALUES ('Тинькофф'),

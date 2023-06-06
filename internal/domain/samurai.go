@@ -5,6 +5,7 @@ type Samurai struct {
 	Nickname         string
 	DaimyoUsername   string
 	TurnoverPerShift float32
+	ChatId           *int
 }
 
 type SamuraiDTO struct {
@@ -13,4 +14,5 @@ type SamuraiDTO struct {
 	Nickname         string
 	DaimyoUsername   string
 	TurnoverPerShift float32
+	ChatId           *int
 }

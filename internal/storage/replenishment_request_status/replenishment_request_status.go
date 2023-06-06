@@ -18,7 +18,7 @@ func NewReplenishmentRequestStatusStorage(pool psql.AtomicPoolClient) *Replenish
 }
 
 func (s *ReplenishmentRequestStatusStorage) GetId(ctx context.Context, name string) (int, error) {
-	q := `select id from replenishment_request_status where name=$1`
+	q := `select id from replenishment_request_status_groups where name=$1`
 
 	var id int
 

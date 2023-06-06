@@ -14,9 +14,10 @@ DROP TABLE cash_managers CASCADE;
 
 DROP TABLE shoguns CASCADE;
 
-DROP TABLE replenishment_request_status CASCADE;
+DROP TABLE replenishment_request_status_groups CASCADE;
 
 DROP TABLE user_roles CASCADE;
 
 DROP TABLE roles CASCADE;
 
+DROP TABLE tasks CASCADE;

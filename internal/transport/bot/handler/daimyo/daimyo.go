@@ -63,7 +63,7 @@ func (h *DaimyoHandler) MenuSelectionHandler(ctx context.Context, msg *tgb.Messa
 	//}
 
 	switch msg.Text {
-	case domain.DaimyoMenu.MakeReplenishmentRequest:
+	case domain.DaimyoMainMenu.MakeReplenishmentRequest:
 		banks, err := h.cardService.GetBankNames(ctx)
 		if err != nil {
 			return err

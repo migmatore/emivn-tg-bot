@@ -7,6 +7,7 @@ var AdminMainMenu = struct {
 	RequestsList string
 	Report       string
 	Hierarchy    string
+	CreateGARA   string
 	UploadData   string
 	Deposits     string
 }{
@@ -14,6 +15,7 @@ var AdminMainMenu = struct {
 	RequestsList: "Список заявок",
 	Report:       "Запросить отчет",
 	Hierarchy:    "Иерархия",
+	CreateGARA:   "Создать ГАРА",
 	UploadData:   "Выгрузить данные",
 	Deposits:     "Пополнения",
 }
@@ -42,8 +44,16 @@ var AdminCreateEntityMenu = struct {
 	//Back:              "Назад",
 }
 
-var DaimyoMenu = struct {
+var DaimyoMainMenu = struct {
 	MakeReplenishmentRequest string
+	Requests                 string
+	CardLimit                string
+	Report                   string
+	Hierarchy                string
 }{
-	MakeReplenishmentRequest: "Сделать запрос на пополнение карты",
+	MakeReplenishmentRequest: "Запросить пополнение",
+	Requests:                 "Заявки",
+	CardLimit:                "Лимит по карте",
+	Report:                   "Отчет",
+	Hierarchy:                "Иерархия",
 }
