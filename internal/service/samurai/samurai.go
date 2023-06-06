@@ -4,10 +4,14 @@ import (
 	"context"
 	"emivn-tg-bot/internal/domain"
 	"emivn-tg-bot/internal/storage"
+	"emivn-tg-bot/pkg/logging"
+	"github.com/mr-linch/go-tg"
 )
 
 type SamuraiStorage interface {
 	Insert(ctx context.Context, samurai domain.Samurai) error
+	GetByUsername(ctx context.Context, username string) (domain.Samurai, error)
+	SetChatId(ctx context.Context, username string, id int64) error
 }
 
 type SamuraiUserRoleStorage interface {
@@ -72,4 +76,18 @@ func (s *SamuraiService) Create(ctx context.Context, dto domain.SamuraiDTO) erro
 	}
 
 	return nil
+}
+
+func (s *SamuraiService) SetChatId(ctx context.Context, username string, id tg.ChatID) error {
+	samurai, err := s.storage.GetByUsername(ctx, username)
+	if err != nil {
+		return err
+	}
+
+	// TODO: Error refactoring
+	if samurai.ChatId != nil {
+		logging.GetLogger(ctx).Error("Error: samurai chat id is already set")
+	}
+
+	return s.storage.SetChatId(ctx, username, int64(id))
 }

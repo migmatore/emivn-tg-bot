@@ -4,11 +4,15 @@ import (
 	"context"
 	"emivn-tg-bot/internal/domain"
 	"emivn-tg-bot/internal/storage"
+	"emivn-tg-bot/pkg/logging"
+	"github.com/mr-linch/go-tg"
 )
 
 type CashManagerStorage interface {
 	Insert(ctx context.Context, cashManager domain.CashManager) error
 	GetByShogunUsername(ctx context.Context, username string) (domain.CashManager, error)
+	GetByUsername(ctx context.Context, username string) (domain.CashManager, error)
+	SetChatId(ctx context.Context, username string, id int64) error
 }
 
 type CashManagerUserRoleStorage interface {
@@ -74,4 +78,18 @@ func (s *CashManagerService) Create(ctx context.Context, dto domain.CashManagerD
 	}
 
 	return nil
+}
+
+func (s *CashManagerService) SetChatId(ctx context.Context, username string, id tg.ChatID) error {
+	cashManager, err := s.storage.GetByUsername(ctx, username)
+	if err != nil {
+		return err
+	}
+
+	// TODO: Error refactoring
+	if cashManager.ChatId != nil {
+		logging.GetLogger(ctx).Error("Error: cashManager chat id is already set")
+	}
+
+	return s.storage.SetChatId(ctx, username, int64(id))
 }

@@ -61,3 +61,42 @@ func (s *CashManagerStorage) GetByShogunUsername(ctx context.Context, username s
 
 	return cashManager, nil
 }
+
+func (s *CashManagerStorage) GetByUsername(ctx context.Context, username string) (domain.CashManager, error) {
+	q := `select username, nickname, shogun_username, chat_id from cash_managers where username=$1`
+
+	cashManager := domain.CashManager{}
+
+	if err := s.pool.QueryRow(ctx, q, username).Scan(
+		&cashManager.Username,
+		&cashManager.Nickname,
+		&cashManager.ShogunUsername,
+		&cashManager.ChatId,
+	); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			logging.GetLogger(ctx).Errorf("Error: %v", err)
+			return cashManager, err
+		}
+
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return cashManager, err
+	}
+
+	return cashManager, nil
+}
+
+func (s *CashManagerStorage) SetChatId(ctx context.Context, username string, id int64) error {
+	q := `update cash_managers set chat_id=$1 where username=$2`
+
+	if _, err := s.pool.Exec(ctx, q, id, username); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			logging.GetLogger(ctx).Errorf("Error: %v", err)
+			return err
+		}
+
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return err
+	}
+
+	return nil
+}

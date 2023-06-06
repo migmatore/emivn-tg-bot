@@ -36,10 +36,12 @@ type DaimyoService interface {
 
 type SamuraiService interface {
 	Create(ctx context.Context, dto domain.SamuraiDTO) error
+	SetChatId(ctx context.Context, username string, id tg.ChatID) error
 }
 
 type CashManagerService interface {
 	Create(ctx context.Context, dto domain.CashManagerDTO) error
+	SetChatId(ctx context.Context, username string, id tg.ChatID) error
 }
 
 type CardService interface {
@@ -90,7 +92,12 @@ func New(deps Deps) *Handler {
 		Router:         tgb.NewRouter(),
 		sessionManager: sm.Manager,
 		scheduler:      scheduler,
-		StartHandler:   start.NewStartHandler(sm.Manager, deps.AuthService),
+		StartHandler: start.NewStartHandler(
+			sm.Manager,
+			deps.AuthService,
+			deps.SamuraiService,
+			deps.CashManagerService,
+		),
 		AdminHandler: admin.NewAdminHandler(
 			sm.Manager,
 			deps.ShogunService,
