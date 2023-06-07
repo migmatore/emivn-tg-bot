@@ -46,7 +46,7 @@ func (s *SchedulerStorage) Insert(ctx context.Context, task domain.Task) error {
 	return nil
 }
 
-func (s *SchedulerStorage) UpdateTime(ctx context.Context, time time.Time, status domain.TaskStatus) (domain.Task, error) {
+func (s *SchedulerStorage) UpdateTime(ctx context.Context, time1 time.Time, status domain.TaskStatus) (domain.Task, error) {
 	q := `update tasks set updated_at=$1 
              where id = (
              	select id from tasks 
@@ -56,7 +56,7 @@ func (s *SchedulerStorage) UpdateTime(ctx context.Context, time time.Time, statu
 
 	task := domain.Task{}
 
-	if err := s.pool.QueryRow(ctx, q, time, status).Scan(
+	if err := s.pool.QueryRow(ctx, q, time1, status).Scan(
 		&task.TaskId,
 		&task.Alias,
 		&task.Name,

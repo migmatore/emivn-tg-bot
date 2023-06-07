@@ -65,7 +65,7 @@ func (s *StartHandler) Start(ctx context.Context, msg *tgb.MessageUpdate) error 
 			Alias:           "notify_samurai",
 			Name:            "test task",
 			Arguments:       nil,
-			IntervalMinutes: 0,
+			IntervalMinutes: 1,
 			RunAt:           time.Now(),
 		}); err != nil {
 			return msg.Answer(err.Error()).DoVoid(ctx)

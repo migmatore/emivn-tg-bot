@@ -37,5 +37,5 @@ func (h *SamuraiHandler) Notify(ctx context.Context, args domain.FuncArgs) (stat
 
 	log.Print("Not found name arg in func args")
 
-	return domain.TaskStatusDeferred, time.Now().Add(time.Second * 5)
+	return domain.TaskStatusWait, time.Now().Add(time.Second * 5)
 }

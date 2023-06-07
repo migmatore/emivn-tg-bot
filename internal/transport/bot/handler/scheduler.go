@@ -60,37 +60,35 @@ func (s *Scheduler) Add(ctx context.Context, dto domain.TaskDTO) error {
 	return s.schedulerService.Create(ctx, dto)
 }
 
-func (s *Scheduler) Run(ctx context.Context) error {
+func (s *Scheduler) Run(ctx context.Context) {
 	for {
-		func(ctx context.Context) {
-			if err := s.transactorService.WithinTransaction(ctx, func(txCtx context.Context) error {
-				task, err := s.schedulerService.UpdateTime(txCtx, time.Now(), domain.TaskStatusWait)
-				if err != nil {
-					logging.GetLogger(ctx).Errorf("%v", err)
-					return err
-				}
-
-				if task.TaskId == 0 {
-					time.Sleep(s.sleepDuration)
-				} else {
-					if fn, ok := s.listeners[task.Alias]; ok {
-						go s.exec(txCtx, &task, fn)
-					} else {
-						task.Status = domain.TaskStatusDeferred
-						if err := s.schedulerService.Update(txCtx, task); err != nil {
-							logging.GetLogger(ctx).Errorf("%v", err)
-							return err
-						}
-					}
-				}
-
-				return nil
-			}); err != nil {
+		if err := s.transactorService.WithinTransaction(ctx, func(txCtx context.Context) error {
+			task, err := s.schedulerService.UpdateTime(txCtx, time.Now(), domain.TaskStatusWait)
+			if err != nil {
 				logging.GetLogger(ctx).Errorf("%v", err)
 				//return err
 			}
-		}(ctx)
 
+			if task.TaskId == 0 {
+				time.Sleep(s.sleepDuration)
+				return nil
+			} else {
+				if fn, ok := s.listeners[task.Alias]; ok {
+					go s.exec(txCtx, &task, fn)
+				} else {
+					task.Status = domain.TaskStatusDeferred
+					if err := s.schedulerService.Update(txCtx, task); err != nil {
+						logging.GetLogger(ctx).Errorf("%v", err)
+						//return err
+					}
+				}
+			}
+
+			return nil
+		}); err != nil {
+			logging.GetLogger(ctx).Errorf("%v", err)
+			//return err
+		}
 	}
 }
 
