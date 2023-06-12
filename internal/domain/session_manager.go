@@ -34,6 +34,9 @@ const (
 
 	SessionStepBackCreateEntityMenuStep
 
+	// shogun steps
+	SessionStepShogunMainMenuHandler
+
 	// diamyo steps
 	SessionStepDaimyoMenuHandler
 	SessionStepEnterReplenishmentRequestCardName

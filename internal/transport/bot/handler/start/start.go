@@ -74,6 +74,13 @@ func (s *StartHandler) Start(ctx context.Context, msg *tgb.MessageUpdate) error 
 		return msg.Answer("Пожалуйста, выберите действие").
 			ReplyMarkup(buildAdminStartMenu()).
 			DoVoid(ctx)
+	case domain.ShogunRole.String():
+		s.sessionManager.Get(ctx).Step = domain.SessionStepShogunMainMenuHandler
+
+		return msg.Answer("Пожалуйста, выберите действие").
+			ReplyMarkup(buildShogunStartMenu()).
+			DoVoid(ctx)
+
 	case domain.DaimyoRole.String():
 		s.sessionManager.Get(ctx).Step = domain.SessionStepDaimyoMenuHandler
 
@@ -102,7 +109,7 @@ func (s *StartHandler) Start(ctx context.Context, msg *tgb.MessageUpdate) error 
 		}
 
 		return msg.Answer("Пожалуйста, выберите действие").
-			ReplyMarkup(buildDaimyoStartMenu()).
+			ReplyMarkup(buildCashManagerStartMenu()).
 			DoVoid(ctx)
 	default:
 		return nil
