@@ -44,6 +44,24 @@ var AdminCreateEntityMenu = struct {
 	//Back:              "Назад",
 }
 
+var ShogunMainMenu = struct {
+	Requests   string
+	Cards      string
+	Report     string
+	Hierarchy  string
+	GARA       string
+	UploadData string
+	Deposits   string
+}{
+	Requests:   "Список заявок",
+	Cards:      "Карты",
+	Report:     "Запросить отчет",
+	Hierarchy:  "Иерархия",
+	GARA:       "ГАРА",
+	UploadData: "Загрузить данные",
+	Deposits:   "Пополнения",
+}
+
 var DaimyoMainMenu = struct {
 	MakeReplenishmentRequest string
 	Requests                 string
@@ -56,4 +74,18 @@ var DaimyoMainMenu = struct {
 	CardLimit:                "Лимит по карте",
 	Report:                   "Отчет",
 	Hierarchy:                "Иерархия",
+}
+
+var CashManagerMainMenu = struct {
+	Requests           string
+	WithdrawalRequests string
+	RemainingFunds     string
+	CurrentBalance     string
+	ReplenishmentList  string
+}{
+	Requests:           "Заявки",
+	WithdrawalRequests: "Заявки на вывод",
+	RemainingFunds:     "Остаток средств",
+	CurrentBalance:     "Текущий остаток",
+	ReplenishmentList:  "Список пополнений",
 }
