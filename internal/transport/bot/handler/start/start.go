@@ -6,7 +6,6 @@ import (
 	"github.com/mr-linch/go-tg"
 	"github.com/mr-linch/go-tg/tgb"
 	"github.com/mr-linch/go-tg/tgb/session"
-	"time"
 )
 
 type AuthService interface {
@@ -61,15 +60,15 @@ func (s *StartHandler) Start(ctx context.Context, msg *tgb.MessageUpdate) error 
 	case domain.AdminRole.String():
 		s.sessionManager.Get(ctx).Step = domain.SessionStepAdminMainMenuHandler
 
-		if err := s.scheduler.Add(ctx, domain.TaskDTO{
-			Alias:           "notify_samurai",
-			Name:            "test task",
-			Arguments:       nil,
-			IntervalMinutes: 1,
-			RunAt:           time.Now(),
-		}); err != nil {
-			return msg.Answer(err.Error()).DoVoid(ctx)
-		}
+		//if err := s.scheduler.Add(ctx, domain.TaskDTO{
+		//	Alias:           "notify_samurai",
+		//	Name:            "test task",
+		//	Arguments:       nil,
+		//	IntervalMinutes: 1,
+		//	RunAt:           time.Now(),
+		//}); err != nil {
+		//	return msg.Answer(err.Error()).DoVoid(ctx)
+		//}
 
 		return msg.Answer("Пожалуйста, выберите действие").
 			ReplyMarkup(buildAdminStartMenu()).

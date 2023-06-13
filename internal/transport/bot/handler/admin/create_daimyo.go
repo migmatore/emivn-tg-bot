@@ -3,7 +3,6 @@ package admin
 import (
 	"context"
 	"emivn-tg-bot/internal/domain"
-	"fmt"
 	"github.com/mr-linch/go-tg"
 	"github.com/mr-linch/go-tg/tgb"
 	"strings"
@@ -27,15 +26,22 @@ func (h *AdminHandler) EnterDaimyoNickname(ctx context.Context, msg *tgb.Message
 		return err
 	}
 
-	var str string
+	buttons := make([]tg.KeyboardButton, 0)
 
-	for _, shogun := range shoguns {
-		str += "@" + shogun.Username + "\n"
+	for _, item := range shoguns {
+		buttons = append(buttons, tg.NewKeyboardButton(item.Username))
 	}
+
+	kb := tg.NewReplyKeyboardMarkup(
+		tg.NewButtonColumn(
+			buttons...,
+		)...,
+	).WithResizeKeyboardMarkup()
 
 	sessionManager.Step = domain.SessionStepCreateDaimyo
 
-	return msg.Answer(fmt.Sprintf("Введите username сёгуна, к которому будет привязан даймё. \nСписок сёгунов: \n%s", str)).
+	return msg.Answer("Введите username сёгуна, которому будет подчиняться даймё.").
+		ReplyMarkup(kb).
 		DoVoid(ctx)
 }
 
