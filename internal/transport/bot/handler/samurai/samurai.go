@@ -24,18 +24,25 @@ func (h *SamuraiHandler) MenuSelectionHandler(ctx context.Context, msg *tgb.Mess
 }
 
 func (h *SamuraiHandler) Notify(ctx context.Context, args domain.FuncArgs) (status domain.TaskStatus, when interface{}) {
-	if client, ok := ctx.Value(domain.TaskKey{}).(*tg.Client); ok {
-		var id tg.ChatID = 6109520093
+	if id, ok := args["id"]; ok {
 
-		client.SendMessage(id, "hello").DoVoid(ctx)
+		var id tg.ChatID = tg.ChatID(id.(float64))
+
+		if client, ok := ctx.Value(domain.TaskKey{}).(*tg.Client); ok {
+			client.SendMessage(id, "hello").DoVoid(ctx)
+		}
+
+		return domain.TaskStatusWait, time.Now().Add(time.Second * 10)
 	}
-
-	//if name, ok := args["name"]; ok {
-	//	log.Println("PrintWithArgs:", time.Now(), name)
-	//	return domain.TaskStatusDeferred, time.Now().Add(time.Second * 10)
+	//else {
+	//	if client, ok := ctx.Value(domain.TaskKey{}).(*tg.Client); ok {
+	//		var id tg.ChatID = 6109520093
+	//
+	//		client.SendMessage(id, "hello").DoVoid(ctx)
+	//	}
 	//}
 
 	log.Print("Not found name arg in func args")
 
-	return domain.TaskStatusWait, time.Now().Add(time.Second * 5)
+	return domain.TaskStatusWait, time.Now().Add(time.Second * 30)
 }

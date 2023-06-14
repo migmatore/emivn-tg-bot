@@ -61,6 +61,8 @@ func (s *Scheduler) Add(ctx context.Context, dto domain.TaskDTO) error {
 }
 
 func (s *Scheduler) Run(ctx context.Context) {
+	wg := &sync.WaitGroup{}
+
 	for {
 		if err := s.transactorService.WithinTransaction(ctx, func(txCtx context.Context) error {
 			task, err := s.schedulerService.UpdateTime(txCtx, time.Now(), domain.TaskStatusWait)
@@ -74,7 +76,11 @@ func (s *Scheduler) Run(ctx context.Context) {
 				return nil
 			} else {
 				if fn, ok := s.listeners[task.Alias]; ok {
-					go s.exec(txCtx, &task, fn)
+					wg.Add(1)
+					go func() {
+						defer wg.Done()
+						s.exec(txCtx, &task, fn)
+					}()
 				} else {
 					task.Status = domain.TaskStatusDeferred
 					if err := s.schedulerService.Update(txCtx, task); err != nil {
@@ -89,6 +95,8 @@ func (s *Scheduler) Run(ctx context.Context) {
 			logging.GetLogger(ctx).Errorf("%v", err)
 			//return err
 		}
+
+		wg.Wait()
 	}
 }
 

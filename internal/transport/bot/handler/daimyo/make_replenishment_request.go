@@ -3,7 +3,6 @@ package daimyo
 import (
 	"context"
 	"emivn-tg-bot/internal/domain"
-	"fmt"
 	"github.com/mr-linch/go-tg"
 	"github.com/mr-linch/go-tg/tgb"
 	"strconv"
@@ -15,16 +14,22 @@ func (h *DaimyoHandler) EnterCardName(ctx context.Context, msg *tgb.MessageUpdat
 		return err
 	}
 
-	var str string
+	buttons := make([]tg.KeyboardButton, 0)
 
-	for i, card := range cards {
-		str += fmt.Sprintf("%d. %s\n", i+1, card.Name)
+	for _, item := range cards {
+		buttons = append(buttons, tg.NewKeyboardButton(item.Name))
 	}
+
+	kb := tg.NewReplyKeyboardMarkup(
+		tg.NewButtonColumn(
+			buttons...,
+		)...,
+	).WithResizeKeyboardMarkup()
 
 	h.sessionManager.Get(ctx).Step = domain.SessionStepEnterReplenishmentRequestAmount
 
-	return msg.Answer(fmt.Sprintf("Введите название карты из списка, которую хотите пополнить: \n%s", str)).
-		ReplyMarkup(tg.NewReplyKeyboardRemove()).
+	return msg.Answer("Введите название карты из списка, которую хотите пополнить:").
+		ReplyMarkup(kb).
 		DoVoid(ctx)
 }
 
