@@ -43,6 +43,7 @@ func (a *App) Run(ctx context.Context) error {
 		ShogunStorage:                     storages.Shogun,
 		DaimyoStorage:                     storages.Daimyo,
 		SamuraiStorage:                    storages.Samurai,
+		SamuraiTurnoverStorage:            storages.SamuraiTurnover,
 		CashManagerStorage:                storages.CashManager,
 		UserRoleStorage:                   storages.UserRole,
 		RoleStorage:                       storages.Role,

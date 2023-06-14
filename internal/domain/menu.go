@@ -76,6 +76,18 @@ var DaimyoMainMenu = struct {
 	Hierarchy:                "Иерархия",
 }
 
+var SamuraiMainMenu = struct {
+	EnterData string
+}{
+	EnterData: "Ввести данные на конец смены",
+}
+
+var SamuraiEnterDataMenu = struct {
+	ChooseBank string
+}{
+	ChooseBank: "Выбрать банк",
+}
+
 var CashManagerMainMenu = struct {
 	Requests           string
 	WithdrawalRequests string

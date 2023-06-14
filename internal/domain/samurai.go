@@ -9,7 +9,6 @@ type Samurai struct {
 }
 
 type SamuraiDTO struct {
-	SamuraiId        int
 	Username         string
 	Nickname         string
 	DaimyoUsername   string

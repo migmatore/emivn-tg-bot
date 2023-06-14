@@ -56,3 +56,11 @@ func buildDaimyoStartMenu() *tg.ReplyKeyboardMarkup {
 		)...,
 	).WithResizeKeyboardMarkup()
 }
+
+func buildSamuraiStartMenu() *tg.ReplyKeyboardMarkup {
+	return tg.NewReplyKeyboardMarkup(
+		tg.NewButtonColumn(
+			tg.NewKeyboardButton(domain.SamuraiMainMenu.EnterData),
+		)...,
+	).WithResizeKeyboardMarkup()
+}

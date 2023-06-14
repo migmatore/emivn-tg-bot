@@ -1,3 +1,5 @@
+DROP TABLE samurai_turnovers CASCADE;
+
 DROP TABLE samurai CASCADE;
 
 DROP TABLE administrators CASCADE;

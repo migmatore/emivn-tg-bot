@@ -14,33 +14,40 @@ type SamuraiStorage interface {
 	SetChatId(ctx context.Context, username string, id int64) error
 }
 
-type SamuraiUserRoleStorage interface {
+type SamuraiTurnoverStorage interface {
+	Insert(ctx context.Context, turnover domain.SamuraiTurnover) error
+}
+
+type UserRoleStorage interface {
 	Insert(ctx context.Context, user domain.UserRole) error
 }
 
-type SamuraiRoleStorage interface {
+type RoleStorage interface {
 	GetIdByName(ctx context.Context, role string) (int, error)
 }
 
 type SamuraiService struct {
 	transactor storage.Transactor
 
-	storage         SamuraiStorage
-	userRoleStorage SamuraiUserRoleStorage
-	roleStorage     SamuraiRoleStorage
+	storage                SamuraiStorage
+	SamuraiTurnoverStorage SamuraiTurnoverStorage
+	userRoleStorage        UserRoleStorage
+	roleStorage            RoleStorage
 }
 
 func NewSamuraiService(
 	transactor storage.Transactor,
-	s SamuraiStorage,
-	userRole SamuraiUserRoleStorage,
-	role SamuraiRoleStorage,
+	samuraiStorage SamuraiStorage,
+	samuraiTurnoverStorage SamuraiTurnoverStorage,
+	userRole UserRoleStorage,
+	role RoleStorage,
 ) *SamuraiService {
 	return &SamuraiService{
-		transactor:      transactor,
-		storage:         s,
-		userRoleStorage: userRole,
-		roleStorage:     role,
+		transactor:             transactor,
+		storage:                samuraiStorage,
+		SamuraiTurnoverStorage: samuraiTurnoverStorage,
+		userRoleStorage:        userRole,
+		roleStorage:            role,
 	}
 }
 
@@ -90,4 +97,25 @@ func (s *SamuraiService) SetChatId(ctx context.Context, username string, id tg.C
 	}
 
 	return s.storage.SetChatId(ctx, username, int64(id))
+}
+
+func (s *SamuraiService) GetByUsername(ctx context.Context, username string) (domain.SamuraiDTO, error) {
+	samurai, err := s.storage.GetByUsername(ctx, username)
+	if err != nil {
+		return domain.SamuraiDTO{}, nil
+	}
+
+	samuraiDTO := domain.SamuraiDTO{
+		Username:         samurai.Username,
+		Nickname:         samurai.Nickname,
+		DaimyoUsername:   samurai.DaimyoUsername,
+		TurnoverPerShift: samurai.TurnoverPerShift,
+		ChatId:           samurai.ChatId,
+	}
+
+	return samuraiDTO, nil
+}
+
+func (s *SamuraiService) CreateTurnover(ctx context.Context, turnover domain.SamuraiTurnoverDTO) error {
+	return nil
 }

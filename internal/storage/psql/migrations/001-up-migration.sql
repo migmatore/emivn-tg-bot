@@ -37,6 +37,17 @@ CREATE TABLE samurai
     chat_id            BIGINT       NULL
 );
 
+CREATE TABLE samurai_turnovers
+(
+    id               INTEGER      NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    samurai_username VARCHAR(255) NOT NULL REFERENCES samurai (username),
+    start_date       TIMESTAMP    NOT NULL DEFAULT now(),
+    initial_amount   FLOAT        NOT NULL DEFAULT 0,
+    final_amount     FLOAT        NOT NULL DEFAULT 0,
+    turnover         FLOAT        NOT NULL DEFAULT 0,
+    bank_type_id     INTEGER      NOT NULL REFERENCES bank_types (id)
+);
+
 CREATE TABLE administrators
 (
     username VARCHAR(255) NOT NULL PRIMARY KEY,

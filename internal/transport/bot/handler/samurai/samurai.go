@@ -7,20 +7,85 @@ import (
 	"github.com/mr-linch/go-tg/tgb"
 	"github.com/mr-linch/go-tg/tgb/session"
 	"log"
+	"strconv"
 	"time"
 )
 
+type CardService interface {
+	GetBankNames(ctx context.Context) ([]*domain.BankDTO, error)
+}
+
+type SamuraiService interface {
+	GetByUsername(ctx context.Context, username string) (domain.SamuraiDTO, error)
+	CreateTurnover(ctx context.Context, turnover domain.SamuraiTurnoverDTO) error
+}
+
 type SamuraiHandler struct {
 	sessionManager *session.Manager[domain.Session]
+
+	cardService    CardService
+	samuraiService SamuraiService
 }
 
-func NewSamuraiHandler(sm *session.Manager[domain.Session]) *SamuraiHandler {
-	return &SamuraiHandler{sessionManager: sm}
+func NewSamuraiHandler(
+	sm *session.Manager[domain.Session],
+	cardService CardService,
+	samuraiService SamuraiService,
+) *SamuraiHandler {
+	return &SamuraiHandler{
+		sessionManager: sm,
+		cardService:    cardService,
+		samuraiService: samuraiService,
+	}
 }
 
-func (h *SamuraiHandler) MenuSelectionHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+func (h *SamuraiHandler) EnterDataMenuHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+	sessionManager := h.sessionManager.Get(ctx)
 
-	return nil
+	finalAmount, err := strconv.ParseFloat(msg.Text, 64)
+	if err != nil {
+		sessionManager.Step = domain.SessionStepSamuraiEnterDataMenuHandler
+
+		return msg.Answer("Введите данные на конец смены с 8 до 12 часов дня. Без пробелов, точек и иных знаков.").
+			DoVoid(ctx)
+	}
+
+	sessionManager.SamuraiTurnover.FinalAmount = finalAmount
+	sessionManager.SamuraiTurnover.SamuraiUsername = string(msg.From.Username)
+
+	banks, err := h.cardService.GetBankNames(ctx)
+	if err != nil {
+		return err
+	}
+
+	buttons := make([]tg.KeyboardButton, 0)
+
+	for _, item := range banks {
+		buttons = append(buttons, tg.NewKeyboardButton(item.Name))
+	}
+
+	kb := tg.NewReplyKeyboardMarkup(
+		tg.NewButtonColumn(
+			buttons...,
+		)...,
+	).WithResizeKeyboardMarkup()
+
+	h.sessionManager.Get(ctx).Step = domain.SessionStepSamuraiChooseBankMenuHandler
+
+	return msg.Answer("Выберите банк").ReplyMarkup(kb).DoVoid(ctx)
+}
+
+func (h *SamuraiHandler) ChooseBankMenuHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+	sessionManager := h.sessionManager.Get(ctx)
+	sessionManager.SamuraiTurnover.BankTypeName = msg.Text
+
+	if err := h.samuraiService.CreateTurnover(ctx, sessionManager.SamuraiTurnover); err != nil {
+		return err
+	}
+
+	sessionManager.Step = domain.SessionStepInit
+
+	return msg.Answer("Данные записаны. Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
 }
 
 func (h *SamuraiHandler) Notify(ctx context.Context, args domain.FuncArgs) (status domain.TaskStatus, when interface{}) {

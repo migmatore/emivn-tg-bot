@@ -22,6 +22,7 @@ type Deps struct {
 	ShogunStorage                     shogun.ShogunStorage
 	DaimyoStorage                     daimyo.DaimyoStorage
 	SamuraiStorage                    samurai.SamuraiStorage
+	SamuraiTurnoverStorage            samurai.SamuraiTurnoverStorage
 	CashManagerStorage                cash_manager.CashManagerStorage
 	CardStorage                       card.CardStorage
 	ReplenishmentRequestStorage       replenishment_request.ReplenishmentRequestStorage
@@ -59,6 +60,7 @@ func New(deps Deps) *Service {
 		Samurai: samurai.NewSamuraiService(
 			deps.Transactor,
 			deps.SamuraiStorage,
+			deps.SamuraiTurnoverStorage,
 			deps.UserRoleStorage,
 			deps.RoleStorage,
 		),

@@ -6,7 +6,6 @@ import (
 	"github.com/mr-linch/go-tg"
 	"github.com/mr-linch/go-tg/tgb"
 	"github.com/mr-linch/go-tg/tgb/session"
-	"time"
 )
 
 type AuthService interface {
@@ -61,25 +60,25 @@ func (s *StartHandler) Start(ctx context.Context, msg *tgb.MessageUpdate) error 
 	case domain.AdminRole.String():
 		s.sessionManager.Get(ctx).Step = domain.SessionStepAdminMainMenuHandler
 
-		if err := s.scheduler.Add(ctx, domain.TaskDTO{
-			Alias:           "notify_samurai",
-			Name:            "test task",
-			Arguments:       domain.FuncArgs{"id": 6109520093},
-			IntervalMinutes: 0,
-			RunAt:           time.Now(),
-		}); err != nil {
-			return msg.Answer(err.Error()).DoVoid(ctx)
-		}
-
-		if err := s.scheduler.Add(ctx, domain.TaskDTO{
-			Alias:           "notify_samurai",
-			Name:            "test task 2",
-			Arguments:       domain.FuncArgs{"id": 1093658711},
-			IntervalMinutes: 0,
-			RunAt:           time.Now(),
-		}); err != nil {
-			return msg.Answer(err.Error()).DoVoid(ctx)
-		}
+		//if err := s.scheduler.Add(ctx, domain.TaskDTO{
+		//	Alias:           "notify_samurai",
+		//	Name:            "test task",
+		//	Arguments:       domain.FuncArgs{"id": 6109520093},
+		//	IntervalMinutes: 0,
+		//	RunAt:           time.Now(),
+		//}); err != nil {
+		//	return msg.Answer(err.Error()).DoVoid(ctx)
+		//}
+		//
+		//if err := s.scheduler.Add(ctx, domain.TaskDTO{
+		//	Alias:           "notify_samurai",
+		//	Name:            "test task 2",
+		//	Arguments:       domain.FuncArgs{"id": 1093658711},
+		//	IntervalMinutes: 0,
+		//	RunAt:           time.Now(),
+		//}); err != nil {
+		//	return msg.Answer(err.Error()).DoVoid(ctx)
+		//}
 
 		return msg.Answer("Пожалуйста, выберите действие").
 			ReplyMarkup(buildAdminStartMenu()).
@@ -98,7 +97,7 @@ func (s *StartHandler) Start(ctx context.Context, msg *tgb.MessageUpdate) error 
 			ReplyMarkup(buildDaimyoStartMenu()).
 			DoVoid(ctx)
 	case domain.SamuraiRole.String():
-		s.sessionManager.Get(ctx).Step = domain.SessionStepSamuraiMenuHandler
+		s.sessionManager.Get(ctx).Step = domain.SessionStepSamuraiEnterDataMenuHandler
 
 		if err := s.SamuraiService.SetChatId(ctx, string(msg.Chat.Username), msg.Chat.ID); err != nil {
 			s.sessionManager.Reset(s.sessionManager.Get(ctx))
@@ -106,8 +105,7 @@ func (s *StartHandler) Start(ctx context.Context, msg *tgb.MessageUpdate) error 
 			return msg.Answer("Ошибка").DoVoid(ctx)
 		}
 
-		return msg.Answer("Пожалуйста, выберите действие").
-			ReplyMarkup(buildDaimyoStartMenu()).
+		return msg.Answer("Введите данные на конец смены с 8 до 12 часов дня. Без пробелов, точек и иных знаков.").
 			DoVoid(ctx)
 	case domain.CashManagerRole.String():
 		s.sessionManager.Get(ctx).Step = domain.SessionStepCashManagerMenuHandler

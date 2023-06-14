@@ -37,6 +37,8 @@ type DaimyoService interface {
 type SamuraiService interface {
 	Create(ctx context.Context, dto domain.SamuraiDTO) error
 	SetChatId(ctx context.Context, username string, id tg.ChatID) error
+	GetByUsername(ctx context.Context, username string) (domain.SamuraiDTO, error)
+	CreateTurnover(ctx context.Context, turnover domain.SamuraiTurnoverDTO) error
 }
 
 type CashManagerService interface {
@@ -114,7 +116,7 @@ func New(deps Deps) *Handler {
 			deps.CashManagerService,
 		),
 		CashManagerHandler: cash_manager.NewCashManagerHandler(sm.Manager),
-		SamuraiHandler:     samurai.NewSamuraiHandler(sm.Manager),
+		SamuraiHandler:     samurai.NewSamuraiHandler(sm.Manager, deps.CardService, deps.SamuraiService),
 		ShogunHandler:      shogun.NewShogunHandler(sm.Manager),
 	}
 }

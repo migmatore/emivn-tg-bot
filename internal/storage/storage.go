@@ -10,6 +10,7 @@ import (
 	"emivn-tg-bot/internal/storage/replenishment_request_status"
 	"emivn-tg-bot/internal/storage/role"
 	"emivn-tg-bot/internal/storage/samurai"
+	"emivn-tg-bot/internal/storage/samurai_turnover"
 	"emivn-tg-bot/internal/storage/scheduler"
 	"emivn-tg-bot/internal/storage/shogun"
 	"emivn-tg-bot/internal/storage/user_role"
@@ -22,6 +23,7 @@ type Storage struct {
 	Shogun                            *shogun.ShogunStorage
 	Daimyo                            *daimyo.DaimyoStorage
 	Samurai                           *samurai.SamuraiStorage
+	SamuraiTurnover                   *samurai_turnover.SamuraiTurnoverStorage
 	CashManager                       *cash_manager.CashManagerStorage
 	Card                              *card.CardStorage
 	ReplenishmentRequest              *replenishment_request.ReplenishmentRequestStorage
@@ -39,6 +41,7 @@ func New(pool psql.AtomicPoolClient) *Storage {
 		Shogun:                            shogun.NewShogunStorage(pool),
 		Daimyo:                            daimyo.NewDaimyoStorage(pool),
 		Samurai:                           samurai.NewSamuraiStorage(pool),
+		SamuraiTurnover:                   samurai_turnover.New(pool),
 		CashManager:                       cash_manager.NewCashManagerStorage(pool),
 		Card:                              card.NewCardStorage(pool),
 		ReplenishmentRequest:              replenishment_request.NewReplenishmentRequestStorage(pool),

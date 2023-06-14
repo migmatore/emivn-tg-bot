@@ -43,7 +43,9 @@ const (
 	SessionStepEnterReplenishmentRequestAmount
 	SessionStepMakeReplenishmentRequest
 
-	SessionStepSamuraiMenuHandler
+	// samurai steps
+	SessionStepSamuraiEnterDataMenuHandler
+	SessionStepSamuraiChooseBankMenuHandler
 
 	SessionStepCashManagerMenuHandler
 )
@@ -57,4 +59,5 @@ type Session struct {
 	CashManager          CashManagerDTO
 	Card                 CardDTO
 	ReplenishmentRequest ReplenishmentRequestDTO
+	SamuraiTurnover      SamuraiTurnoverDTO
 }
