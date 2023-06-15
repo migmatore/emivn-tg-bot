@@ -1,11 +1,9 @@
 package domain
 
-import "time"
-
 type SamuraiTurnover struct {
 	TurnoverId      int
 	SamuraiUsername string
-	StartDate       time.Time
+	StartDate       string
 	InitialAmount   float64
 	FinalAmount     float64
 	Turnover        float64
@@ -14,7 +12,7 @@ type SamuraiTurnover struct {
 
 type SamuraiTurnoverDTO struct {
 	SamuraiUsername string
-	StartDate       time.Time
+	StartDate       string
 	InitialAmount   float64
 	FinalAmount     float64
 	Turnover        float64

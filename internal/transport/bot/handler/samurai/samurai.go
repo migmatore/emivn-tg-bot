@@ -52,7 +52,6 @@ func (h *SamuraiHandler) EnterDataMenuHandler(ctx context.Context, msg *tgb.Mess
 
 	sessionManager.SamuraiTurnover.FinalAmount = finalAmount
 	sessionManager.SamuraiTurnover.SamuraiUsername = string(msg.From.Username)
-	sessionManager.SamuraiTurnover.StartDate = time.Now()
 
 	banks, err := h.cardService.GetBankNames(ctx)
 	if err != nil {

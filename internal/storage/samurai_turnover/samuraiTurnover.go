@@ -4,7 +4,8 @@ import (
 	"context"
 	"emivn-tg-bot/internal/domain"
 	"emivn-tg-bot/internal/storage/psql"
-	"time"
+	"emivn-tg-bot/pkg/logging"
+	"github.com/migmatore/bakery-shop-api/pkg/utils"
 )
 
 type SamuraiTurnoverStorage struct {
@@ -16,10 +17,100 @@ func New(pool psql.AtomicPoolClient) *SamuraiTurnoverStorage {
 }
 
 func (s *SamuraiTurnoverStorage) Insert(ctx context.Context, turnover domain.SamuraiTurnover) error {
+	q := `insert into samurai_turnovers(samurai_username, start_date, initial_amount, final_amount, 
+                              turnover, bank_type_id) values ($1, $2, $3, $4, $5, $6)`
+
+	if _, err := s.pool.Exec(
+		ctx,
+		q,
+		turnover.SamuraiUsername,
+		turnover.StartDate,
+		turnover.InitialAmount,
+		turnover.FinalAmount,
+		turnover.Turnover,
+		turnover.BankTypeId,
+	); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			logging.GetLogger(ctx).Errorf("Error: %v", err)
+			return err
+		}
+
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return err
+	}
+
+	return nil
+
 	return nil
 }
 
-func (s *SamuraiTurnoverStorage) CheckIfExists(ctx context.Context, time time.Time) (bool, error) {
+func (s *SamuraiTurnoverStorage) CheckIfExists(ctx context.Context, date string, bankId int) (bool, error) {
+	q := `select exists(select * from samurai_turnovers where start_date = $1 and bank_type_id = $2)`
 
-	return true, nil
+	var exists bool
+
+	if err := s.pool.QueryRow(ctx, q, date, bankId).Scan(&exists); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			logging.GetLogger(ctx).Errorf("Error: %v", err)
+			return false, err
+		}
+
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return false, err
+	}
+
+	return exists, nil
+}
+
+func (s *SamuraiTurnoverStorage) GetByDateAndBank(ctx context.Context, date string, bankId int) (domain.SamuraiTurnover, error) {
+	q := `select id, samurai_username, start_date::text, initial_amount, final_amount, turnover, bank_type_id 
+				from samurai_turnovers where start_date = $1 and bank_type_id = $2`
+
+	turnover := domain.SamuraiTurnover{}
+
+	if err := s.pool.QueryRow(ctx, q, date, bankId).Scan(
+		&turnover.TurnoverId,
+		&turnover.SamuraiUsername,
+		&turnover.StartDate,
+		&turnover.InitialAmount,
+		&turnover.FinalAmount,
+		&turnover.Turnover,
+		&turnover.BankTypeId,
+	); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			logging.GetLogger(ctx).Errorf("Error: %v", err)
+			return turnover, err
+		}
+
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return turnover, err
+	}
+
+	return turnover, nil
+}
+
+func (s *SamuraiTurnoverStorage) Update(ctx context.Context, turnover domain.SamuraiTurnover) error {
+	q := `update samurai_turnovers SET initial_amount=$1, final_amount=$2, turnover=$3 where  bank_type_id=$6 
+                                                                               and (id=$4 or start_date=$5)`
+
+	if _, err := s.pool.Exec(
+		ctx,
+		q,
+		turnover.InitialAmount,
+		turnover.FinalAmount,
+		turnover.Turnover,
+		turnover.TurnoverId,
+		turnover.StartDate,
+		turnover.BankTypeId,
+	); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			logging.GetLogger(ctx).Errorf("Error: %v", err)
+			return err
+		}
+
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return err
+	}
+
+	return nil
 }

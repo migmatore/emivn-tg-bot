@@ -17,7 +17,13 @@ type SamuraiStorage interface {
 
 type SamuraiTurnoverStorage interface {
 	Insert(ctx context.Context, turnover domain.SamuraiTurnover) error
-	CheckIfExists(ctx context.Context) (bool, error)
+	CheckIfExists(ctx context.Context, date string, bankId int) (bool, error)
+	GetByDateAndBank(ctx context.Context, date string, bankId int) (domain.SamuraiTurnover, error)
+	Update(ctx context.Context, turnover domain.SamuraiTurnover) error
+}
+
+type CardStorage interface {
+	GetBankIdByName(ctx context.Context, bankName string) (int, error)
 }
 
 type UserRoleStorage interface {
@@ -32,7 +38,8 @@ type SamuraiService struct {
 	transactor storage.Transactor
 
 	storage                SamuraiStorage
-	SamuraiTurnoverStorage SamuraiTurnoverStorage
+	samuraiTurnoverStorage SamuraiTurnoverStorage
+	cardStorage            CardStorage
 	userRoleStorage        UserRoleStorage
 	roleStorage            RoleStorage
 }
@@ -41,13 +48,15 @@ func NewSamuraiService(
 	transactor storage.Transactor,
 	samuraiStorage SamuraiStorage,
 	samuraiTurnoverStorage SamuraiTurnoverStorage,
+	cardStorage CardStorage,
 	userRole UserRoleStorage,
 	role RoleStorage,
 ) *SamuraiService {
 	return &SamuraiService{
 		transactor:             transactor,
 		storage:                samuraiStorage,
-		SamuraiTurnoverStorage: samuraiTurnoverStorage,
+		samuraiTurnoverStorage: samuraiTurnoverStorage,
+		cardStorage:            cardStorage,
 		userRoleStorage:        userRole,
 		roleStorage:            role,
 	}
@@ -119,13 +128,79 @@ func (s *SamuraiService) GetByUsername(ctx context.Context, username string) (do
 }
 
 func (s *SamuraiService) CreateTurnover(ctx context.Context, dto domain.SamuraiTurnoverDTO) error {
-	turnover := domain.SamuraiTurnover{
-		SamuraiUsername: dto.SamuraiUsername,
-		StartDate:       time.Time{},
-		InitialAmount:   dto.FinalAmount,
-		FinalAmount:     dto.FinalAmount,
-		Turnover:        dto.Turnover,
-		BankTypeId:      0,
+	yesterday := time.Now().AddDate(0, 0, -1).Format("2006-01-02")
+
+	bankId, err := s.cardStorage.GetBankIdByName(ctx, dto.BankTypeName)
+	if err != nil {
+		return err
+	}
+
+	exists, err := s.samuraiTurnoverStorage.CheckIfExists(ctx, yesterday, bankId)
+	if err != nil {
+		return err
+	}
+
+	initialAmount := dto.FinalAmount
+
+	if err := s.transactor.WithinTransaction(ctx, func(txCtx context.Context) error {
+		if !exists {
+			turnover := domain.SamuraiTurnover{
+				SamuraiUsername: dto.SamuraiUsername,
+				StartDate:       yesterday,
+				InitialAmount:   0,
+				FinalAmount:     dto.FinalAmount,
+				Turnover:        dto.FinalAmount,
+				BankTypeId:      bankId,
+			}
+
+			if err := s.samuraiTurnoverStorage.Insert(ctx, turnover); err != nil {
+				return err
+			}
+		} else {
+			turnover, err := s.samuraiTurnoverStorage.GetByDateAndBank(ctx, yesterday, bankId)
+			if err != nil {
+				return err
+			}
+
+			turnover.FinalAmount = dto.FinalAmount + turnover.InitialAmount
+			turnover.Turnover = dto.FinalAmount
+
+			initialAmount = turnover.FinalAmount
+
+			if err := s.samuraiTurnoverStorage.Update(ctx, turnover); err != nil {
+				return err
+			}
+		}
+
+		turnover := domain.SamuraiTurnover{
+			SamuraiUsername: dto.SamuraiUsername,
+			StartDate:       time.Now().Format("2006-01-02"),
+			InitialAmount:   initialAmount,
+			FinalAmount:     0,
+			Turnover:        initialAmount,
+			BankTypeId:      bankId,
+		}
+
+		newExists, err := s.samuraiTurnoverStorage.CheckIfExists(ctx, time.Now().Format("2006-01-02"), bankId)
+		if err != nil {
+			return err
+		}
+
+		if !newExists {
+			if err := s.samuraiTurnoverStorage.Insert(ctx, turnover); err != nil {
+				return err
+			}
+
+			return nil
+		}
+
+		if err := s.samuraiTurnoverStorage.Update(ctx, turnover); err != nil {
+			return err
+		}
+
+		return nil
+	}); err != nil {
+		return err
 	}
 
 	return nil
