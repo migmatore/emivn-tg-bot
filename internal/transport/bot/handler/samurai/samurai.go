@@ -17,7 +17,7 @@ type CardService interface {
 
 type SamuraiService interface {
 	GetByUsername(ctx context.Context, username string) (domain.SamuraiDTO, error)
-	CreateTurnover(ctx context.Context, turnover domain.SamuraiTurnoverDTO) error
+	CreateTurnover(ctx context.Context, dto domain.SamuraiTurnoverDTO) error
 }
 
 type SamuraiHandler struct {
@@ -52,6 +52,7 @@ func (h *SamuraiHandler) EnterDataMenuHandler(ctx context.Context, msg *tgb.Mess
 
 	sessionManager.SamuraiTurnover.FinalAmount = finalAmount
 	sessionManager.SamuraiTurnover.SamuraiUsername = string(msg.From.Username)
+	sessionManager.SamuraiTurnover.StartDate = time.Now()
 
 	banks, err := h.cardService.GetBankNames(ctx)
 	if err != nil {

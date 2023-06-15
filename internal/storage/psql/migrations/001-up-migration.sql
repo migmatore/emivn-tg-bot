@@ -41,7 +41,7 @@ CREATE TABLE samurai_turnovers
 (
     id               INTEGER      NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     samurai_username VARCHAR(255) NOT NULL REFERENCES samurai (username),
-    start_date       TIMESTAMP    NOT NULL DEFAULT now(),
+    start_date       DATE         NOT NULL DEFAULT now(),
     initial_amount   FLOAT        NOT NULL DEFAULT 0,
     final_amount     FLOAT        NOT NULL DEFAULT 0,
     turnover         FLOAT        NOT NULL DEFAULT 0,

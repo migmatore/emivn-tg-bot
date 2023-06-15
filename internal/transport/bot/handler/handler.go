@@ -38,7 +38,7 @@ type SamuraiService interface {
 	Create(ctx context.Context, dto domain.SamuraiDTO) error
 	SetChatId(ctx context.Context, username string, id tg.ChatID) error
 	GetByUsername(ctx context.Context, username string) (domain.SamuraiDTO, error)
-	CreateTurnover(ctx context.Context, turnover domain.SamuraiTurnoverDTO) error
+	CreateTurnover(ctx context.Context, dto domain.SamuraiTurnoverDTO) error
 }
 
 type CashManagerService interface {
@@ -144,6 +144,7 @@ func (h *Handler) Init(ctx context.Context) (*tgb.Router, *Scheduler) {
 	h.registerStartHandlers()
 	h.registerAdminHandlers()
 	h.registerDaimyoHandler()
+	h.registerSamuraiHandler()
 
 	return h.Router, h.scheduler
 }

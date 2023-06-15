@@ -6,6 +6,7 @@ import (
 	"emivn-tg-bot/internal/storage"
 	"emivn-tg-bot/pkg/logging"
 	"github.com/mr-linch/go-tg"
+	"time"
 )
 
 type SamuraiStorage interface {
@@ -16,6 +17,7 @@ type SamuraiStorage interface {
 
 type SamuraiTurnoverStorage interface {
 	Insert(ctx context.Context, turnover domain.SamuraiTurnover) error
+	CheckIfExists(ctx context.Context) (bool, error)
 }
 
 type UserRoleStorage interface {
@@ -116,6 +118,15 @@ func (s *SamuraiService) GetByUsername(ctx context.Context, username string) (do
 	return samuraiDTO, nil
 }
 
-func (s *SamuraiService) CreateTurnover(ctx context.Context, turnover domain.SamuraiTurnoverDTO) error {
+func (s *SamuraiService) CreateTurnover(ctx context.Context, dto domain.SamuraiTurnoverDTO) error {
+	turnover := domain.SamuraiTurnover{
+		SamuraiUsername: dto.SamuraiUsername,
+		StartDate:       time.Time{},
+		InitialAmount:   dto.FinalAmount,
+		FinalAmount:     dto.FinalAmount,
+		Turnover:        dto.Turnover,
+		BankTypeId:      0,
+	}
+
 	return nil
 }
