@@ -46,6 +46,7 @@ func (a *App) Run(ctx context.Context) error {
 		SamuraiTurnoverStorage:            storages.SamuraiTurnover,
 		CashManagerStorage:                storages.CashManager,
 		ControllerStorage:                 storages.Controller,
+		ControllerTurnoverStorage:         storages.ControllerTurnover,
 		UserRoleStorage:                   storages.UserRole,
 		RoleStorage:                       storages.Role,
 		CardStorage:                       storages.Card,

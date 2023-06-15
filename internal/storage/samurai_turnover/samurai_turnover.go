@@ -44,12 +44,17 @@ func (s *SamuraiTurnoverStorage) Insert(ctx context.Context, turnover domain.Sam
 	return nil
 }
 
-func (s *SamuraiTurnoverStorage) CheckIfExists(ctx context.Context, date string, bankId int) (bool, error) {
-	q := `select exists(select * from samurai_turnovers where start_date = $1 and bank_type_id = $2)`
+func (s *SamuraiTurnoverStorage) CheckIfExists(
+	ctx context.Context,
+	date string,
+	bankId int,
+	samuraiUsername string,
+) (bool, error) {
+	q := `select exists(select * from samurai_turnovers where start_date=$1 and bank_type_id=$2 and samurai_username=$3)`
 
 	var exists bool
 
-	if err := s.pool.QueryRow(ctx, q, date, bankId).Scan(&exists); err != nil {
+	if err := s.pool.QueryRow(ctx, q, date, bankId, samuraiUsername).Scan(&exists); err != nil {
 		if err := utils.ParsePgError(err); err != nil {
 			logging.GetLogger(ctx).Errorf("Error: %v", err)
 			return false, err
@@ -62,13 +67,18 @@ func (s *SamuraiTurnoverStorage) CheckIfExists(ctx context.Context, date string,
 	return exists, nil
 }
 
-func (s *SamuraiTurnoverStorage) GetByDateAndBank(ctx context.Context, date string, bankId int) (domain.SamuraiTurnover, error) {
+func (s *SamuraiTurnoverStorage) GetByDateAndBank(
+	ctx context.Context,
+	date string,
+	bankId int,
+	samuraiUsername string,
+) (domain.SamuraiTurnover, error) {
 	q := `select id, samurai_username, start_date::text, initial_amount, final_amount, turnover, bank_type_id 
-				from samurai_turnovers where start_date = $1 and bank_type_id = $2`
+				from samurai_turnovers where start_date = $1 and bank_type_id = $2 and samurai_username = $3`
 
 	turnover := domain.SamuraiTurnover{}
 
-	if err := s.pool.QueryRow(ctx, q, date, bankId).Scan(
+	if err := s.pool.QueryRow(ctx, q, date, bankId, samuraiUsername).Scan(
 		&turnover.TurnoverId,
 		&turnover.SamuraiUsername,
 		&turnover.StartDate,
@@ -90,8 +100,8 @@ func (s *SamuraiTurnoverStorage) GetByDateAndBank(ctx context.Context, date stri
 }
 
 func (s *SamuraiTurnoverStorage) Update(ctx context.Context, turnover domain.SamuraiTurnover) error {
-	q := `update samurai_turnovers SET initial_amount=$1, final_amount=$2, turnover=$3 where  bank_type_id=$6 
-                                                                               and (id=$4 or start_date=$5)`
+	q := `update samurai_turnovers SET initial_amount=$1, final_amount=$2, turnover=$3 where samurai_username=$4 and bank_type_id=$5 
+                                                                               and (id=$6 or start_date=$7)`
 
 	if _, err := s.pool.Exec(
 		ctx,
@@ -99,9 +109,10 @@ func (s *SamuraiTurnoverStorage) Update(ctx context.Context, turnover domain.Sam
 		turnover.InitialAmount,
 		turnover.FinalAmount,
 		turnover.Turnover,
+		turnover.SamuraiUsername,
+		turnover.BankTypeId,
 		turnover.TurnoverId,
 		turnover.StartDate,
-		turnover.BankTypeId,
 	); err != nil {
 		if err := utils.ParsePgError(err); err != nil {
 			logging.GetLogger(ctx).Errorf("Error: %v", err)

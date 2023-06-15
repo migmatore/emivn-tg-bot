@@ -20,3 +20,10 @@ type ControllerTurnoverDTO struct {
 	Turnover           float64
 	BankTypeName       string
 }
+
+type ControllerArgs struct {
+	Date               string
+	BankId             int
+	ControllerUsername string
+	SamuraiUsername    string
+}

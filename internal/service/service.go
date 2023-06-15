@@ -26,6 +26,7 @@ type Deps struct {
 	SamuraiTurnoverStorage            samurai.SamuraiTurnoverStorage
 	CashManagerStorage                cash_manager.CashManagerStorage
 	ControllerStorage                 controller.ControllerStorage
+	ControllerTurnoverStorage         controller.ControllerTurnoverStorage
 	CardStorage                       card.CardStorage
 	ReplenishmentRequestStorage       replenishment_request.ReplenishmentRequestStorage
 	ReplenishmentRequestStatusStorage replenishment_request_status.ReplenishmentRequestStatusStorage
@@ -77,6 +78,8 @@ func New(deps Deps) *Service {
 		Controller: controller.New(
 			deps.Transactor,
 			deps.ControllerStorage,
+			deps.ControllerTurnoverStorage,
+			deps.CardStorage,
 		),
 		Card: card.NewCardService(deps.Transactor, deps.CardStorage),
 		ReplenishmentRequest: replenishment_request.NewReplenishmentRequestService(

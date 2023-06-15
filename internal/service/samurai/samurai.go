@@ -18,8 +18,8 @@ type SamuraiStorage interface {
 
 type SamuraiTurnoverStorage interface {
 	Insert(ctx context.Context, turnover domain.SamuraiTurnover) error
-	CheckIfExists(ctx context.Context, date string, bankId int) (bool, error)
-	GetByDateAndBank(ctx context.Context, date string, bankId int) (domain.SamuraiTurnover, error)
+	CheckIfExists(ctx context.Context, date string, bankId int, samuraiUsername string) (bool, error)
+	GetByDateAndBank(ctx context.Context, date string, bankId int, samuraiUsername string) (domain.SamuraiTurnover, error)
 	Update(ctx context.Context, turnover domain.SamuraiTurnover) error
 }
 
@@ -48,7 +48,7 @@ type SamuraiService struct {
 func NewSamuraiService(
 	transactor storage.Transactor,
 	samuraiStorage SamuraiStorage,
-	samuraiTurnoverStorage SamuraiTurnoverStorage,
+	turnoverStorage SamuraiTurnoverStorage,
 	cardStorage CardStorage,
 	userRole UserRoleStorage,
 	role RoleStorage,
@@ -56,7 +56,7 @@ func NewSamuraiService(
 	return &SamuraiService{
 		transactor:             transactor,
 		storage:                samuraiStorage,
-		samuraiTurnoverStorage: samuraiTurnoverStorage,
+		samuraiTurnoverStorage: turnoverStorage,
 		cardStorage:            cardStorage,
 		userRoleStorage:        userRole,
 		roleStorage:            role,
@@ -159,7 +159,7 @@ func (s *SamuraiService) CreateTurnover(ctx context.Context, dto domain.SamuraiT
 		return err
 	}
 
-	exists, err := s.samuraiTurnoverStorage.CheckIfExists(ctx, yesterday, bankId)
+	exists, err := s.samuraiTurnoverStorage.CheckIfExists(ctx, yesterday, bankId, dto.SamuraiUsername)
 	if err != nil {
 		return err
 	}
@@ -181,7 +181,7 @@ func (s *SamuraiService) CreateTurnover(ctx context.Context, dto domain.SamuraiT
 				return err
 			}
 		} else {
-			turnover, err := s.samuraiTurnoverStorage.GetByDateAndBank(ctx, yesterday, bankId)
+			turnover, err := s.samuraiTurnoverStorage.GetByDateAndBank(ctx, yesterday, bankId, dto.SamuraiUsername)
 			if err != nil {
 				return err
 			}
@@ -205,7 +205,12 @@ func (s *SamuraiService) CreateTurnover(ctx context.Context, dto domain.SamuraiT
 			BankTypeId:      bankId,
 		}
 
-		newExists, err := s.samuraiTurnoverStorage.CheckIfExists(ctx, time.Now().Format("2006-01-02"), bankId)
+		newExists, err := s.samuraiTurnoverStorage.CheckIfExists(
+			ctx,
+			time.Now().Format("2006-01-02"),
+			bankId,
+			dto.SamuraiUsername,
+		)
 		if err != nil {
 			return err
 		}
