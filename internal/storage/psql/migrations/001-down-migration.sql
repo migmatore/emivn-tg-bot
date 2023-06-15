@@ -1,3 +1,7 @@
+DROP TABLE controllers CASCADE;
+
+DROP TABLE controller_turnovers CASCADE;
+
 DROP TABLE samurai_turnovers CASCADE;
 
 DROP TABLE samurai CASCADE;
