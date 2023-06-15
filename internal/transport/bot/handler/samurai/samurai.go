@@ -42,15 +42,11 @@ func NewSamuraiHandler(
 func (h *SamuraiHandler) EnterDataMenuHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	sessionManager := h.sessionManager.Get(ctx)
 
-	finalAmount, err := strconv.ParseFloat(msg.Text, 64)
-	if err != nil {
-		sessionManager.Step = domain.SessionStepSamuraiEnterDataMenuHandler
-
-		return msg.Answer("Введите данные на конец смены с 8 до 12 часов дня. Без пробелов, точек и иных знаков.").
-			DoVoid(ctx)
+	if msg.Text != domain.SamuraiMainMenu.EnterData {
+		sessionManager.Step = domain.SessionStepInit
+		return msg.Answer("Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
 	}
 
-	sessionManager.SamuraiTurnover.FinalAmount = finalAmount
 	sessionManager.SamuraiTurnover.SamuraiUsername = string(msg.From.Username)
 
 	banks, err := h.cardService.GetBankNames(ctx)
@@ -70,7 +66,7 @@ func (h *SamuraiHandler) EnterDataMenuHandler(ctx context.Context, msg *tgb.Mess
 		)...,
 	).WithResizeKeyboardMarkup()
 
-	h.sessionManager.Get(ctx).Step = domain.SessionStepSamuraiChooseBankMenuHandler
+	sessionManager.Step = domain.SessionStepSamuraiChooseBankMenuHandler
 
 	return msg.Answer("Выберите банк").ReplyMarkup(kb).DoVoid(ctx)
 }
@@ -78,6 +74,24 @@ func (h *SamuraiHandler) EnterDataMenuHandler(ctx context.Context, msg *tgb.Mess
 func (h *SamuraiHandler) ChooseBankMenuHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	sessionManager := h.sessionManager.Get(ctx)
 	sessionManager.SamuraiTurnover.BankTypeName = msg.Text
+
+	sessionManager.Step = domain.SessionStepSamuraiCreateTurnoverHandler
+
+	return msg.Answer("Введите данные на конец смены с 8 до 12 часов дня. Без пробелов, точек и иных знаков.").DoVoid(ctx)
+}
+
+func (h *SamuraiHandler) CreateTurnoverMenuHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+	sessionManager := h.sessionManager.Get(ctx)
+
+	finalAmount, err := strconv.ParseFloat(msg.Text, 64)
+	if err != nil {
+		sessionManager.Step = domain.SessionStepSamuraiChooseBankMenuHandler
+
+		return msg.Answer("Введите данные на конец смены с 8 до 12 часов дня. Без пробелов, точек и иных знаков.").
+			DoVoid(ctx)
+	}
+
+	sessionManager.SamuraiTurnover.FinalAmount = finalAmount
 
 	if err := h.samuraiService.CreateTurnover(ctx, sessionManager.SamuraiTurnover); err != nil {
 		return err

@@ -101,3 +101,9 @@ var CashManagerMainMenu = struct {
 	CurrentBalance:     "Текущий остаток",
 	ReplenishmentList:  "Список пополнений",
 }
+
+var ControllerMainMenu = struct {
+	EnterData string
+}{
+	EnterData: "Ввести данные на конец смены",
+}

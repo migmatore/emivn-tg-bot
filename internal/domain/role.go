@@ -8,6 +8,7 @@ const (
 	DaimyoRole
 	SamuraiRole
 	CashManagerRole
+	ControllerRole
 )
 
 func (r Role) String() string {
@@ -22,6 +23,8 @@ func (r Role) String() string {
 		return "Самурай"
 	case CashManagerRole:
 		return "Инкассатор"
+	case ControllerRole:
+		return "Контролёр"
 	default:
 		return ""
 	}

@@ -64,3 +64,11 @@ func buildSamuraiStartMenu() *tg.ReplyKeyboardMarkup {
 		)...,
 	).WithResizeKeyboardMarkup()
 }
+
+func buildControllerStartMenu() *tg.ReplyKeyboardMarkup {
+	return tg.NewReplyKeyboardMarkup(
+		tg.NewButtonColumn(
+			tg.NewKeyboardButton(domain.ControllerMainMenu.EnterData),
+		)...,
+	).WithResizeKeyboardMarkup()
+}

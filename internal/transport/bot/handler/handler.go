@@ -5,6 +5,7 @@ import (
 	"emivn-tg-bot/internal/domain"
 	"emivn-tg-bot/internal/transport/bot/handler/admin"
 	"emivn-tg-bot/internal/transport/bot/handler/cash_manager"
+	"emivn-tg-bot/internal/transport/bot/handler/controller"
 	"emivn-tg-bot/internal/transport/bot/handler/daimyo"
 	"emivn-tg-bot/internal/transport/bot/handler/samurai"
 	"emivn-tg-bot/internal/transport/bot/handler/shogun"
@@ -39,11 +40,16 @@ type SamuraiService interface {
 	SetChatId(ctx context.Context, username string, id tg.ChatID) error
 	GetByUsername(ctx context.Context, username string) (domain.SamuraiDTO, error)
 	CreateTurnover(ctx context.Context, dto domain.SamuraiTurnoverDTO) error
+	GetAllByDaimyo(ctx context.Context, daimyoUsername string) ([]*domain.SamuraiDTO, error)
 }
 
 type CashManagerService interface {
 	Create(ctx context.Context, dto domain.CashManagerDTO) error
 	SetChatId(ctx context.Context, username string, id tg.ChatID) error
+}
+
+type ControllerService interface {
+	CreateTurnover(ctx context.Context, dto domain.ControllerTurnoverDTO) error
 }
 
 type CardService interface {
@@ -65,6 +71,7 @@ type Deps struct {
 	DaimyoService               DaimyoService
 	SamuraiService              SamuraiService
 	CashManagerService          CashManagerService
+	ControllerService           ControllerService
 	CardService                 CardService
 	ReplenishmentRequestService ReplenishmentRequestService
 
@@ -82,6 +89,7 @@ type Handler struct {
 	CashManagerHandler *cash_manager.CashManagerHandler
 	SamuraiHandler     *samurai.SamuraiHandler
 	ShogunHandler      *shogun.ShogunHandler
+	ControllerHandler  *controller.ControllerHandler
 
 	scheduler *Scheduler
 }
@@ -115,9 +123,16 @@ func New(deps Deps) *Handler {
 			deps.ReplenishmentRequestService,
 			deps.CashManagerService,
 		),
-		CashManagerHandler: cash_manager.NewCashManagerHandler(sm.Manager),
+		CashManagerHandler: cash_manager.New(sm.Manager),
 		SamuraiHandler:     samurai.NewSamuraiHandler(sm.Manager, deps.CardService, deps.SamuraiService),
 		ShogunHandler:      shogun.NewShogunHandler(sm.Manager),
+		ControllerHandler: controller.New(
+			sm.Manager,
+			deps.ControllerService,
+			deps.CardService,
+			deps.DaimyoService,
+			deps.SamuraiService,
+		),
 	}
 }
 
@@ -145,6 +160,7 @@ func (h *Handler) Init(ctx context.Context) (*tgb.Router, *Scheduler) {
 	h.registerAdminHandlers()
 	h.registerDaimyoHandler()
 	h.registerSamuraiHandler()
+	h.registerControllerHandler()
 
 	return h.Router, h.scheduler
 }

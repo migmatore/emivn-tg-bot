@@ -13,6 +13,7 @@ type SamuraiStorage interface {
 	Insert(ctx context.Context, samurai domain.Samurai) error
 	GetByUsername(ctx context.Context, username string) (domain.Samurai, error)
 	SetChatId(ctx context.Context, username string, id int64) error
+	GetAllByDaimyo(ctx context.Context, daimyoUsername string) ([]*domain.Samurai, error)
 }
 
 type SamuraiTurnoverStorage interface {
@@ -125,6 +126,29 @@ func (s *SamuraiService) GetByUsername(ctx context.Context, username string) (do
 	}
 
 	return samuraiDTO, nil
+}
+
+func (s *SamuraiService) GetAllByDaimyo(ctx context.Context, daimyoUsername string) ([]*domain.SamuraiDTO, error) {
+	samurais, err := s.storage.GetAllByDaimyo(ctx, daimyoUsername)
+	if err != nil {
+		return nil, err
+	}
+
+	samuraiDTOs := make([]*domain.SamuraiDTO, 0)
+
+	for _, item := range samurais {
+		samuraiDTO := domain.SamuraiDTO{
+			Username:         item.Username,
+			Nickname:         item.Nickname,
+			DaimyoUsername:   item.DaimyoUsername,
+			TurnoverPerShift: item.TurnoverPerShift,
+			ChatId:           item.ChatId,
+		}
+
+		samuraiDTOs = append(samuraiDTOs, &samuraiDTO)
+	}
+
+	return samuraiDTOs, nil
 }
 
 func (s *SamuraiService) CreateTurnover(ctx context.Context, dto domain.SamuraiTurnoverDTO) error {

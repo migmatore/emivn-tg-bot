@@ -106,6 +106,7 @@ func (s *StartHandler) Start(ctx context.Context, msg *tgb.MessageUpdate) error 
 		}
 
 		return msg.Answer("Введите данные на конец смены с 8 до 12 часов дня. Без пробелов, точек и иных знаков.").
+			ReplyMarkup(buildSamuraiStartMenu()).
 			DoVoid(ctx)
 	case domain.CashManagerRole.String():
 		s.sessionManager.Get(ctx).Step = domain.SessionStepCashManagerMenuHandler
@@ -118,6 +119,12 @@ func (s *StartHandler) Start(ctx context.Context, msg *tgb.MessageUpdate) error 
 
 		return msg.Answer("Пожалуйста, выберите действие").
 			ReplyMarkup(buildCashManagerStartMenu()).
+			DoVoid(ctx)
+	case domain.ControllerRole.String():
+		s.sessionManager.Get(ctx).Step = domain.SessionStepControllerEnterDataMenuHandler
+
+		return msg.Answer("Введите данные на конец смены с 8 до 12 часов дня. Без пробелов, точек и иных знаков.").
+			ReplyMarkup(buildControllerStartMenu()).
 			DoVoid(ctx)
 	default:
 		return nil

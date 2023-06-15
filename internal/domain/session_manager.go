@@ -46,8 +46,16 @@ const (
 	// samurai steps
 	SessionStepSamuraiEnterDataMenuHandler
 	SessionStepSamuraiChooseBankMenuHandler
+	SessionStepSamuraiCreateTurnoverHandler
 
 	SessionStepCashManagerMenuHandler
+
+	// controller steps
+	SessionStepControllerEnterDataMenuHandler
+	SessionStepControllerChooseDaimyoMenuHandler
+	SessionStepControllerChooseSamuraiMenuHandler
+	SessionStepControllerChooseBankMenuHandler
+	SessionStepControllerCreateTurnoverHandler
 )
 
 type Session struct {
@@ -57,7 +65,9 @@ type Session struct {
 	Daimyo               DaimyoDTO
 	Samurai              SamuraiDTO
 	CashManager          CashManagerDTO
+	Controller           ControllerDTO
 	Card                 CardDTO
 	ReplenishmentRequest ReplenishmentRequestDTO
 	SamuraiTurnover      SamuraiTurnoverDTO
+	ControllerTurnover   ControllerTurnoverDTO
 }

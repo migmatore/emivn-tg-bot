@@ -11,7 +11,7 @@ type CashManagerHandler struct {
 	sessionManager *session.Manager[domain.Session]
 }
 
-func NewCashManagerHandler(sm *session.Manager[domain.Session]) *CashManagerHandler {
+func New(sm *session.Manager[domain.Session]) *CashManagerHandler {
 	return &CashManagerHandler{sessionManager: sm}
 }
 

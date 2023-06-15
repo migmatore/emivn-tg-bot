@@ -71,3 +71,37 @@ func (s *SamuraiStorage) SetChatId(ctx context.Context, username string, id int6
 
 	return nil
 }
+
+func (s *SamuraiStorage) GetAllByDaimyo(ctx context.Context, daimyoUsername string) ([]*domain.Samurai, error) {
+	q := `select username, nickname, daimyo_username, turnover_per_shift, chat_id from samurai where daimyo_username=$1`
+
+	samurais := make([]*domain.Samurai, 0)
+
+	rows, err := s.pool.Query(ctx, q, daimyoUsername)
+	if err != nil {
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var samurai domain.Samurai
+
+		err := rows.Scan(
+			&samurai.Username,
+			&samurai.Nickname,
+			&samurai.DaimyoUsername,
+			&samurai.TurnoverPerShift,
+			&samurai.ChatId,
+		)
+		if err != nil {
+			logging.GetLogger(ctx).Errorf("Query error. %v", err)
+			return nil, err
+		}
+
+		samurais = append(samurais, &samurai)
+	}
+
+	return samurais, nil
+}
