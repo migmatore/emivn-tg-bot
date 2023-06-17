@@ -19,11 +19,29 @@ func (h *DaimyoHandler) HierarchyMenuHandler(ctx context.Context, msg *tgb.Messa
 			DoVoid(ctx)
 
 	case domain.DaimyoHierarchyMenu.InSubordination:
+		samurais, err := h.samuraiService.GetAllByDaimyo(ctx, string(msg.From.Username))
+		if err != nil {
+			return err
+		}
 
-		return nil
+		buttons := make([]tg.KeyboardButton, 0)
+
+		for _, item := range samurais {
+			buttons = append(buttons, tg.NewKeyboardButton(item.Username))
+		}
+
+		kb := tg.NewReplyKeyboardMarkup(
+			tg.NewButtonColumn(
+				buttons...,
+			)...,
+		).WithResizeKeyboardMarkup()
+
+		h.sessionManager.Reset(h.sessionManager.Get(ctx))
+
+		return msg.Answer("Напишите /start").ReplyMarkup(kb).DoVoid(ctx)
 
 	default:
-		h.sessionManager.Get(ctx).Step = domain.SessionStepInit
+		h.sessionManager.Reset(h.sessionManager.Get(ctx))
 		return msg.Answer("Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
 	}
 }
