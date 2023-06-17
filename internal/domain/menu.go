@@ -2,6 +2,8 @@ package domain
 
 // TODO: menu code refactoring(with back button)
 
+// Admin
+
 var AdminMainMenu = struct {
 	Cards        string
 	RequestsList string
@@ -29,20 +31,26 @@ var AdminHierarchyMenu = struct {
 }
 
 var AdminCreateEntityMenu = struct {
-	CreateShogun      string
-	CreateDaimyo      string
-	CreateSamurai     string
-	CreateCashManager string
-	CreateCard        string
-	Back              string
+	CreateShogun       string
+	CreateDaimyo       string
+	CreateSamurai      string
+	CreateCashManager  string
+	CreateController   string
+	CreateMainOperator string
+	CreateCard         string
+	Back               string
 }{
-	CreateShogun:      "Создать сёгуна",
-	CreateDaimyo:      "Создать даймё",
-	CreateSamurai:     "Создать самурая",
-	CreateCashManager: "Создать инкассатора",
-	CreateCard:        "Создать карту",
-	//Back:              "Назад",
+	CreateShogun:       "Сёгун",
+	CreateDaimyo:       "Дайме",
+	CreateSamurai:      "Самурай",
+	CreateCashManager:  "Инкассатор",
+	CreateController:   "Контролёр",
+	CreateMainOperator: "Главный оператор",
+	CreateCard:         "Карта(убрать)",
+	Back:               "",
 }
+
+// Shogun
 
 var ShogunMainMenu = struct {
 	Requests   string
@@ -62,6 +70,8 @@ var ShogunMainMenu = struct {
 	Deposits:   "Пополнения",
 }
 
+// Daimyo
+
 var DaimyoMainMenu = struct {
 	MakeReplenishmentRequest string
 	Requests                 string
@@ -76,6 +86,32 @@ var DaimyoMainMenu = struct {
 	Hierarchy:                "Иерархия",
 }
 
+var DaimyoReportMenu = struct {
+	EnterShiftData string
+	ReportRequest  string
+}{
+	EnterShiftData: "Ввести данные за смену",
+	ReportRequest:  "Запросить отчет",
+}
+
+var DaimyoReportPeriodMenu = struct {
+	ForShift  string
+	ForPeriod string
+}{
+	ForShift:  "За смену с 8 до 12",
+	ForPeriod: "За период",
+}
+
+var DaimyoHierarchyMenu = struct {
+	CreateSamurai   string
+	InSubordination string
+}{
+	CreateSamurai:   "Создать Самурая",
+	InSubordination: "В подчинении",
+}
+
+// Samurai
+
 var SamuraiMainMenu = struct {
 	EnterData string
 }{
@@ -87,6 +123,8 @@ var SamuraiEnterDataMenu = struct {
 }{
 	ChooseBank: "Выбрать банк",
 }
+
+// Cash manager
 
 var CashManagerMainMenu = struct {
 	Requests           string
@@ -101,6 +139,8 @@ var CashManagerMainMenu = struct {
 	CurrentBalance:     "Текущий остаток",
 	ReplenishmentList:  "Список пополнений",
 }
+
+// Controller
 
 var ControllerMainMenu = struct {
 	EnterData string

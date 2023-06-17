@@ -60,6 +60,34 @@ func (s *DaimyoStorage) GetAll(ctx context.Context) ([]*domain.Daimyo, error) {
 	return daimyos, nil
 }
 
+func (s *DaimyoStorage) GetAllByShogun(ctx context.Context, shogunUsername string) ([]*domain.Daimyo, error) {
+	q := `select shogun_username, username, nickname from daimyo where shogun_username=$1`
+
+	daimyos := make([]*domain.Daimyo, 0)
+
+	rows, err := s.pool.Query(ctx, q, shogunUsername)
+	if err != nil {
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var daimyo domain.Daimyo
+
+		err := rows.Scan(&daimyo.ShogunUsername, &daimyo.Username, &daimyo.Nickname)
+		if err != nil {
+			logging.GetLogger(ctx).Errorf("Query error. %v", err)
+			return nil, err
+		}
+
+		daimyos = append(daimyos, &daimyo)
+	}
+
+	return daimyos, nil
+}
+
 func (s *DaimyoStorage) GetByUsername(ctx context.Context, username string) (domain.Daimyo, error) {
 	q := `select username, nickname, cards_balance, shogun_username from daimyo where username=$1`
 

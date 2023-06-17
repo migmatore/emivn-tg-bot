@@ -27,6 +27,10 @@ type CashManagerService interface {
 	Create(ctx context.Context, dto domain.CashManagerDTO) error
 }
 
+type ControllerService interface {
+	Create(ctx context.Context, dto domain.ControllerDTO) error
+}
+
 type CardService interface {
 	Create(ctx context.Context, dto domain.CardDTO) error
 	GetBankNames(ctx context.Context) ([]*domain.BankDTO, error)
@@ -39,6 +43,7 @@ type AdminHandler struct {
 	daimyoService      DaimyoService
 	samuraiService     SamuraiService
 	cashManagerService CashManagerService
+	controllerService  ControllerService
 	cardService        CardService
 }
 
@@ -48,6 +53,7 @@ func NewAdminHandler(
 	daimyoService DaimyoService,
 	samuraiService SamuraiService,
 	cashManagerService CashManagerService,
+	controllerService ControllerService,
 	cardService CardService,
 ) *AdminHandler {
 	return &AdminHandler{
@@ -56,12 +62,12 @@ func NewAdminHandler(
 		daimyoService:      daimyoService,
 		samuraiService:     samuraiService,
 		cashManagerService: cashManagerService,
+		controllerService:  controllerService,
 		cardService:        cardService,
 	}
 }
 
 func (h *AdminHandler) MainMenuHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
-
 	switch msg.Text {
 	case domain.AdminMainMenu.Hierarchy:
 		h.sessionManager.Get(ctx).Step = domain.SessionStepHierarchyMenuHandler
@@ -92,6 +98,8 @@ func (h *AdminHandler) HierarchyMenuHandler(ctx context.Context, msg *tgb.Messag
 				tg.NewKeyboardButton(domain.AdminCreateEntityMenu.CreateDaimyo),
 				tg.NewKeyboardButton(domain.AdminCreateEntityMenu.CreateSamurai),
 				tg.NewKeyboardButton(domain.AdminCreateEntityMenu.CreateCashManager),
+				tg.NewKeyboardButton(domain.AdminCreateEntityMenu.CreateController),
+				tg.NewKeyboardButton(domain.AdminCreateEntityMenu.CreateMainOperator),
 				tg.NewKeyboardButton(domain.AdminCreateEntityMenu.CreateCard),
 			)...,
 		).WithResizeKeyboardMarkup()
@@ -129,6 +137,13 @@ func (h *AdminHandler) CreateEntityMenuHandler(ctx context.Context, msg *tgb.Mes
 
 	case domain.AdminCreateEntityMenu.CreateCashManager:
 		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateCashManagerUsername
+
+		return msg.Answer(fmt.Sprintf("Введите telegram username")).
+			ReplyMarkup(tg.NewReplyKeyboardRemove()).
+			DoVoid(ctx)
+
+	case domain.AdminCreateEntityMenu.CreateController:
+		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateControllerUsername
 
 		return msg.Answer(fmt.Sprintf("Введите telegram username")).
 			ReplyMarkup(tg.NewReplyKeyboardRemove()).

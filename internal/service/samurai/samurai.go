@@ -21,6 +21,8 @@ type SamuraiTurnoverStorage interface {
 	CheckIfExists(ctx context.Context, date string, bankId int, samuraiUsername string) (bool, error)
 	GetByDateAndBank(ctx context.Context, date string, bankId int, samuraiUsername string) (domain.SamuraiTurnover, error)
 	Update(ctx context.Context, turnover domain.SamuraiTurnover) error
+
+	GetTurnover(ctx context.Context, samuraiUsername string, date string, bankId int) (float64, error)
 }
 
 type CardStorage interface {

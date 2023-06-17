@@ -33,6 +33,8 @@ type ShogunService interface {
 type DaimyoService interface {
 	Create(ctx context.Context, dto domain.DaimyoDTO) error
 	GetAll(ctx context.Context) ([]*domain.DaimyoDTO, error)
+	GetAllByShogun(ctx context.Context, shogunUsername string) ([]*domain.DaimyoDTO, error)
+	CreateSamuraiReport(ctx context.Context, date string) ([]string, error)
 }
 
 type SamuraiService interface {
@@ -49,6 +51,7 @@ type CashManagerService interface {
 }
 
 type ControllerService interface {
+	Create(ctx context.Context, dto domain.ControllerDTO) error
 	CreateTurnover(ctx context.Context, dto domain.ControllerTurnoverDTO) error
 }
 
@@ -115,13 +118,16 @@ func New(deps Deps) *Handler {
 			deps.DaimyoService,
 			deps.SamuraiService,
 			deps.CashManagerService,
+			deps.ControllerService,
 			deps.CardService,
 		),
 		DaimyoHandler: daimyo.NewDaimyoHandler(
 			sm.Manager,
 			deps.CardService,
+			deps.DaimyoService,
 			deps.ReplenishmentRequestService,
 			deps.CashManagerService,
+			deps.SamuraiService,
 		),
 		CashManagerHandler: cash_manager.New(sm.Manager),
 		SamuraiHandler:     samurai.NewSamuraiHandler(sm.Manager, deps.CardService, deps.SamuraiService),

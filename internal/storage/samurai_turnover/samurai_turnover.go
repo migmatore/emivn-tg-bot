@@ -125,3 +125,26 @@ func (s *SamuraiTurnoverStorage) Update(ctx context.Context, turnover domain.Sam
 
 	return nil
 }
+
+func (s *SamuraiTurnoverStorage) GetTurnover(
+	ctx context.Context,
+	samuraiUsername string,
+	date string,
+	bankId int,
+) (float64, error) {
+	q := `select turnover from samurai_turnovers where samurai_username=$1 and start_date=$2 and bank_type_id=$3`
+
+	var turnover float64
+
+	if err := s.pool.QueryRow(ctx, q, samuraiUsername, date, bankId).Scan(&turnover); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			logging.GetLogger(ctx).Errorf("Error: %v", err)
+			return turnover, err
+		}
+
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return turnover, err
+	}
+
+	return turnover, nil
+}

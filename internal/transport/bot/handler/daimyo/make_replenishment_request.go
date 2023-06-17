@@ -26,7 +26,7 @@ func (h *DaimyoHandler) EnterCardName(ctx context.Context, msg *tgb.MessageUpdat
 		)...,
 	).WithResizeKeyboardMarkup()
 
-	h.sessionManager.Get(ctx).Step = domain.SessionStepEnterReplenishmentRequestAmount
+	h.sessionManager.Get(ctx).Step = domain.SessionStepDaimyoEnterReplenishmentRequestAmount
 
 	return msg.Answer("Введите название карты из списка, которую хотите пополнить:").
 		ReplyMarkup(kb).
@@ -37,7 +37,7 @@ func (h *DaimyoHandler) EnterReplenishmentRequestAmount(ctx context.Context, msg
 	sessionManager := h.sessionManager.Get(ctx)
 	sessionManager.ReplenishmentRequest.CardName = msg.Text
 
-	sessionManager.Step = domain.SessionStepMakeReplenishmentRequest
+	sessionManager.Step = domain.SessionStepDaimyoMakeReplenishmentRequest
 	return msg.Answer("Введите сумму на пополнение").DoVoid(ctx)
 }
 
@@ -46,7 +46,7 @@ func (h *DaimyoHandler) MakeReplenishmentRequest(ctx context.Context, msg *tgb.M
 
 	amount, err := strconv.ParseFloat(msg.Text, 32)
 	if err != nil {
-		sessionManager.Step = domain.SessionStepMakeReplenishmentRequest
+		sessionManager.Step = domain.SessionStepDaimyoMakeReplenishmentRequest
 		return msg.Answer("Пожалуйста, введите суточный лимит карты").DoVoid(ctx)
 	}
 

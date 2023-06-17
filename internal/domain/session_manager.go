@@ -26,6 +26,9 @@ const (
 	SessionStepCreateCashManagerNickname
 	SessionStepCreateCashManager
 
+	SessionStepCreateControllerUsername
+	SessionStepCreateController
+
 	SessionStepCreateCardBank
 	SessionStepCreateCardName
 	SessionStepCreateCardLastDigits
@@ -39,15 +42,24 @@ const (
 
 	// diamyo steps
 	SessionStepDaimyoMenuHandler
-	SessionStepEnterReplenishmentRequestCardName
-	SessionStepEnterReplenishmentRequestAmount
-	SessionStepMakeReplenishmentRequest
+	SessionStepDaimyoEnterReplenishmentRequestCardName
+	SessionStepDaimyoEnterReplenishmentRequestAmount
+	SessionStepDaimyoMakeReplenishmentRequest
+
+	SessionStepDaimyoReportMenuHandler
+	SessionStepDaimyoReportPeriodMenuHandler
+
+	SessionStepDaimyoHierarchyMenuHandler
 
 	// samurai steps
 	SessionStepSamuraiEnterDataMenuHandler
 	SessionStepSamuraiChooseBankMenuHandler
 	SessionStepSamuraiCreateTurnoverHandler
 
+	SessionStepDaimyoCreateSamuraiUsername
+	SessionStepDaimyoCreateSamuraiNickname
+
+	// cash manager steps
 	SessionStepCashManagerMenuHandler
 
 	// controller steps

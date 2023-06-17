@@ -13,12 +13,21 @@ type CardService interface {
 	GetBankNames(ctx context.Context) ([]*domain.BankDTO, error)
 }
 
+type DaimyoService interface {
+	CreateSamuraiReport(ctx context.Context, date string) ([]string, error)
+}
+
 type ReplenishmentRequestService interface {
 	Create(ctx context.Context, dto domain.ReplenishmentRequestDTO) (tg.ChatID, error)
 }
 
 type CashManagerService interface {
 	//GetByDaimyoUsername(ctx context.Context, username string) (domain.CashManagerDTO, error)
+}
+
+type SamuraiService interface {
+	Create(ctx context.Context, dto domain.SamuraiDTO) error
+	GetAllByDaimyo(ctx context.Context, daimyoUsername string) ([]*domain.SamuraiDTO, error)
 }
 
 type SchedulerService interface {
@@ -29,8 +38,10 @@ type DaimyoHandler struct {
 	sessionManager *session.Manager[domain.Session]
 
 	cardService                 CardService
+	daimyoService               DaimyoService
 	replenishmentRequestService ReplenishmentRequestService
 	cashManagerService          CashManagerService
+	samuraiService              SamuraiService
 
 	schedulerService SchedulerService
 }
@@ -38,14 +49,18 @@ type DaimyoHandler struct {
 func NewDaimyoHandler(
 	sm *session.Manager[domain.Session],
 	cardService CardService,
+	daimyoService DaimyoService,
 	replenishmentRequestService ReplenishmentRequestService,
 	cashManagerService CashManagerService,
+	samuraiService SamuraiService,
 ) *DaimyoHandler {
 	return &DaimyoHandler{
 		sessionManager:              sm,
 		cardService:                 cardService,
+		daimyoService:               daimyoService,
 		replenishmentRequestService: replenishmentRequestService,
 		cashManagerService:          cashManagerService,
+		samuraiService:              samuraiService,
 	}
 }
 
@@ -79,9 +94,34 @@ func (h *DaimyoHandler) MenuSelectionHandler(ctx context.Context, msg *tgb.Messa
 			)...,
 		).WithResizeKeyboardMarkup()
 
-		h.sessionManager.Get(ctx).Step = domain.SessionStepEnterReplenishmentRequestCardName
+		h.sessionManager.Get(ctx).Step = domain.SessionStepDaimyoEnterReplenishmentRequestCardName
 
 		return msg.Answer("Выберите банк").ReplyMarkup(kb).DoVoid(ctx)
+
+	case domain.DaimyoMainMenu.Report:
+		kb := tg.NewReplyKeyboardMarkup(
+			tg.NewButtonColumn(
+				tg.NewKeyboardButton(domain.DaimyoReportMenu.EnterShiftData),
+				tg.NewKeyboardButton(domain.DaimyoReportMenu.ReportRequest),
+			)...,
+		).WithResizeKeyboardMarkup()
+
+		h.sessionManager.Get(ctx).Step = domain.SessionStepDaimyoReportMenuHandler
+
+		return msg.Answer("Выберите действие").ReplyMarkup(kb).DoVoid(ctx)
+
+	case domain.DaimyoMainMenu.Hierarchy:
+		kb := tg.NewReplyKeyboardMarkup(
+			tg.NewButtonColumn(
+				tg.NewKeyboardButton(domain.DaimyoHierarchyMenu.CreateSamurai),
+				tg.NewKeyboardButton(domain.DaimyoHierarchyMenu.InSubordination),
+			)...,
+		).WithResizeKeyboardMarkup()
+
+		h.sessionManager.Get(ctx).Step = domain.SessionStepDaimyoHierarchyMenuHandler
+
+		return msg.Answer("Выберите действие").ReplyMarkup(kb).DoVoid(ctx)
+
 	default:
 		h.sessionManager.Get(ctx).Step = domain.SessionStepInit
 		return msg.Answer("Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)

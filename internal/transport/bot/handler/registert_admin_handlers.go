@@ -28,7 +28,11 @@ func (h *Handler) registerAdminHandlers() {
 	h.Message(h.AdminHandler.EnterCashManagerNickname, h.isSessionStep(domain.SessionStepCreateCashManagerNickname))
 	h.Message(h.AdminHandler.CreateCashManager, h.isSessionStep(domain.SessionStepCreateCashManager))
 
-	// card
+	// controller
+	h.Message(h.AdminHandler.EnterControllerUsername, h.isSessionStep(domain.SessionStepCreateControllerUsername))
+	h.Message(h.AdminHandler.EnterControllerNicknameAndCreate, h.isSessionStep(domain.SessionStepCreateController))
+
+	// card (deprecated)
 	h.Message(h.AdminHandler.CardBank, h.isSessionStep(domain.SessionStepCreateCardBank))
 	h.Message(h.AdminHandler.EnterCardName, h.isSessionStep(domain.SessionStepCreateCardName))
 	h.Message(h.AdminHandler.EnterCardLastDigits, h.isSessionStep(domain.SessionStepCreateCardLastDigits))

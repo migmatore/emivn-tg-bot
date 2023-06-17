@@ -58,6 +58,9 @@ func New(deps Deps) *Service {
 		Daimyo: daimyo.NewDaimyoService(
 			deps.Transactor,
 			deps.DaimyoStorage,
+			deps.SamuraiTurnoverStorage,
+			deps.ControllerTurnoverStorage,
+			deps.SamuraiStorage,
 			deps.UserRoleStorage,
 			deps.RoleStorage,
 		),
@@ -80,6 +83,8 @@ func New(deps Deps) *Service {
 			deps.ControllerStorage,
 			deps.ControllerTurnoverStorage,
 			deps.CardStorage,
+			deps.UserRoleStorage,
+			deps.RoleStorage,
 		),
 		Card: card.NewCardService(deps.Transactor, deps.CardStorage),
 		ReplenishmentRequest: replenishment_request.NewReplenishmentRequestService(
