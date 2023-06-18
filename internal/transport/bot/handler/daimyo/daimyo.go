@@ -64,7 +64,7 @@ func NewDaimyoHandler(
 	}
 }
 
-func (h *DaimyoHandler) MenuSelectionHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+func (h *DaimyoHandler) MainMenuHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	//if err := h.schedulerService.Add(ctx, domain.TaskDTO{
 	//	Alias:           "notify_samurai",
 	//	Name:            fmt.Sprintf("notify_samurai %s", msg.From.Username),
@@ -123,7 +123,7 @@ func (h *DaimyoHandler) MenuSelectionHandler(ctx context.Context, msg *tgb.Messa
 		return msg.Answer("Выберите действие").ReplyMarkup(kb).DoVoid(ctx)
 
 	default:
-		h.sessionManager.Get(ctx).Step = domain.SessionStepInit
+		h.sessionManager.Reset(h.sessionManager.Get(ctx))
 		return msg.Answer("Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
 	}
 }

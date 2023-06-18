@@ -7,7 +7,7 @@ import (
 func (h *Handler) registerAdminHandlers() {
 	h.Message(h.AdminHandler.MainMenuHandler, h.isSessionStep(domain.SessionStepAdminMainMenuHandler))
 	h.Message(h.AdminHandler.HierarchyMenuHandler, h.isSessionStep(domain.SessionStepHierarchyMenuHandler))
-	h.Message(h.AdminHandler.CreateEntityMenuHandler, h.isSessionStep(domain.SessionStepCreateEntityHandler))
+	h.Message(h.AdminHandler.CreateEntityMenuHandler, h.isSessionStep(domain.SessionStepCreateEntityMenuHandler))
 
 	// shogun
 	h.Message(h.AdminHandler.EnterShogunUsername, h.isSessionStep(domain.SessionStepCreateShogunUsername))

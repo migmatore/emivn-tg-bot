@@ -3,7 +3,7 @@ package handler
 import "emivn-tg-bot/internal/domain"
 
 func (h *Handler) registerDaimyoHandler() {
-	h.Message(h.DaimyoHandler.MenuSelectionHandler, h.isSessionStep(domain.SessionStepDaimyoMenuHandler)).
+	h.Message(h.DaimyoHandler.MainMenuHandler, h.isSessionStep(domain.SessionStepDaimyoMainMenuHandler)).
 		Message(h.DaimyoHandler.EnterCardName, h.isSessionStep(domain.SessionStepDaimyoEnterReplenishmentRequestCardName)).
 		Message(h.DaimyoHandler.MakeReplenishmentRequest, h.isSessionStep(domain.SessionStepDaimyoMakeReplenishmentRequest)).
 		Message(h.DaimyoHandler.EnterReplenishmentRequestAmount, h.isSessionStep(domain.SessionStepDaimyoEnterReplenishmentRequestAmount)).

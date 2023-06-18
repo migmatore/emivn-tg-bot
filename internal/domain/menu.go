@@ -70,6 +70,26 @@ var ShogunMainMenu = struct {
 	Deposits:   "Пополнения",
 }
 
+var ShogunHierarchyMenu = struct {
+	CreateEntity    string
+	InSubordination string
+}{
+	CreateEntity:    "Создать",
+	InSubordination: "В подчинении",
+}
+
+var ShogunCreateEntityMenu = struct {
+	CreateDaimyo       string
+	CreateSamurai      string
+	CreateCashManager  string
+	CreateMainOperator string
+}{
+	CreateDaimyo:       "Дайме",
+	CreateSamurai:      "Самурай",
+	CreateCashManager:  "Инкассатор",
+	CreateMainOperator: "Главный оператор",
+}
+
 // Daimyo
 
 var DaimyoMainMenu = struct {

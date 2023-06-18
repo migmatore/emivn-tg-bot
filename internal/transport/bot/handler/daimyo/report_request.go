@@ -23,7 +23,7 @@ func (h *DaimyoHandler) ReportMenuHandler(ctx context.Context, msg *tgb.MessageU
 
 		return msg.Answer("Выберите действие").ReplyMarkup(kb).DoVoid(ctx)
 	default:
-		h.sessionManager.Get(ctx).Step = domain.SessionStepInit
+		h.sessionManager.Reset(h.sessionManager.Get(ctx))
 		return msg.Answer("Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
 	}
 }
@@ -46,7 +46,7 @@ func (h *DaimyoHandler) ReportPeriodMenuHandler(ctx context.Context, msg *tgb.Me
 	case domain.DaimyoReportPeriodMenu.ForPeriod:
 		return nil
 	default:
-		h.sessionManager.Get(ctx).Step = domain.SessionStepInit
+		h.sessionManager.Reset(h.sessionManager.Get(ctx))
 		return msg.Answer("Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
 	}
 }

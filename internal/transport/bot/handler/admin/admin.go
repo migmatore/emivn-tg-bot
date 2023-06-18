@@ -90,7 +90,7 @@ func (h *AdminHandler) MainMenuHandler(ctx context.Context, msg *tgb.MessageUpda
 func (h *AdminHandler) HierarchyMenuHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	switch msg.Text {
 	case domain.AdminHierarchyMenu.CreateEntity:
-		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateEntityHandler
+		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateEntityMenuHandler
 
 		kb := tg.NewReplyKeyboardMarkup(
 			tg.NewButtonColumn(

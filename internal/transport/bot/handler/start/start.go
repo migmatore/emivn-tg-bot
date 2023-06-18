@@ -91,7 +91,7 @@ func (s *StartHandler) Start(ctx context.Context, msg *tgb.MessageUpdate) error 
 			DoVoid(ctx)
 
 	case domain.DaimyoRole.String():
-		s.sessionManager.Get(ctx).Step = domain.SessionStepDaimyoMenuHandler
+		s.sessionManager.Get(ctx).Step = domain.SessionStepDaimyoMainMenuHandler
 
 		return msg.Answer("Пожалуйста, выберите действие").
 			ReplyMarkup(buildDaimyoStartMenu()).

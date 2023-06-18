@@ -131,7 +131,12 @@ func New(deps Deps) *Handler {
 		),
 		CashManagerHandler: cash_manager.New(sm.Manager),
 		SamuraiHandler:     samurai.NewSamuraiHandler(sm.Manager, deps.CardService, deps.SamuraiService),
-		ShogunHandler:      shogun.NewShogunHandler(sm.Manager),
+		ShogunHandler: shogun.NewShogunHandler(
+			sm.Manager,
+			deps.DaimyoService,
+			deps.SamuraiService,
+			deps.CashManagerService,
+		),
 		ControllerHandler: controller.New(
 			sm.Manager,
 			deps.ControllerService,
@@ -167,6 +172,7 @@ func (h *Handler) Init(ctx context.Context) (*tgb.Router, *Scheduler) {
 	h.registerDaimyoHandler()
 	h.registerSamuraiHandler()
 	h.registerControllerHandler()
+	h.registerShogunHandler()
 
 	return h.Router, h.scheduler
 }

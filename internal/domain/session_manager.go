@@ -9,7 +9,7 @@ const (
 	SessionStepAdminMainMenuHandler
 	SessionStepHierarchyMenuHandler
 
-	SessionStepCreateEntityHandler
+	SessionStepCreateEntityMenuHandler
 
 	SessionStepCreateShogunUsername
 	SessionStepCreateShogun
@@ -40,8 +40,25 @@ const (
 	// shogun steps
 	SessionStepShogunMainMenuHandler
 
+	SessionStepShogunHierarchyMenuHandler
+
+	SessionStepShogunCreateEntityMenuHandler
+
+	SessionStepShogunCreateDaimyoNickname
+	SessionStepShogunCreateDaimyo
+	SessionStepShogunCreateSamurai
+
+	SessionStepShogunCreateSamuraiNickname
+	SessionStepShogunChooseSamuraiDaimyo
+
+	SessionStepShogunCreateCashManagerNickname
+	SessionStepShogunCreateCashManager
+
+	SessionStepShogunCreateMainOperatorNickname
+	SessionStepShogunCreateMainOperator
+
 	// diamyo steps
-	SessionStepDaimyoMenuHandler
+	SessionStepDaimyoMainMenuHandler
 	SessionStepDaimyoEnterReplenishmentRequestCardName
 	SessionStepDaimyoEnterReplenishmentRequestAmount
 	SessionStepDaimyoMakeReplenishmentRequest
