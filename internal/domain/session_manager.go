@@ -95,6 +95,7 @@ type Session struct {
 	Samurai              SamuraiDTO
 	CashManager          CashManagerDTO
 	Controller           ControllerDTO
+	MainOperator         MainOperatorDTO
 	Card                 CardDTO
 	ReplenishmentRequest ReplenishmentRequestDTO
 	SamuraiTurnover      SamuraiTurnoverDTO

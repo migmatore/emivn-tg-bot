@@ -10,7 +10,7 @@ import (
 
 func (h *ShogunHandler) EnterDaimyoNicknameHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	sessionManager := h.sessionManager.Get(ctx)
-	// TODO: create regular expression to check the username is correct
+
 	sessionManager.Daimyo.Nickname = msg.Text
 
 	sessionManager.Step = domain.SessionStepShogunCreateDaimyo

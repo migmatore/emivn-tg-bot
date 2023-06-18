@@ -17,4 +17,6 @@ func (h *Handler) registerShogunHandler() {
 	h.Message(h.ShogunHandler.EnterCashManagerNicknameHandler, h.isSessionStep(domain.SessionStepShogunCreateCashManagerNickname))
 	h.Message(h.ShogunHandler.CreateCashManagerHandler, h.isSessionStep(domain.SessionStepShogunCreateCashManager))
 
+	h.Message(h.ShogunHandler.EnterMainOperatorNicknameHandler, h.isSessionStep(domain.SessionStepShogunCreateMainOperatorNickname))
+	h.Message(h.ShogunHandler.CreateMainOperatorHandler, h.isSessionStep(domain.SessionStepShogunCreateMainOperator))
 }

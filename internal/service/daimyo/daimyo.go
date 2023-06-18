@@ -29,11 +29,11 @@ type SamuraiStorage interface {
 	GetAllByDaimyo(ctx context.Context, daimyoUsername string) ([]*domain.Samurai, error)
 }
 
-type DaimyoUserRoleStorage interface {
+type UserRoleStorage interface {
 	Insert(ctx context.Context, user domain.UserRole) error
 }
 
-type DaimyoRoleStorage interface {
+type RoleStorage interface {
 	GetIdByName(ctx context.Context, role string) (int, error)
 }
 
@@ -44,8 +44,8 @@ type DaimyoService struct {
 	samuraiTurnoverStorage    SamuraiTurnoverStorage
 	controllerTurnoverStorage ControllerTurnoverStorage
 	samuraiStorage            SamuraiStorage
-	userRoleStorage           DaimyoUserRoleStorage
-	roleStorage               DaimyoRoleStorage
+	userRoleStorage           UserRoleStorage
+	roleStorage               RoleStorage
 }
 
 func NewDaimyoService(
@@ -54,8 +54,8 @@ func NewDaimyoService(
 	samuraiTurnover SamuraiTurnoverStorage,
 	controllerTurnover ControllerTurnoverStorage,
 	samuraiStorage SamuraiStorage,
-	userRoleStorage DaimyoUserRoleStorage,
-	roleStorage DaimyoRoleStorage,
+	userRoleStorage UserRoleStorage,
+	roleStorage RoleStorage,
 ) *DaimyoService {
 	return &DaimyoService{
 		transactor:                t,

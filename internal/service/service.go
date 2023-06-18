@@ -6,6 +6,7 @@ import (
 	"emivn-tg-bot/internal/service/cash_manager"
 	"emivn-tg-bot/internal/service/controller"
 	"emivn-tg-bot/internal/service/daimyo"
+	"emivn-tg-bot/internal/service/main_operator"
 	"emivn-tg-bot/internal/service/replenishment_request"
 	"emivn-tg-bot/internal/service/replenishment_request_status"
 	"emivn-tg-bot/internal/service/role"
@@ -27,6 +28,7 @@ type Deps struct {
 	CashManagerStorage                cash_manager.CashManagerStorage
 	ControllerStorage                 controller.ControllerStorage
 	ControllerTurnoverStorage         controller.ControllerTurnoverStorage
+	MainOperatorStorage               main_operator.MainOperatorStorage
 	CardStorage                       card.CardStorage
 	ReplenishmentRequestStorage       replenishment_request.ReplenishmentRequestStorage
 	ReplenishmentRequestStatusStorage replenishment_request_status.ReplenishmentRequestStatusStorage
@@ -44,6 +46,7 @@ type Service struct {
 	Samurai              *samurai.SamuraiService
 	CashManager          *cash_manager.CashManagerService
 	Controller           *controller.ControllerService
+	MainOperator         *main_operator.MainOperatorService
 	Card                 *card.CardService
 	ReplenishmentRequest *replenishment_request.ReplenishmentRequestService
 	SchedulerService     *scheduler.SchedulerService
@@ -83,6 +86,12 @@ func New(deps Deps) *Service {
 			deps.ControllerStorage,
 			deps.ControllerTurnoverStorage,
 			deps.CardStorage,
+			deps.UserRoleStorage,
+			deps.RoleStorage,
+		),
+		MainOperator: main_operator.New(
+			deps.Transactor,
+			deps.MainOperatorStorage,
 			deps.UserRoleStorage,
 			deps.RoleStorage,
 		),

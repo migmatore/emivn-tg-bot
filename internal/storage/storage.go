@@ -7,6 +7,7 @@ import (
 	"emivn-tg-bot/internal/storage/controller"
 	"emivn-tg-bot/internal/storage/controller_turnover"
 	"emivn-tg-bot/internal/storage/daimyo"
+	"emivn-tg-bot/internal/storage/main_operator"
 	"emivn-tg-bot/internal/storage/psql"
 	"emivn-tg-bot/internal/storage/replenishment_request"
 	"emivn-tg-bot/internal/storage/replenishment_request_status"
@@ -29,6 +30,7 @@ type Storage struct {
 	CashManager                       *cash_manager.CashManagerStorage
 	Controller                        *controller.ControllerStorage
 	ControllerTurnover                *controller_turnover.ControllerTurnoverStorage
+	MainOperator                      *main_operator.MainOperatorStorage
 	Card                              *card.CardStorage
 	ReplenishmentRequest              *replenishment_request.ReplenishmentRequestStorage
 	ReplenishmentRequestStatusStorage *replenishment_request_status.ReplenishmentRequestStatusStorage
@@ -49,6 +51,7 @@ func New(pool psql.AtomicPoolClient) *Storage {
 		CashManager:                       cash_manager.NewCashManagerStorage(pool),
 		Controller:                        controller.New(pool),
 		ControllerTurnover:                controller_turnover.New(pool),
+		MainOperator:                      main_operator.New(pool),
 		Card:                              card.NewCardStorage(pool),
 		ReplenishmentRequest:              replenishment_request.NewReplenishmentRequestStorage(pool),
 		ReplenishmentRequestStatusStorage: replenishment_request_status.NewReplenishmentRequestStatusStorage(pool),

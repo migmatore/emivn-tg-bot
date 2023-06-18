@@ -55,6 +55,10 @@ type ControllerService interface {
 	CreateTurnover(ctx context.Context, dto domain.ControllerTurnoverDTO) error
 }
 
+type MainOperatorService interface {
+	Create(ctx context.Context, dto domain.MainOperatorDTO) error
+}
+
 type CardService interface {
 	Create(ctx context.Context, dto domain.CardDTO) error
 	GetByUsername(ctx context.Context, bankName string, daimyoUsername string) ([]*domain.CardDTO, error)
@@ -75,6 +79,7 @@ type Deps struct {
 	SamuraiService              SamuraiService
 	CashManagerService          CashManagerService
 	ControllerService           ControllerService
+	MainOperatorService         MainOperatorService
 	CardService                 CardService
 	ReplenishmentRequestService ReplenishmentRequestService
 
@@ -136,6 +141,7 @@ func New(deps Deps) *Handler {
 			deps.DaimyoService,
 			deps.SamuraiService,
 			deps.CashManagerService,
+			deps.MainOperatorService,
 		),
 		ControllerHandler: controller.New(
 			sm.Manager,

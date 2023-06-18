@@ -22,12 +22,17 @@ type CashManagerService interface {
 	Create(ctx context.Context, dto domain.CashManagerDTO) error
 }
 
+type MainOperatorService interface {
+	Create(ctx context.Context, dto domain.MainOperatorDTO) error
+}
+
 type ShogunHandler struct {
 	sessionManager *session.Manager[domain.Session]
 
-	daimyoService      DaimyoService
-	samuraiService     SamuraiService
-	cashManagerService CashManagerService
+	daimyoService       DaimyoService
+	samuraiService      SamuraiService
+	cashManagerService  CashManagerService
+	mainOperatorService MainOperatorService
 }
 
 func NewShogunHandler(
@@ -35,12 +40,14 @@ func NewShogunHandler(
 	daimyoService DaimyoService,
 	samuraiService SamuraiService,
 	cashManagerService CashManagerService,
+	mainOperatorService MainOperatorService,
 ) *ShogunHandler {
 	return &ShogunHandler{
-		sessionManager:     sm,
-		daimyoService:      daimyoService,
-		samuraiService:     samuraiService,
-		cashManagerService: cashManagerService,
+		sessionManager:      sm,
+		daimyoService:       daimyoService,
+		samuraiService:      samuraiService,
+		cashManagerService:  cashManagerService,
+		mainOperatorService: mainOperatorService,
 	}
 }
 
@@ -99,6 +106,7 @@ func (h *ShogunHandler) HierarchyMenuHandler(ctx context.Context, msg *tgb.Messa
 		return msg.Answer("Выберите сущность, которую хотите создать").ReplyMarkup(kb).DoVoid(ctx)
 
 	case domain.ShogunHierarchyMenu.InSubordination:
+
 		return nil
 
 	default:
