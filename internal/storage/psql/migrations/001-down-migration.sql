@@ -18,6 +18,8 @@ DROP TABLE bank_types CASCADE;
 
 DROP TABLE cash_managers CASCADE;
 
+DROP TABLE main_operators CASCADE;
+
 DROP TABLE shoguns CASCADE;
 
 DROP TABLE replenishment_request_status_groups CASCADE;

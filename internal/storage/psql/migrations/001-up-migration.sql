@@ -63,6 +63,13 @@ CREATE TABLE cash_managers
 --     replenishment_request_id INTEGER      NOT NULL REFERENCES replenishment_requests (id)
 );
 
+CREATE TABLE main_operators
+(
+    username        VARCHAR(255) NOT NULL PRIMARY KEY,
+    nickname        VARCHAR(255) NOT NULL UNIQUE,
+    shogun_username VARCHAR(255) NOT NULL UNIQUE REFERENCES shoguns (username)
+);
+
 CREATE TABLE controllers
 (
     username VARCHAR(255) NOT NULL PRIMARY KEY,
