@@ -32,10 +32,14 @@ func (h *Handler) registerAdminHandlers() {
 	h.Message(h.AdminHandler.EnterControllerUsername, h.isSessionStep(domain.SessionStepCreateControllerUsername))
 	h.Message(h.AdminHandler.EnterControllerNicknameAndCreate, h.isSessionStep(domain.SessionStepCreateController))
 
-	// card (deprecated)
-	h.Message(h.AdminHandler.CardBank, h.isSessionStep(domain.SessionStepCreateCardBank))
-	h.Message(h.AdminHandler.EnterCardName, h.isSessionStep(domain.SessionStepCreateCardName))
-	h.Message(h.AdminHandler.EnterCardLastDigits, h.isSessionStep(domain.SessionStepCreateCardLastDigits))
-	h.Message(h.AdminHandler.EnterCardDailyLimit, h.isSessionStep(domain.SessionStepCreateCardDailyLimit))
-	h.Message(h.AdminHandler.EnterCardDaimyoUsernameAndCreate, h.isSessionStep(domain.SessionStepCreateCard))
+	// cards menu
+	h.Message(h.AdminHandler.CardsChooseShogunHandler, h.isSessionStep(domain.SessionStepAdminCardsChooseShogunHandler))
+	h.Message(h.AdminHandler.CardsMenuHandler, h.isSessionStep(domain.SessionStepAdminCardsMenuHandler))
+
+	// create card
+	h.Message(h.AdminHandler.ChooseCardBankMenuHandler, h.isSessionStep(domain.SessionStepAdminChooseCardBankHandler))
+	h.Message(h.AdminHandler.EnterCardNameHandler, h.isSessionStep(domain.SessionStepAdminEnterCardNameHandler))
+	h.Message(h.AdminHandler.EnterCardLastDigitsHandler, h.isSessionStep(domain.SessionStepAdminEnterCardLastDigitsHandler))
+	h.Message(h.AdminHandler.SetCardLimitHandler, h.isSessionStep(domain.SessionStepAdminSetCardLimitHandler))
+	h.Message(h.AdminHandler.ChooseCardDaimyoAndCreateHandler, h.isSessionStep(domain.SessionStepAdminChooseCardDaimyoHandler))
 }

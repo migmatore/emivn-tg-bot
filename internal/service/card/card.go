@@ -35,9 +35,10 @@ func (s *CardService) Create(ctx context.Context, dto domain.CardDTO) error {
 
 	card := domain.Card{
 		Name:           dto.Name,
+		DaimyoUsername: dto.DaimyoUsername,
 		LastDigits:     dto.LastDigits,
 		DailyLimit:     dto.DailyLimit,
-		DaimyoUsername: dto.DaimyoUsername,
+		Balance:        0,
 		BankTypeId:     bankName,
 	}
 

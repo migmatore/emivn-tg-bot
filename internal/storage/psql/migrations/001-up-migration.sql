@@ -22,9 +22,10 @@ CREATE TABLE cards
 (
     id              INTEGER      NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     name            VARCHAR(50)  NOT NULL,
+    daimyo_username VARCHAR(255) NOT NULL REFERENCES daimyo (username),
     last_digits     INTEGER      NOT NULL UNIQUE,
     daily_limit     INTEGER      NOT NULL DEFAULT 2000000,
-    daimyo_username VARCHAR(255) NOT NULL REFERENCES daimyo (username),
+    balance         FLOAT        NOT NULL DEFAULT 0,
     bank_type_id    INTEGER      NOT NULL REFERENCES bank_types (id)
 );
 

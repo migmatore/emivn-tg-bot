@@ -17,6 +17,7 @@ type ShogunService interface {
 type DaimyoService interface {
 	Create(ctx context.Context, dto domain.DaimyoDTO) error
 	GetAll(ctx context.Context) ([]*domain.DaimyoDTO, error)
+	GetAllByShogun(ctx context.Context, shogunUsername string) ([]*domain.DaimyoDTO, error)
 }
 
 type SamuraiService interface {
@@ -69,6 +70,34 @@ func NewAdminHandler(
 
 func (h *AdminHandler) MainMenuHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	switch msg.Text {
+	case domain.AdminMainMenu.Cards:
+		shoguns, err := h.shogunService.GetAll(ctx)
+		if err != nil {
+			return err
+		}
+
+		buttons := make([]tg.KeyboardButton, 0)
+
+		for _, item := range shoguns {
+			buttons = append(buttons, tg.NewKeyboardButton(item.Username))
+		}
+
+		kb := tg.NewReplyKeyboardMarkup(
+			tg.NewButtonColumn(
+				buttons...,
+			)...,
+		).WithResizeKeyboardMarkup()
+
+		h.sessionManager.Get(ctx).Step = domain.SessionStepAdminCardsChooseShogunHandler
+
+		return msg.Answer("Выберите сёгуна").ReplyMarkup(kb).DoVoid(ctx)
+
+	case domain.AdminMainMenu.RequestsList:
+		return nil
+
+	case domain.AdminMainMenu.Report:
+		return nil
+
 	case domain.AdminMainMenu.Hierarchy:
 		h.sessionManager.Get(ctx).Step = domain.SessionStepHierarchyMenuHandler
 
@@ -81,8 +110,71 @@ func (h *AdminHandler) MainMenuHandler(ctx context.Context, msg *tgb.MessageUpda
 
 		return msg.Answer("Выберите действие").ReplyMarkup(kb).DoVoid(ctx)
 
+	case domain.AdminMainMenu.CreateGARA:
+		return nil
+
+	case domain.AdminMainMenu.UploadData:
+		return nil
+
+	case domain.AdminMainMenu.Deposits:
+		return nil
+
 	default:
 		h.sessionManager.Get(ctx).Step = domain.SessionStepInit
+		return msg.Answer("Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
+	}
+}
+
+func (h *AdminHandler) CardsChooseShogunHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+	sessionManager := h.sessionManager.Get(ctx)
+	sessionManager.Shogun.Username = msg.Text
+
+	kb := tg.NewReplyKeyboardMarkup(
+		tg.NewButtonColumn(
+			tg.NewKeyboardButton(domain.AdminCardsMenu.CreateCard),
+			tg.NewKeyboardButton(domain.AdminCardsMenu.CardsList),
+			tg.NewKeyboardButton(domain.AdminCardsMenu.Limit),
+			tg.NewKeyboardButton(domain.AdminCardsMenu.Balance),
+		)...,
+	).WithResizeKeyboardMarkup()
+
+	sessionManager.Step = domain.SessionStepAdminCardsMenuHandler
+
+	return msg.Answer("Выберите действие").ReplyMarkup(kb).DoVoid(ctx)
+}
+
+func (h *AdminHandler) CardsMenuHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+	switch msg.Text {
+	case domain.ShogunCardsMenu.CreateCard:
+		banks, err := h.cardService.GetBankNames(ctx)
+		if err != nil {
+			return err
+		}
+
+		buttons := make([]tg.KeyboardButton, 0)
+
+		for _, item := range banks {
+			buttons = append(buttons, tg.NewKeyboardButton(item.Name))
+		}
+
+		kb := tg.NewReplyKeyboardMarkup(
+			tg.NewButtonColumn(
+				buttons...,
+			)...,
+		).WithResizeKeyboardMarkup()
+
+		h.sessionManager.Get(ctx).Step = domain.SessionStepAdminChooseCardBankHandler
+
+		return msg.Answer("Выберите банк").ReplyMarkup(kb).DoVoid(ctx)
+
+	case domain.ShogunCardsMenu.CardsList:
+		return nil
+	case domain.ShogunCardsMenu.Limit:
+		return nil
+	case domain.ShogunCardsMenu.Balance:
+		return nil
+	default:
+		h.sessionManager.Reset(h.sessionManager.Get(ctx))
 		return msg.Answer("Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
 	}
 }
@@ -100,7 +192,6 @@ func (h *AdminHandler) HierarchyMenuHandler(ctx context.Context, msg *tgb.Messag
 				tg.NewKeyboardButton(domain.AdminCreateEntityMenu.CreateCashManager),
 				tg.NewKeyboardButton(domain.AdminCreateEntityMenu.CreateController),
 				tg.NewKeyboardButton(domain.AdminCreateEntityMenu.CreateMainOperator),
-				tg.NewKeyboardButton(domain.AdminCreateEntityMenu.CreateCard),
 			)...,
 		).WithResizeKeyboardMarkup()
 
@@ -149,29 +240,6 @@ func (h *AdminHandler) CreateEntityMenuHandler(ctx context.Context, msg *tgb.Mes
 			ReplyMarkup(tg.NewReplyKeyboardRemove()).
 			DoVoid(ctx)
 
-	case domain.AdminCreateEntityMenu.CreateCard:
-		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateCardBank
-
-		banks, err := h.cardService.GetBankNames(ctx)
-		if err != nil {
-			return err
-		}
-
-		buttons := make([]tg.KeyboardButton, 0)
-
-		for _, item := range banks {
-			buttons = append(buttons, tg.NewKeyboardButton(item.Name))
-		}
-
-		kb := tg.NewReplyKeyboardMarkup(
-			tg.NewButtonColumn(
-				buttons...,
-			)...,
-		).WithResizeKeyboardMarkup()
-
-		return msg.Answer(fmt.Sprintf("Выберите банк")).
-			ReplyMarkup(kb).
-			DoVoid(ctx)
 	//case domain.AdminCreateEntityMenu.Back:
 	//	h.sessionManager.Get(ctx).Step = domain.SessionStepInit
 	//	return msg.Answer("Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)

@@ -22,6 +22,18 @@ var AdminMainMenu = struct {
 	Deposits:     "Пополнения",
 }
 
+var AdminCardsMenu = struct {
+	CreateCard string
+	CardsList  string
+	Limit      string
+	Balance    string
+}{
+	CreateCard: "Создать карту",
+	CardsList:  "Список карт",
+	Limit:      "Лимит",
+	Balance:    "Баланс",
+}
+
 var AdminHierarchyMenu = struct {
 	CreateEntity    string
 	InSubordination string
@@ -46,8 +58,6 @@ var AdminCreateEntityMenu = struct {
 	CreateCashManager:  "Инкассатор",
 	CreateController:   "Контролёр",
 	CreateMainOperator: "Главный оператор",
-	CreateCard:         "Карта(убрать)",
-	Back:               "",
 }
 
 // Shogun
@@ -68,6 +78,18 @@ var ShogunMainMenu = struct {
 	GARA:       "ГАРА",
 	UploadData: "Загрузить данные",
 	Deposits:   "Пополнения",
+}
+
+var ShogunCardsMenu = struct {
+	CreateCard string
+	CardsList  string
+	Limit      string
+	Balance    string
+}{
+	CreateCard: "Создать карту",
+	CardsList:  "Список карт",
+	Limit:      "Лимит",
+	Balance:    "Баланс",
 }
 
 var ShogunHierarchyMenu = struct {

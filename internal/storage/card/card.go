@@ -17,15 +17,17 @@ func NewCardStorage(pool psql.AtomicPoolClient) *CardStorage {
 }
 
 func (s *CardStorage) Insert(ctx context.Context, card domain.Card) error {
-	q := `insert into cards(name, last_digits, daily_limit, daimyo_username, bank_type_id) values ($1, $2, $3, $4, $5)`
+	q := `insert into cards(name, daimyo_username, last_digits, daily_limit, balance, bank_type_id) 
+				values ($1, $2, $3, $4, $5, $6)`
 
 	if _, err := s.pool.Exec(
 		ctx,
 		q,
 		card.Name,
+		card.DaimyoUsername,
 		card.LastDigits,
 		card.DailyLimit,
-		card.DaimyoUsername,
+		card.Balance,
 		card.BankTypeId,
 	); err != nil {
 		if err := utils.ParsePgError(err); err != nil {

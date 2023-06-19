@@ -7,6 +7,19 @@ const (
 
 	// admin steps
 	SessionStepAdminMainMenuHandler
+
+	// admin cards menu
+	SessionStepAdminCardsChooseShogunHandler
+	SessionStepAdminCardsMenuHandler
+
+	// admin create card steps
+	SessionStepAdminChooseCardBankHandler
+	SessionStepAdminEnterCardNameHandler
+	SessionStepAdminEnterCardLastDigitsHandler
+	SessionStepAdminSetCardLimitHandler
+	SessionStepAdminChooseCardDaimyoHandler
+
+	// admin hierrarchy menu
 	SessionStepHierarchyMenuHandler
 
 	SessionStepCreateEntityMenuHandler
@@ -29,17 +42,20 @@ const (
 	SessionStepCreateControllerUsername
 	SessionStepCreateController
 
-	SessionStepCreateCardBank
-	SessionStepCreateCardName
-	SessionStepCreateCardLastDigits
-	SessionStepCreateCardDailyLimit
-	SessionStepCreateCard
-
-	SessionStepBackCreateEntityMenuStep
-
 	// shogun steps
 	SessionStepShogunMainMenuHandler
 
+	// shogun cards menu
+	SessionStepShogunCardsMenuHandler
+
+	// shogun create card steps
+	SessionStepShogunChooseCardBankHandler
+	SessionStepShogunEnterCardNameHandler
+	SessionStepShogunEnterCardLastDigitsHandler
+	SessionStepShogunSetCardLimitHandler
+	SessionStepShogunChooseCardDaimyoHandler
+
+	// shogun hierarchy menu
 	SessionStepShogunHierarchyMenuHandler
 
 	SessionStepShogunCreateEntityMenuHandler

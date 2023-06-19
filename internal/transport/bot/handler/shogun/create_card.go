@@ -1,4 +1,4 @@
-package admin
+package shogun
 
 import (
 	"context"
@@ -8,51 +8,51 @@ import (
 	"strconv"
 )
 
-func (h *AdminHandler) ChooseCardBankMenuHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+func (h *ShogunHandler) ChooseCardBankMenuHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	sessionManager := h.sessionManager.Get(ctx)
 	sessionManager.Card.BankType = msg.Text
 
-	sessionManager.Step = domain.SessionStepAdminEnterCardNameHandler
+	sessionManager.Step = domain.SessionStepShogunEnterCardNameHandler
 
 	return msg.Answer("Введите имя карты").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
 }
 
-func (h *AdminHandler) EnterCardNameHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+func (h *ShogunHandler) EnterCardNameHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	sessionManager := h.sessionManager.Get(ctx)
 	sessionManager.Card.Name = msg.Text
 
-	sessionManager.Step = domain.SessionStepAdminEnterCardLastDigitsHandler
+	sessionManager.Step = domain.SessionStepShogunEnterCardLastDigitsHandler
 
 	return msg.Answer("Введите 4 последних цифры номера карты").DoVoid(ctx)
 }
 
-func (h *AdminHandler) EnterCardLastDigitsHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+func (h *ShogunHandler) EnterCardLastDigitsHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	sessionManager := h.sessionManager.Get(ctx)
 
 	lastDigits, err := strconv.Atoi(msg.Text)
 	if err != nil {
-		sessionManager.Step = domain.SessionStepAdminEnterCardLastDigitsHandler
+		sessionManager.Step = domain.SessionStepShogunEnterCardLastDigitsHandler
 		return msg.Answer("Пожалуйста, введите последние 4 цифры номера карты").DoVoid(ctx)
 	}
 
 	sessionManager.Card.LastDigits = lastDigits
-	sessionManager.Step = domain.SessionStepAdminSetCardLimitHandler
+	sessionManager.Step = domain.SessionStepShogunSetCardLimitHandler
 
 	return msg.Answer("Установите лимит").DoVoid(ctx)
 }
 
-func (h *AdminHandler) SetCardLimitHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+func (h *ShogunHandler) SetCardLimitHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	sessionManager := h.sessionManager.Get(ctx)
 
 	limit, err := strconv.Atoi(msg.Text)
 	if err != nil {
-		sessionManager.Step = domain.SessionStepAdminSetCardLimitHandler
+		sessionManager.Step = domain.SessionStepShogunSetCardLimitHandler
 		return msg.Answer("Пожалуйста, установите лимит").DoVoid(ctx)
 	}
 
 	sessionManager.Card.DailyLimit = limit
 
-	daimyos, err := h.daimyoService.GetAllByShogun(ctx, sessionManager.Shogun.Username)
+	daimyos, err := h.daimyoService.GetAllByShogun(ctx, string(msg.From.Username))
 	if err != nil {
 		return err
 	}
@@ -69,12 +69,12 @@ func (h *AdminHandler) SetCardLimitHandler(ctx context.Context, msg *tgb.Message
 		)...,
 	).WithResizeKeyboardMarkup()
 
-	sessionManager.Step = domain.SessionStepAdminChooseCardDaimyoHandler
+	sessionManager.Step = domain.SessionStepShogunChooseCardDaimyoHandler
 
 	return msg.Answer("Выберите имя дайме, к которому будет привязана карта").ReplyMarkup(kb).DoVoid(ctx)
 }
 
-func (h *AdminHandler) ChooseCardDaimyoAndCreateHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+func (h *ShogunHandler) ChooseCardDaimyoAndCreateHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	sessionManager := h.sessionManager.Get(ctx)
 	sessionManager.Card.DaimyoUsername = msg.Text
 

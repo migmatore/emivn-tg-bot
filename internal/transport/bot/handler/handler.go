@@ -142,6 +142,7 @@ func New(deps Deps) *Handler {
 			deps.SamuraiService,
 			deps.CashManagerService,
 			deps.MainOperatorService,
+			deps.CardService,
 		),
 		ControllerHandler: controller.New(
 			sm.Manager,

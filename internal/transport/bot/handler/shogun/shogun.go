@@ -26,6 +26,11 @@ type MainOperatorService interface {
 	Create(ctx context.Context, dto domain.MainOperatorDTO) error
 }
 
+type CardService interface {
+	Create(ctx context.Context, dto domain.CardDTO) error
+	GetBankNames(ctx context.Context) ([]*domain.BankDTO, error)
+}
+
 type ShogunHandler struct {
 	sessionManager *session.Manager[domain.Session]
 
@@ -33,6 +38,7 @@ type ShogunHandler struct {
 	samuraiService      SamuraiService
 	cashManagerService  CashManagerService
 	mainOperatorService MainOperatorService
+	cardService         CardService
 }
 
 func NewShogunHandler(
@@ -41,6 +47,7 @@ func NewShogunHandler(
 	samuraiService SamuraiService,
 	cashManagerService CashManagerService,
 	mainOperatorService MainOperatorService,
+	cardService CardService,
 ) *ShogunHandler {
 	return &ShogunHandler{
 		sessionManager:      sm,
@@ -48,6 +55,7 @@ func NewShogunHandler(
 		samuraiService:      samuraiService,
 		cashManagerService:  cashManagerService,
 		mainOperatorService: mainOperatorService,
+		cardService:         cardService,
 	}
 }
 
@@ -57,6 +65,19 @@ func (h *ShogunHandler) MainMenuHandler(ctx context.Context, msg *tgb.MessageUpd
 		return nil
 
 	case domain.ShogunMainMenu.Cards:
+		h.sessionManager.Get(ctx).Step = domain.SessionStepShogunCardsMenuHandler
+
+		kb := tg.NewReplyKeyboardMarkup(
+			tg.NewButtonColumn(
+				tg.NewKeyboardButton(domain.ShogunCardsMenu.CreateCard),
+				tg.NewKeyboardButton(domain.ShogunCardsMenu.CardsList),
+				tg.NewKeyboardButton(domain.ShogunCardsMenu.Limit),
+				tg.NewKeyboardButton(domain.ShogunCardsMenu.Balance),
+			)...,
+		).WithResizeKeyboardMarkup()
+
+		return msg.Answer("Выберите действие").ReplyMarkup(kb).DoVoid(ctx)
+
 		return nil
 
 	case domain.ShogunMainMenu.Report:
@@ -83,6 +104,42 @@ func (h *ShogunHandler) MainMenuHandler(ctx context.Context, msg *tgb.MessageUpd
 	case domain.ShogunMainMenu.Deposits:
 		return nil
 
+	default:
+		h.sessionManager.Reset(h.sessionManager.Get(ctx))
+		return msg.Answer("Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
+	}
+}
+
+func (h *ShogunHandler) CardsMenuHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+	switch msg.Text {
+	case domain.ShogunCardsMenu.CreateCard:
+		banks, err := h.cardService.GetBankNames(ctx)
+		if err != nil {
+			return err
+		}
+
+		buttons := make([]tg.KeyboardButton, 0)
+
+		for _, item := range banks {
+			buttons = append(buttons, tg.NewKeyboardButton(item.Name))
+		}
+
+		kb := tg.NewReplyKeyboardMarkup(
+			tg.NewButtonColumn(
+				buttons...,
+			)...,
+		).WithResizeKeyboardMarkup()
+
+		h.sessionManager.Get(ctx).Step = domain.SessionStepShogunChooseCardBankHandler
+
+		return msg.Answer("Выберите банк").ReplyMarkup(kb).DoVoid(ctx)
+
+	case domain.ShogunCardsMenu.CardsList:
+		return nil
+	case domain.ShogunCardsMenu.Limit:
+		return nil
+	case domain.ShogunCardsMenu.Balance:
+		return nil
 	default:
 		h.sessionManager.Reset(h.sessionManager.Get(ctx))
 		return msg.Answer("Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
