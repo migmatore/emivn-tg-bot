@@ -57,6 +57,8 @@ const (
 	SessionStepShogunCreateMainOperatorNickname
 	SessionStepShogunCreateMainOperator
 
+	SessionStepShogunSubordinationMenuHandler
+
 	// diamyo steps
 	SessionStepDaimyoMainMenuHandler
 	SessionStepDaimyoEnterReplenishmentRequestCardName

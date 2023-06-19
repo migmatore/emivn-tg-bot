@@ -90,6 +90,18 @@ var ShogunCreateEntityMenu = struct {
 	CreateMainOperator: "Главный оператор",
 }
 
+var ShogunSubordinationMenu = struct {
+	Daimyo       string
+	Samurai      string
+	MainOperator string
+	CashManager  string
+}{
+	Daimyo:       "Дайме",
+	Samurai:      "Самураи",
+	MainOperator: "Главные операторы",
+	CashManager:  "Инкассаторы",
+}
+
 // Daimyo
 
 var DaimyoMainMenu = struct {

@@ -106,8 +106,18 @@ func (h *ShogunHandler) HierarchyMenuHandler(ctx context.Context, msg *tgb.Messa
 		return msg.Answer("Выберите сущность, которую хотите создать").ReplyMarkup(kb).DoVoid(ctx)
 
 	case domain.ShogunHierarchyMenu.InSubordination:
+		h.sessionManager.Get(ctx).Step = domain.SessionStepShogunSubordinationMenuHandler
 
-		return nil
+		kb := tg.NewReplyKeyboardMarkup(
+			tg.NewButtonColumn(
+				tg.NewKeyboardButton(domain.ShogunSubordinationMenu.Daimyo),
+				tg.NewKeyboardButton(domain.ShogunSubordinationMenu.Samurai),
+				tg.NewKeyboardButton(domain.ShogunSubordinationMenu.MainOperator),
+				tg.NewKeyboardButton(domain.ShogunSubordinationMenu.CashManager),
+			)...,
+		).WithResizeKeyboardMarkup()
+
+		return msg.Answer("Выберите действие").ReplyMarkup(kb).DoVoid(ctx)
 
 	default:
 		h.sessionManager.Reset(h.sessionManager.Get(ctx))
