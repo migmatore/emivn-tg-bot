@@ -9,7 +9,7 @@ import (
 )
 
 type CardService interface {
-	GetByUsername(ctx context.Context, bankName string, daimyoUsername string) ([]*domain.CardDTO, error)
+	GetAllByUsername(ctx context.Context, bankName string, daimyoUsername string) ([]*domain.CardDTO, error)
 	GetBankNames(ctx context.Context) ([]*domain.BankDTO, error)
 }
 

@@ -42,9 +42,9 @@ func (s *CardStorage) Insert(ctx context.Context, card domain.Card) error {
 	return nil
 }
 
-func (s *CardStorage) GetByUsername(ctx context.Context, bankId int, daimyoUsername string) ([]*domain.Card, error) {
-	q := `select id, name, last_digits, daily_limit, daimyo_username, bank_type_id from cards where daimyo_username=$1 
-                                                                        and bank_type_id=$2`
+func (s *CardStorage) GetAllByUsername(ctx context.Context, bankId int, daimyoUsername string) ([]*domain.Card, error) {
+	q := `select id, name, daimyo_username, last_digits, daily_limit, balance, bank_type_id from cards 
+                where daimyo_username=$1 and bank_type_id=$2`
 
 	cards := make([]*domain.Card, 0)
 
@@ -62,9 +62,47 @@ func (s *CardStorage) GetByUsername(ctx context.Context, bankId int, daimyoUsern
 		err := rows.Scan(
 			&card.CardId,
 			&card.Name,
+			&card.DaimyoUsername,
 			&card.LastDigits,
 			&card.DailyLimit,
+			&card.Balance,
+			&card.BankTypeId,
+		)
+		if err != nil {
+			logging.GetLogger(ctx).Errorf("Query error. %v", err)
+			return nil, err
+		}
+
+		cards = append(cards, &card)
+	}
+
+	return cards, nil
+}
+
+func (s *CardStorage) GetAllByShogun(ctx context.Context, shogunUsername string) ([]*domain.Card, error) {
+	q := `select id, name, daimyo_username, last_digits, daily_limit, balance, bank_type_id from cards
+			where daimyo_username in (select username from daimyo where shogun_username = $1)`
+
+	cards := make([]*domain.Card, 0)
+
+	rows, err := s.pool.Query(ctx, q, shogunUsername)
+	if err != nil {
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var card domain.Card
+
+		err := rows.Scan(
+			&card.CardId,
+			&card.Name,
 			&card.DaimyoUsername,
+			&card.LastDigits,
+			&card.DailyLimit,
+			&card.Balance,
 			&card.BankTypeId,
 		)
 		if err != nil {

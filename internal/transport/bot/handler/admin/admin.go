@@ -35,6 +35,7 @@ type ControllerService interface {
 type CardService interface {
 	Create(ctx context.Context, dto domain.CardDTO) error
 	GetBankNames(ctx context.Context) ([]*domain.BankDTO, error)
+	GetAllByShogun(ctx context.Context, shogunUsername string) ([]*domain.CardDTO, error)
 }
 
 type AdminHandler struct {

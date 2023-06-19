@@ -8,7 +8,8 @@ import (
 
 type CardStorage interface {
 	Insert(ctx context.Context, card domain.Card) error
-	GetByUsername(ctx context.Context, bankId int, daimyoUsername string) ([]*domain.Card, error)
+	GetAllByUsername(ctx context.Context, bankId int, daimyoUsername string) ([]*domain.Card, error)
+	GetAllByShogun(ctx context.Context, shogunUsername string) ([]*domain.Card, error)
 	GetByName(ctx context.Context, name string) (domain.Card, error)
 	GetBankNames(ctx context.Context) ([]*domain.Bank, error)
 	GetBankIdByName(ctx context.Context, bankName string) (int, error)
@@ -45,13 +46,13 @@ func (s *CardService) Create(ctx context.Context, dto domain.CardDTO) error {
 	return s.storage.Insert(ctx, card)
 }
 
-func (s *CardService) GetByUsername(ctx context.Context, bankName string, daimyoUsername string) ([]*domain.CardDTO, error) {
+func (s *CardService) GetAllByUsername(ctx context.Context, bankName string, daimyoUsername string) ([]*domain.CardDTO, error) {
 	bankId, err := s.storage.GetBankIdByName(ctx, bankName)
 	if err != nil {
 		return nil, err
 	}
 
-	cards, err := s.storage.GetByUsername(ctx, bankId, daimyoUsername)
+	cards, err := s.storage.GetAllByUsername(ctx, bankId, daimyoUsername)
 	if err != nil {
 		return nil, err
 	}
@@ -61,10 +62,34 @@ func (s *CardService) GetByUsername(ctx context.Context, bankName string, daimyo
 	for _, item := range cards {
 		cardDTO := domain.CardDTO{
 			Name:           item.Name,
+			DaimyoUsername: item.DaimyoUsername,
 			LastDigits:     item.LastDigits,
 			DailyLimit:     item.DailyLimit,
-			DaimyoUsername: item.DaimyoUsername,
+			Balance:        item.Balance,
 			BankType:       bankName,
+		}
+
+		cardDTOs = append(cardDTOs, &cardDTO)
+	}
+
+	return cardDTOs, nil
+}
+
+func (s *CardService) GetAllByShogun(ctx context.Context, shogunUsername string) ([]*domain.CardDTO, error) {
+	cards, err := s.storage.GetAllByShogun(ctx, shogunUsername)
+	if err != nil {
+		return nil, err
+	}
+
+	cardDTOs := make([]*domain.CardDTO, 0)
+
+	for _, item := range cards {
+		cardDTO := domain.CardDTO{
+			Name:           item.Name,
+			DaimyoUsername: item.DaimyoUsername,
+			LastDigits:     item.LastDigits,
+			DailyLimit:     item.DailyLimit,
+			Balance:        item.Balance,
 		}
 
 		cardDTOs = append(cardDTOs, &cardDTO)

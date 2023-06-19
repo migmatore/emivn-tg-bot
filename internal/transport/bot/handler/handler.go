@@ -61,7 +61,8 @@ type MainOperatorService interface {
 
 type CardService interface {
 	Create(ctx context.Context, dto domain.CardDTO) error
-	GetByUsername(ctx context.Context, bankName string, daimyoUsername string) ([]*domain.CardDTO, error)
+	GetAllByUsername(ctx context.Context, bankName string, daimyoUsername string) ([]*domain.CardDTO, error)
+	GetAllByShogun(ctx context.Context, shogunUsername string) ([]*domain.CardDTO, error)
 	GetBankNames(ctx context.Context) ([]*domain.BankDTO, error)
 }
 
