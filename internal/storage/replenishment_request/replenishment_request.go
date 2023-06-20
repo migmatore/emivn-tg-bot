@@ -63,13 +63,15 @@ func (s *ReplenishmentRequestStorage) CheckIfExists(ctx context.Context, cardNam
 func (s *ReplenishmentRequestStorage) GetAllByCashManager(
 	ctx context.Context,
 	username string,
+	status string,
 ) ([]*domain.ReplenishmentRequest, error) {
 	q := `select id, cash_manager_username, owner_username, card_id, amount, status_id from replenishment_requests
-                                                                             where cash_manager_username = $1`
+               where cash_manager_username = $1 
+               and status_id = (select id from replenishment_request_status_groups where name = $2)`
 
 	replenishmentRequests := make([]*domain.ReplenishmentRequest, 0)
 
-	rows, err := s.pool.Query(ctx, q, username)
+	rows, err := s.pool.Query(ctx, q, username, status)
 	if err != nil {
 		logging.GetLogger(ctx).Errorf("Query error. %v", err)
 		return nil, err

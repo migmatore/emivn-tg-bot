@@ -9,7 +9,7 @@ import (
 type ReplenishmentRequestStorage interface {
 	Insert(ctx context.Context, replenishmentReq domain.ReplenishmentRequest) error
 	CheckIfExists(ctx context.Context, cardName string) (bool, error)
-	GetAllByCashManager(ctx context.Context, username string) ([]*domain.ReplenishmentRequest, error)
+	GetAllByCashManager(ctx context.Context, username string, status string) ([]*domain.ReplenishmentRequest, error)
 }
 
 type CashManagerStorage interface {
@@ -97,8 +97,9 @@ func (s *ReplenishmentRequestService) CheckIfExists(ctx context.Context, cardNam
 func (s *ReplenishmentRequestService) GetAllByCashManager(
 	ctx context.Context,
 	username string,
+	status string,
 ) ([]*domain.ReplenishmentRequestDTO, error) {
-	requests, err := s.storage.GetAllByCashManager(ctx, username)
+	requests, err := s.storage.GetAllByCashManager(ctx, username, status)
 	if err != nil {
 		return nil, err
 	}
@@ -107,11 +108,6 @@ func (s *ReplenishmentRequestService) GetAllByCashManager(
 
 	for _, request := range requests {
 		card, err := s.cardStorage.GetById(ctx, request.CardId)
-		if err != nil {
-			return nil, err
-		}
-
-		status, err := s.replenishmentRequestStatusStorage.GetById(ctx, request.ReplenishmentRequestId)
 		if err != nil {
 			return nil, err
 		}

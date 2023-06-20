@@ -13,6 +13,7 @@ type CardStorage interface {
 	GetAllByShogun(ctx context.Context, shogunUsername string) ([]*domain.Card, error)
 	GetByUsername(ctx context.Context, daimyoUsername string) (domain.Card, error)
 	GetByName(ctx context.Context, name string) (domain.Card, error)
+	GetById(ctx context.Context, cardId int) (domain.Card, error)
 	GetBankNames(ctx context.Context) ([]*domain.Bank, error)
 	GetBankIdByName(ctx context.Context, bankName string) (int, error)
 	GetBankById(ctx context.Context, bankId int) (domain.Bank, error)
@@ -122,7 +123,7 @@ func (s *CardService) GetByUsername(ctx context.Context, daimyoUsername string) 
 		return domain.CardDTO{}, err
 	}
 
-	bankName, err := s.storage.GetBankById(ctx, card.BankTypeId)
+	bank, err := s.storage.GetBankById(ctx, card.BankTypeId)
 	if err != nil {
 		return domain.CardDTO{}, err
 	}
@@ -133,7 +134,30 @@ func (s *CardService) GetByUsername(ctx context.Context, daimyoUsername string) 
 		LastDigits:     card.LastDigits,
 		DailyLimit:     card.DailyLimit,
 		Balance:        card.Balance,
-		BankType:       bankName.Name,
+		BankType:       bank.Name,
+	}
+
+	return cardDTO, nil
+}
+
+func (s *CardService) GetByName(ctx context.Context, name string) (domain.CardDTO, error) {
+	card, err := s.storage.GetByName(ctx, name)
+	if err != nil {
+		return domain.CardDTO{}, err
+	}
+
+	bank, err := s.storage.GetBankById(ctx, card.BankTypeId)
+	if err != nil {
+		return domain.CardDTO{}, err
+	}
+
+	cardDTO := domain.CardDTO{
+		Name:           card.Name,
+		DaimyoUsername: card.DaimyoUsername,
+		LastDigits:     card.LastDigits,
+		DailyLimit:     card.DailyLimit,
+		Balance:        card.Balance,
+		BankType:       bank.Name,
 	}
 
 	return cardDTO, nil

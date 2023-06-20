@@ -34,6 +34,7 @@ type DaimyoService interface {
 	Create(ctx context.Context, dto domain.DaimyoDTO) error
 	GetAll(ctx context.Context) ([]*domain.DaimyoDTO, error)
 	GetAllByShogun(ctx context.Context, shogunUsername string) ([]*domain.DaimyoDTO, error)
+	GetByUsername(ctx context.Context, username string) (domain.DaimyoDTO, error)
 	CreateSamuraiReport(ctx context.Context, date string) ([]string, error)
 }
 
@@ -64,6 +65,7 @@ type CardService interface {
 	GetAllByUsername(ctx context.Context, bankName string, daimyoUsername string) ([]*domain.CardDTO, error)
 	GetAllByShogun(ctx context.Context, shogunUsername string) ([]*domain.CardDTO, error)
 	GetByUsername(ctx context.Context, daimyoUsername string) (domain.CardDTO, error)
+	GetByName(ctx context.Context, name string) (domain.CardDTO, error)
 	GetBankNames(ctx context.Context) ([]*domain.BankDTO, error)
 	GetCardsBalancesByShogun(ctx context.Context, shogunUsername string) ([]string, error)
 }
@@ -71,6 +73,7 @@ type CardService interface {
 type ReplenishmentRequestService interface {
 	Create(ctx context.Context, dto domain.ReplenishmentRequestDTO) (tg.ChatID, error)
 	CheckIfExists(ctx context.Context, cardName string) (bool, error)
+	GetAllByCashManager(ctx context.Context, username string, status string) ([]*domain.ReplenishmentRequestDTO, error)
 }
 
 // TODO: Refactor DI
@@ -138,8 +141,17 @@ func New(deps Deps) *Handler {
 			deps.CashManagerService,
 			deps.SamuraiService,
 		),
-		CashManagerHandler: cash_manager.New(sm.Manager),
-		SamuraiHandler:     samurai.NewSamuraiHandler(sm.Manager, deps.CardService, deps.SamuraiService),
+		CashManagerHandler: cash_manager.New(
+			sm.Manager,
+			deps.ReplenishmentRequestService,
+			deps.CardService,
+			deps.DaimyoService,
+		),
+		SamuraiHandler: samurai.NewSamuraiHandler(
+			sm.Manager,
+			deps.CardService,
+			deps.SamuraiService,
+		),
 		ShogunHandler: shogun.NewShogunHandler(
 			sm.Manager,
 			deps.DaimyoService,

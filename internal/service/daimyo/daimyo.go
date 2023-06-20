@@ -146,6 +146,22 @@ func (s *DaimyoService) GetAllByShogun(ctx context.Context, shogunUsername strin
 	return daimyoDTOs, nil
 }
 
+func (s *DaimyoService) GetByUsername(ctx context.Context, username string) (domain.DaimyoDTO, error) {
+	daimyo, err := s.storage.GetByUsername(ctx, username)
+	if err != nil {
+		return domain.DaimyoDTO{}, err
+	}
+
+	daimyoDTO := domain.DaimyoDTO{
+		Username:       daimyo.Username,
+		Nickname:       daimyo.Nickname,
+		CardsBalance:   daimyo.CardsBalance,
+		ShogunUsername: daimyo.ShogunUsername,
+	}
+
+	return daimyoDTO, nil
+}
+
 func (s *DaimyoService) CreateSamuraiReport(ctx context.Context, date string) ([]string, error) {
 	reportMessages := make([]string, 0)
 

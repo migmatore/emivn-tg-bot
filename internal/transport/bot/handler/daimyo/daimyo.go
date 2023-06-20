@@ -86,8 +86,8 @@ func (h *DaimyoHandler) MainMenuHandler(ctx context.Context, msg *tgb.MessageUpd
 
 		buttons := make([]tg.KeyboardButton, 0)
 
-		for _, item := range banks {
-			buttons = append(buttons, tg.NewKeyboardButton(item.Name))
+		for _, bank := range banks {
+			buttons = append(buttons, tg.NewKeyboardButton(bank.Name))
 		}
 
 		kb := tg.NewReplyKeyboardMarkup(

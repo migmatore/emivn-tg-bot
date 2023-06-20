@@ -178,8 +178,8 @@ func (s *CardStorage) GetById(ctx context.Context, cardId int) (domain.Card, err
 		&card.CardId,
 		&card.Name,
 		&card.DaimyoUsername,
+		&card.LastDigits,
 		&card.DailyLimit,
-		&card.Name,
 		&card.Balance,
 		&card.BankTypeId,
 	); err != nil {

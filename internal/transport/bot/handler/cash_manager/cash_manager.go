@@ -8,12 +8,38 @@ import (
 	"github.com/mr-linch/go-tg/tgb/session"
 )
 
-type CashManagerHandler struct {
-	sessionManager *session.Manager[domain.Session]
+type ReplenishmentRequestService interface {
+	GetAllByCashManager(ctx context.Context, username string, status string) ([]*domain.ReplenishmentRequestDTO, error)
 }
 
-func New(sm *session.Manager[domain.Session]) *CashManagerHandler {
-	return &CashManagerHandler{sessionManager: sm}
+type CardService interface {
+	GetByName(ctx context.Context, name string) (domain.CardDTO, error)
+}
+
+type DaimyoService interface {
+	GetByUsername(ctx context.Context, username string) (domain.DaimyoDTO, error)
+}
+
+type CashManagerHandler struct {
+	sessionManager *session.Manager[domain.Session]
+
+	replenishmentRequestService ReplenishmentRequestService
+	cardService                 CardService
+	daimyoService               DaimyoService
+}
+
+func New(
+	sm *session.Manager[domain.Session],
+	replenishmentRequestService ReplenishmentRequestService,
+	cardService CardService,
+	daimyoService DaimyoService,
+) *CashManagerHandler {
+	return &CashManagerHandler{
+		sessionManager:              sm,
+		replenishmentRequestService: replenishmentRequestService,
+		cardService:                 cardService,
+		daimyoService:               daimyoService,
+	}
 }
 
 func (h *CashManagerHandler) MainMenuHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
