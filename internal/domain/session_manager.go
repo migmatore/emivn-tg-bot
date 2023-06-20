@@ -77,13 +77,22 @@ const (
 
 	// diamyo steps
 	SessionStepDaimyoMainMenuHandler
-	SessionStepDaimyoEnterReplenishmentRequestCardName
+
+	// daimyo replenishment request menu
+	SessionStepDaimyoChooseReplenishmentRequestBank
+
+	// daimyo make replenishment request
 	SessionStepDaimyoEnterReplenishmentRequestAmount
 	SessionStepDaimyoMakeReplenishmentRequest
+	SessionStepDaimyoChangeReplenishmentRequestAmount
 
+	// daimyo report menu
 	SessionStepDaimyoReportMenuHandler
+
+	// daimyo make report
 	SessionStepDaimyoReportPeriodMenuHandler
 
+	// daimyo hierarchy menu
 	SessionStepDaimyoHierarchyMenuHandler
 
 	// samurai steps

@@ -64,6 +64,7 @@ type CardService interface {
 	GetAllByUsername(ctx context.Context, bankName string, daimyoUsername string) ([]*domain.CardDTO, error)
 	GetAllByShogun(ctx context.Context, shogunUsername string) ([]*domain.CardDTO, error)
 	GetBankNames(ctx context.Context) ([]*domain.BankDTO, error)
+	GetCardsBalancesByShogun(ctx context.Context, shogunUsername string) ([]string, error)
 }
 
 type ReplenishmentRequestService interface {

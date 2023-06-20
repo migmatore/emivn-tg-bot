@@ -8,8 +8,8 @@ import (
 	"strconv"
 )
 
-func (h *DaimyoHandler) EnterCardName(ctx context.Context, msg *tgb.MessageUpdate) error {
-	cards, err := h.cardService.GetByUsername(ctx, msg.Text, string(msg.Chat.Username))
+func (h *DaimyoHandler) RepReqChooseCardHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+	cards, err := h.cardService.GetAllByUsername(ctx, msg.Text, string(msg.Chat.Username))
 	if err != nil {
 		return err
 	}
@@ -33,15 +33,18 @@ func (h *DaimyoHandler) EnterCardName(ctx context.Context, msg *tgb.MessageUpdat
 		DoVoid(ctx)
 }
 
-func (h *DaimyoHandler) EnterReplenishmentRequestAmount(ctx context.Context, msg *tgb.MessageUpdate) error {
+func (h *DaimyoHandler) EnterRepReqAmountHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	sessionManager := h.sessionManager.Get(ctx)
 	sessionManager.ReplenishmentRequest.CardName = msg.Text
+
+	// TODO: Search the card in the replenishment requests table.
+	// If the record exists, then reject the request.
 
 	sessionManager.Step = domain.SessionStepDaimyoMakeReplenishmentRequest
 	return msg.Answer("Введите сумму на пополнение").DoVoid(ctx)
 }
 
-func (h *DaimyoHandler) MakeReplenishmentRequest(ctx context.Context, msg *tgb.MessageUpdate) error {
+func (h *DaimyoHandler) MakeRepReqHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	sessionManager := h.sessionManager.Get(ctx)
 
 	amount, err := strconv.ParseFloat(msg.Text, 32)
@@ -53,6 +56,7 @@ func (h *DaimyoHandler) MakeReplenishmentRequest(ctx context.Context, msg *tgb.M
 	sessionManager.ReplenishmentRequest.Amount = float32(amount)
 	sessionManager.ReplenishmentRequest.DaimyoUsername = string(msg.From.Username)
 
+	// TODO: Check the card's limit
 	chatId, err := h.replenishmentRequestService.Create(ctx, sessionManager.ReplenishmentRequest)
 	if err != nil {
 		return err
@@ -63,7 +67,11 @@ func (h *DaimyoHandler) MakeReplenishmentRequest(ctx context.Context, msg *tgb.M
 	}
 
 	h.sessionManager.Reset(sessionManager)
-	return msg.Answer("Запрос на пополнение успешно создан. Напишите /start").
+	return msg.Answer("Данные записаны. Напишите /start").
 		ReplyMarkup(tg.NewReplyKeyboardRemove()).
 		DoVoid(ctx)
+}
+
+func (h *DaimyoHandler) ChangeRepReqAmountHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+	return nil
 }

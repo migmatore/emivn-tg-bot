@@ -30,6 +30,7 @@ type CardService interface {
 	Create(ctx context.Context, dto domain.CardDTO) error
 	GetAllByShogun(ctx context.Context, shogunUsername string) ([]*domain.CardDTO, error)
 	GetBankNames(ctx context.Context) ([]*domain.BankDTO, error)
+	GetCardsBalancesByShogun(ctx context.Context, shogunUsername string) ([]string, error)
 }
 
 type ShogunHandler struct {
@@ -138,7 +139,20 @@ func (h *ShogunHandler) CardsMenuHandler(ctx context.Context, msg *tgb.MessageUp
 	case domain.ShogunCardsMenu.CardsList:
 		return nil
 	case domain.ShogunCardsMenu.Limit:
-		return nil
+		sessionManager := h.sessionManager.Get(ctx)
+
+		cardsBalances, err := h.cardService.GetCardsBalancesByShogun(ctx, sessionManager.Shogun.Username)
+		if err != nil {
+			return err
+		}
+
+		for _, cardBalance := range cardsBalances {
+			msg.Answer(cardBalance).DoVoid(ctx)
+		}
+
+		h.sessionManager.Reset(sessionManager)
+		return msg.Answer("Балансы карт на данный момент.\nНапишите /start").DoVoid(ctx)
+
 	case domain.ShogunCardsMenu.Balance:
 		return nil
 	default:

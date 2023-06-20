@@ -94,9 +94,15 @@ func (h *DaimyoHandler) MainMenuHandler(ctx context.Context, msg *tgb.MessageUpd
 			)...,
 		).WithResizeKeyboardMarkup()
 
-		h.sessionManager.Get(ctx).Step = domain.SessionStepDaimyoEnterReplenishmentRequestCardName
+		h.sessionManager.Get(ctx).Step = domain.SessionStepDaimyoChooseReplenishmentRequestBank
 
 		return msg.Answer("Выберите банк").ReplyMarkup(kb).DoVoid(ctx)
+
+	case domain.DaimyoMainMenu.Requests:
+		return nil
+
+	case domain.DaimyoMainMenu.CardLimit:
+		return nil
 
 	case domain.DaimyoMainMenu.Report:
 		kb := tg.NewReplyKeyboardMarkup(

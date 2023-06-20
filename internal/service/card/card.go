@@ -4,6 +4,7 @@ import (
 	"context"
 	"emivn-tg-bot/internal/domain"
 	"emivn-tg-bot/internal/storage"
+	"fmt"
 )
 
 type CardStorage interface {
@@ -96,6 +97,21 @@ func (s *CardService) GetAllByShogun(ctx context.Context, shogunUsername string)
 	}
 
 	return cardDTOs, nil
+}
+
+func (s *CardService) GetCardsBalancesByShogun(ctx context.Context, shogunUsername string) ([]string, error) {
+	cardsBalances := make([]string, 0)
+
+	cards, err := s.storage.GetAllByShogun(ctx, shogunUsername)
+	if err != nil {
+		return nil, nil
+	}
+
+	for _, item := range cards {
+		cardsBalances = append(cardsBalances, fmt.Sprintf("%s - %f", item.Name, item.Balance))
+	}
+
+	return cardsBalances, nil
 }
 
 func (s *CardService) GetBankNames(ctx context.Context) ([]*domain.BankDTO, error) {

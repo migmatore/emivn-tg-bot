@@ -36,6 +36,7 @@ type CardService interface {
 	Create(ctx context.Context, dto domain.CardDTO) error
 	GetBankNames(ctx context.Context) ([]*domain.BankDTO, error)
 	GetAllByShogun(ctx context.Context, shogunUsername string) ([]*domain.CardDTO, error)
+	GetCardsBalancesByShogun(ctx context.Context, shogunUsername string) ([]string, error)
 }
 
 type AdminHandler struct {
@@ -173,7 +174,19 @@ func (h *AdminHandler) CardsMenuHandler(ctx context.Context, msg *tgb.MessageUpd
 	case domain.ShogunCardsMenu.Limit:
 		return nil
 	case domain.ShogunCardsMenu.Balance:
-		return nil
+		sessionManager := h.sessionManager.Get(ctx)
+
+		cardsBalances, err := h.cardService.GetCardsBalancesByShogun(ctx, sessionManager.Shogun.Username)
+		if err != nil {
+			return err
+		}
+
+		for _, cardBalance := range cardsBalances {
+			msg.Answer(cardBalance).DoVoid(ctx)
+		}
+
+		h.sessionManager.Reset(sessionManager)
+		return msg.Answer("Балансы карт на данный момент.\nНапишите /start").DoVoid(ctx)
 	default:
 		h.sessionManager.Reset(h.sessionManager.Get(ctx))
 		return msg.Answer("Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
