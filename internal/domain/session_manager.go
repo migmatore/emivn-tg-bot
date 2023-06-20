@@ -104,7 +104,11 @@ const (
 	SessionStepDaimyoCreateSamuraiNickname
 
 	// cash manager steps
-	SessionStepCashManagerMenuHandler
+	// cash mamager main menu handler
+	SessionStepCashManagerMainMenuHandler
+
+	// cash manager replenishment requests handler
+	SessionStepCashManagerRepReqMenuHandler
 
 	// controller steps
 	SessionStepControllerEnterDataMenuHandler

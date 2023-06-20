@@ -194,6 +194,26 @@ var CashManagerMainMenu = struct {
 	ReplenishmentList:  "Список пополнений",
 }
 
+// cash manager replenishment requests menu
+var CashManagerRepRequestsMenu = struct {
+	Active        string
+	Objectionable string
+}{
+	Active:        "Активные",
+	Objectionable: "Спорные",
+}
+
+// cash manager confirm replenishment requests menu
+var CashManagerConfirmRepRequestsMenu = struct {
+	Confirm     string
+	EnterAmount string
+	Cancel      string
+}{
+	Confirm:     "Подтвердить",
+	EnterAmount: "Ввести сумму",
+	Cancel:      "Отменить заявку",
+}
+
 // Controller
 
 var ControllerMainMenu = struct {

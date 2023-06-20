@@ -184,6 +184,7 @@ func (h *Handler) Init(ctx context.Context) (*tgb.Router, *Scheduler) {
 	h.registerSamuraiHandler()
 	h.registerControllerHandler()
 	h.registerShogunHandler()
+	h.registerCashManagerHandlers()
 
 	return h.Router, h.scheduler
 }

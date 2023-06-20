@@ -109,7 +109,7 @@ func (s *StartHandler) Start(ctx context.Context, msg *tgb.MessageUpdate) error 
 			ReplyMarkup(buildSamuraiStartMenu()).
 			DoVoid(ctx)
 	case domain.CashManagerRole.String():
-		s.sessionManager.Get(ctx).Step = domain.SessionStepCashManagerMenuHandler
+		s.sessionManager.Get(ctx).Step = domain.SessionStepCashManagerMainMenuHandler
 
 		if err := s.CashManagerService.SetChatId(ctx, string(msg.Chat.Username), msg.Chat.ID); err != nil {
 			s.sessionManager.Reset(s.sessionManager.Get(ctx))

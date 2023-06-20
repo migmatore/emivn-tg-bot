@@ -169,6 +169,32 @@ func (s *CardStorage) GetByUsername(ctx context.Context, daimyoUsername string) 
 	return card, nil
 }
 
+func (s *CardStorage) GetById(ctx context.Context, cardId int) (domain.Card, error) {
+	q := `select id, name, daimyo_username, last_digits, daily_limit, balance, bank_type_id from cards where id = $1`
+
+	card := domain.Card{}
+
+	if err := s.pool.QueryRow(ctx, q, cardId).Scan(
+		&card.CardId,
+		&card.Name,
+		&card.DaimyoUsername,
+		&card.DailyLimit,
+		&card.Name,
+		&card.Balance,
+		&card.BankTypeId,
+	); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			logging.GetLogger(ctx).Errorf("Error: %v", err)
+			return card, err
+		}
+
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return card, err
+	}
+
+	return card, nil
+}
+
 func (s *CardStorage) GetBankNames(ctx context.Context) ([]*domain.Bank, error) {
 	q := `select id, name from bank_types`
 

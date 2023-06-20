@@ -9,6 +9,7 @@ import (
 type ReplenishmentRequestStorage interface {
 	Insert(ctx context.Context, replenishmentReq domain.ReplenishmentRequest) error
 	CheckIfExists(ctx context.Context, cardName string) (bool, error)
+	GetAllByCashManager(ctx context.Context, username string) ([]*domain.ReplenishmentRequest, error)
 }
 
 type CashManagerStorage interface {
@@ -21,10 +22,12 @@ type DaimyoStorage interface {
 
 type CardStorage interface {
 	GetByName(ctx context.Context, name string) (domain.Card, error)
+	GetById(ctx context.Context, cardId int) (domain.Card, error)
 }
 
 type ReplenishmentRequestStatusStorage interface {
 	GetId(ctx context.Context, name string) (int, error)
+	GetById(ctx context.Context, statusId int) (string, error)
 }
 
 type ReplenishmentRequestService struct {
@@ -89,4 +92,40 @@ func (s *ReplenishmentRequestService) Create(ctx context.Context, dto domain.Rep
 
 func (s *ReplenishmentRequestService) CheckIfExists(ctx context.Context, cardName string) (bool, error) {
 	return s.storage.CheckIfExists(ctx, cardName)
+}
+
+func (s *ReplenishmentRequestService) GetAllByCashManager(
+	ctx context.Context,
+	username string,
+) ([]*domain.ReplenishmentRequestDTO, error) {
+	requests, err := s.storage.GetAllByCashManager(ctx, username)
+	if err != nil {
+		return nil, err
+	}
+
+	requestsDTOs := make([]*domain.ReplenishmentRequestDTO, 0)
+
+	for _, request := range requests {
+		card, err := s.cardStorage.GetById(ctx, request.CardId)
+		if err != nil {
+			return nil, err
+		}
+
+		status, err := s.replenishmentRequestStatusStorage.GetById(ctx, request.ReplenishmentRequestId)
+		if err != nil {
+			return nil, err
+		}
+
+		requestDTO := domain.ReplenishmentRequestDTO{
+			CashManagerUsername: request.CashManagerUsername,
+			OwnerUsername:       request.OwnerUsername,
+			CardName:            card.Name,
+			Amount:              request.Amount,
+			Status:              status,
+		}
+
+		requestsDTOs = append(requestsDTOs, &requestDTO)
+	}
+
+	return requestsDTOs, nil
 }

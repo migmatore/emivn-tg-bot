@@ -90,9 +90,9 @@ func (h *DaimyoHandler) MakeRepReqHandler(ctx context.Context, msg *tgb.MessageU
 		return err
 	}
 
-	if err := msg.Client.SendMessage(chatId, "RepReq").DoVoid(ctx); err != nil {
-		// TODO
-	}
+	msg.Client.SendMessage(chatId,
+		fmt.Sprintf("Появилась новая заявка на пополнение: %s / %s %d", msg.From.Username, card.Name, card.LastDigits)).
+		DoVoid(ctx)
 
 	h.sessionManager.Reset(sessionManager)
 	return msg.Answer("Данные записаны.\n Напишите /start").
