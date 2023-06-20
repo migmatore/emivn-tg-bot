@@ -117,16 +117,45 @@ func (s *CardStorage) GetAllByShogun(ctx context.Context, shogunUsername string)
 }
 
 func (s *CardStorage) GetByName(ctx context.Context, name string) (domain.Card, error) {
-	q := `select id, name, last_digits, daily_limit, daimyo_username from cards where name=$1`
+	q := `select id, name, daimyo_username, last_digits, daily_limit, balance, bank_type_id from cards where name=$1`
 
 	card := domain.Card{}
 
 	if err := s.pool.QueryRow(ctx, q, name).Scan(
 		&card.CardId,
 		&card.Name,
+		&card.DaimyoUsername,
 		&card.LastDigits,
 		&card.DailyLimit,
+		&card.Balance,
+		&card.BankTypeId,
+	); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			logging.GetLogger(ctx).Errorf("Error: %v", err)
+			return card, err
+		}
+
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return card, err
+	}
+
+	return card, nil
+}
+
+func (s *CardStorage) GetByUsername(ctx context.Context, daimyoUsername string) (domain.Card, error) {
+	q := `select id, name, daimyo_username, last_digits, daily_limit, balance, bank_type_id from cards 
+                                                                                  where daimyo_username=$1`
+
+	card := domain.Card{}
+
+	if err := s.pool.QueryRow(ctx, q, daimyoUsername).Scan(
+		&card.CardId,
+		&card.Name,
 		&card.DaimyoUsername,
+		&card.LastDigits,
+		&card.DailyLimit,
+		&card.Balance,
+		&card.BankTypeId,
 	); err != nil {
 		if err := utils.ParsePgError(err); err != nil {
 			logging.GetLogger(ctx).Errorf("Error: %v", err)
@@ -184,4 +213,22 @@ func (s *CardStorage) GetBankIdByName(ctx context.Context, bankName string) (int
 	}
 
 	return id, nil
+}
+
+func (s *CardStorage) GetBankById(ctx context.Context, bankId int) (domain.Bank, error) {
+	q := `select id, name from bank_types where id=$1`
+
+	bank := domain.Bank{}
+
+	if err := s.pool.QueryRow(ctx, q, bankId).Scan(&bank.BankId, &bank.Name); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			logging.GetLogger(ctx).Errorf("Error: %v", err)
+			return bank, err
+		}
+
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return bank, err
+	}
+
+	return bank, nil
 }

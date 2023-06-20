@@ -5,14 +5,17 @@ type ReplenishmentRequestStatus int
 const (
 	ActiveRequest ReplenishmentRequestStatus = iota
 	ObjectionableRequest
+	CompletedRequests
 )
 
 func (r ReplenishmentRequestStatus) String() string {
 	switch r {
 	case ActiveRequest:
-		return "Активный"
+		return "Активные"
 	case ObjectionableRequest:
-		return "Спорный"
+		return "Спорные"
+	case CompletedRequests:
+		return "Выполненные"
 	default:
 		return ""
 	}

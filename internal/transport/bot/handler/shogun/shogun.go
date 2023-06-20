@@ -139,9 +139,12 @@ func (h *ShogunHandler) CardsMenuHandler(ctx context.Context, msg *tgb.MessageUp
 	case domain.ShogunCardsMenu.CardsList:
 		return nil
 	case domain.ShogunCardsMenu.Limit:
+		return nil
+
+	case domain.ShogunCardsMenu.Balance:
 		sessionManager := h.sessionManager.Get(ctx)
 
-		cardsBalances, err := h.cardService.GetCardsBalancesByShogun(ctx, sessionManager.Shogun.Username)
+		cardsBalances, err := h.cardService.GetCardsBalancesByShogun(ctx, string(msg.From.Username))
 		if err != nil {
 			return err
 		}
@@ -153,8 +156,6 @@ func (h *ShogunHandler) CardsMenuHandler(ctx context.Context, msg *tgb.MessageUp
 		h.sessionManager.Reset(sessionManager)
 		return msg.Answer("Балансы карт на данный момент.\nНапишите /start").DoVoid(ctx)
 
-	case domain.ShogunCardsMenu.Balance:
-		return nil
 	default:
 		h.sessionManager.Reset(h.sessionManager.Get(ctx))
 		return msg.Answer("Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)

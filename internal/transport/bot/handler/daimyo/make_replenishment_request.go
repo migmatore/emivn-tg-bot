@@ -3,6 +3,7 @@ package daimyo
 import (
 	"context"
 	"emivn-tg-bot/internal/domain"
+	"fmt"
 	"github.com/mr-linch/go-tg"
 	"github.com/mr-linch/go-tg/tgb"
 	"strconv"
@@ -37,8 +38,17 @@ func (h *DaimyoHandler) EnterRepReqAmountHandler(ctx context.Context, msg *tgb.M
 	sessionManager := h.sessionManager.Get(ctx)
 	sessionManager.ReplenishmentRequest.CardName = msg.Text
 
-	// TODO: Search the card in the replenishment requests table.
 	// If the record exists, then reject the request.
+	exists, err := h.replenishmentRequestService.CheckIfExists(ctx, msg.Text)
+	if err != nil {
+		return err
+	}
+
+	if exists {
+		h.sessionManager.Reset(sessionManager)
+		return msg.Answer("Вы не можете использовать данную карту, так как она активна/в споре.\nНапишите /start").
+			DoVoid(ctx)
+	}
 
 	sessionManager.Step = domain.SessionStepDaimyoMakeReplenishmentRequest
 	return msg.Answer("Введите сумму на пополнение").DoVoid(ctx)
@@ -54,9 +64,27 @@ func (h *DaimyoHandler) MakeRepReqHandler(ctx context.Context, msg *tgb.MessageU
 	}
 
 	sessionManager.ReplenishmentRequest.Amount = float32(amount)
-	sessionManager.ReplenishmentRequest.DaimyoUsername = string(msg.From.Username)
+	sessionManager.ReplenishmentRequest.OwnerUsername = string(msg.From.Username)
 
-	// TODO: Check the card's limit
+	card, err := h.cardService.GetByUsername(ctx, string(msg.From.Username))
+	if err != nil {
+		return err
+	}
+
+	if float32(amount) > float32(card.DailyLimit) {
+		sessionManager.Step = domain.SessionStepDaimyoChangeReplenishmentRequestAmount
+
+		kb := tg.NewReplyKeyboardMarkup(
+			tg.NewButtonColumn(
+				tg.NewKeyboardButton("Ввести другую сумму"),
+			)...,
+		).WithResizeKeyboardMarkup()
+
+		return msg.Answer(fmt.Sprintf("Вы превысили лимит. Остаток по карте:\n%d", card.DailyLimit)).
+			ReplyMarkup(kb).
+			DoVoid(ctx)
+	}
+
 	chatId, err := h.replenishmentRequestService.Create(ctx, sessionManager.ReplenishmentRequest)
 	if err != nil {
 		return err
@@ -67,11 +95,18 @@ func (h *DaimyoHandler) MakeRepReqHandler(ctx context.Context, msg *tgb.MessageU
 	}
 
 	h.sessionManager.Reset(sessionManager)
-	return msg.Answer("Данные записаны. Напишите /start").
+	return msg.Answer("Данные записаны.\n Напишите /start").
 		ReplyMarkup(tg.NewReplyKeyboardRemove()).
 		DoVoid(ctx)
 }
 
 func (h *DaimyoHandler) ChangeRepReqAmountHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
-	return nil
+	switch msg.Text {
+	case "Ввести другую сумму":
+		h.sessionManager.Get(ctx).Step = domain.SessionStepDaimyoMakeReplenishmentRequest
+		return msg.Answer("Введите сумму на пополнение").DoVoid(ctx)
+	default:
+		h.sessionManager.Reset(h.sessionManager.Get(ctx))
+		return msg.Answer("Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
+	}
 }

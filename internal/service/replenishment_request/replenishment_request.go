@@ -8,6 +8,7 @@ import (
 
 type ReplenishmentRequestStorage interface {
 	Insert(ctx context.Context, replenishmentReq domain.ReplenishmentRequest) error
+	CheckIfExists(ctx context.Context, cardName string) (bool, error)
 }
 
 type CashManagerStorage interface {
@@ -51,7 +52,7 @@ func NewReplenishmentRequestService(
 }
 
 func (s *ReplenishmentRequestService) Create(ctx context.Context, dto domain.ReplenishmentRequestDTO) (tg.ChatID, error) {
-	daimyo, err := s.daimyoStorage.GetByUsername(ctx, dto.DaimyoUsername)
+	daimyo, err := s.daimyoStorage.GetByUsername(ctx, dto.OwnerUsername)
 	if err != nil {
 		return 0, err
 	}
@@ -73,7 +74,7 @@ func (s *ReplenishmentRequestService) Create(ctx context.Context, dto domain.Rep
 
 	replenishmentReq := domain.ReplenishmentRequest{
 		CashManagerUsername: cashManager.Username,
-		DaimyoUsername:      dto.DaimyoUsername,
+		OwnerUsername:       dto.OwnerUsername,
 		CardId:              card.CardId,
 		Amount:              dto.Amount,
 		StatusId:            statusId,
@@ -84,4 +85,8 @@ func (s *ReplenishmentRequestService) Create(ctx context.Context, dto domain.Rep
 	}
 
 	return tg.ChatID(*cashManager.ChatId), nil
+}
+
+func (s *ReplenishmentRequestService) CheckIfExists(ctx context.Context, cardName string) (bool, error) {
+	return s.storage.CheckIfExists(ctx, cardName)
 }

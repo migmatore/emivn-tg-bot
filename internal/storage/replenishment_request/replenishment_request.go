@@ -17,14 +17,14 @@ func NewReplenishmentRequestStorage(pool psql.AtomicPoolClient) *ReplenishmentRe
 }
 
 func (s *ReplenishmentRequestStorage) Insert(ctx context.Context, replenishmentReq domain.ReplenishmentRequest) error {
-	q := `insert into replenishment_requests(cash_manager_username, daimyo_username, card_id, amount, status_id) 
+	q := `insert into replenishment_requests(cash_manager_username, owner_username, card_id, amount, status_id) 
 		values ($1, $2, $3, $4, $5)`
 
 	if _, err := s.pool.Exec(
 		ctx,
 		q,
 		replenishmentReq.CashManagerUsername,
-		replenishmentReq.DaimyoUsername,
+		replenishmentReq.OwnerUsername,
 		replenishmentReq.CardId,
 		replenishmentReq.Amount,
 		replenishmentReq.StatusId,
@@ -39,4 +39,23 @@ func (s *ReplenishmentRequestStorage) Insert(ctx context.Context, replenishmentR
 	}
 
 	return nil
+}
+
+func (s *ReplenishmentRequestStorage) CheckIfExists(ctx context.Context, cardName string) (bool, error) {
+	q := `select exists(select * from replenishment_requests 
+                       where card_id = (select id from cards where name=$1 limit 1))`
+
+	var exists bool
+
+	if err := s.pool.QueryRow(ctx, q, cardName).Scan(&exists); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			logging.GetLogger(ctx).Errorf("Error: %v", err)
+			return false, err
+		}
+
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return false, err
+	}
+
+	return exists, nil
 }

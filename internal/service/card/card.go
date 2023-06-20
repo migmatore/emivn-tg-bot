@@ -11,9 +11,11 @@ type CardStorage interface {
 	Insert(ctx context.Context, card domain.Card) error
 	GetAllByUsername(ctx context.Context, bankId int, daimyoUsername string) ([]*domain.Card, error)
 	GetAllByShogun(ctx context.Context, shogunUsername string) ([]*domain.Card, error)
+	GetByUsername(ctx context.Context, daimyoUsername string) (domain.Card, error)
 	GetByName(ctx context.Context, name string) (domain.Card, error)
 	GetBankNames(ctx context.Context) ([]*domain.Bank, error)
 	GetBankIdByName(ctx context.Context, bankName string) (int, error)
+	GetBankById(ctx context.Context, bankId int) (domain.Bank, error)
 }
 
 type CardService struct {
@@ -30,7 +32,7 @@ func NewCardService(t storage.Transactor, s CardStorage) *CardService {
 }
 
 func (s *CardService) Create(ctx context.Context, dto domain.CardDTO) error {
-	bankName, err := s.storage.GetBankIdByName(ctx, dto.BankType)
+	bankId, err := s.storage.GetBankIdByName(ctx, dto.BankType)
 	if err != nil {
 		return err
 	}
@@ -41,7 +43,7 @@ func (s *CardService) Create(ctx context.Context, dto domain.CardDTO) error {
 		LastDigits:     dto.LastDigits,
 		DailyLimit:     dto.DailyLimit,
 		Balance:        0,
-		BankTypeId:     bankName,
+		BankTypeId:     bankId,
 	}
 
 	return s.storage.Insert(ctx, card)
@@ -112,6 +114,29 @@ func (s *CardService) GetCardsBalancesByShogun(ctx context.Context, shogunUserna
 	}
 
 	return cardsBalances, nil
+}
+
+func (s *CardService) GetByUsername(ctx context.Context, daimyoUsername string) (domain.CardDTO, error) {
+	card, err := s.storage.GetByUsername(ctx, daimyoUsername)
+	if err != nil {
+		return domain.CardDTO{}, err
+	}
+
+	bankName, err := s.storage.GetBankById(ctx, card.BankTypeId)
+	if err != nil {
+		return domain.CardDTO{}, err
+	}
+
+	cardDTO := domain.CardDTO{
+		Name:           card.Name,
+		DaimyoUsername: card.DaimyoUsername,
+		LastDigits:     card.LastDigits,
+		DailyLimit:     card.DailyLimit,
+		Balance:        card.Balance,
+		BankType:       bankName.Name,
+	}
+
+	return cardDTO, nil
 }
 
 func (s *CardService) GetBankNames(ctx context.Context) ([]*domain.BankDTO, error) {

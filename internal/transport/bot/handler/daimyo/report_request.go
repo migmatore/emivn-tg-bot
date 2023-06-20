@@ -31,7 +31,7 @@ func (h *DaimyoHandler) ReportMenuHandler(ctx context.Context, msg *tgb.MessageU
 func (h *DaimyoHandler) ReportPeriodMenuHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	switch msg.Text {
 	case domain.DaimyoReportPeriodMenu.ForShift:
-		reports, err := h.daimyoService.CreateSamuraiReport(ctx, "2023-06-16")
+		reports, err := h.daimyoService.CreateSamuraiReport(ctx, "2023-06-20")
 		if err != nil {
 			return err
 		}

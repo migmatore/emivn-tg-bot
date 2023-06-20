@@ -11,6 +11,7 @@ import (
 type CardService interface {
 	GetAllByUsername(ctx context.Context, bankName string, daimyoUsername string) ([]*domain.CardDTO, error)
 	GetBankNames(ctx context.Context) ([]*domain.BankDTO, error)
+	GetByUsername(ctx context.Context, daimyoUsername string) (domain.CardDTO, error)
 }
 
 type DaimyoService interface {
@@ -19,6 +20,7 @@ type DaimyoService interface {
 
 type ReplenishmentRequestService interface {
 	Create(ctx context.Context, dto domain.ReplenishmentRequestDTO) (tg.ChatID, error)
+	CheckIfExists(ctx context.Context, cardName string) (bool, error)
 }
 
 type CashManagerService interface {

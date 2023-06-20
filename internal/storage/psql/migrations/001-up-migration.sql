@@ -21,7 +21,7 @@ CREATE TABLE bank_types
 CREATE TABLE cards
 (
     id              INTEGER      NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    name            VARCHAR(50)  NOT NULL,
+    name            VARCHAR(50)  NOT NULL UNIQUE,
     daimyo_username VARCHAR(255) NOT NULL REFERENCES daimyo (username),
     last_digits     INTEGER      NOT NULL UNIQUE,
     daily_limit     INTEGER      NOT NULL DEFAULT 2000000,
@@ -142,8 +142,9 @@ VALUES ('Администратор'),
        ('Главный оператор');
 
 INSERT INTO replenishment_request_status_groups(name)
-VALUES ('Активные заявки'),
-       ('Спорные заявки');
+VALUES ('Активные'),
+       ('Спорные'),
+       ('Выполненные');
 
 INSERT INTO bank_types(name)
 VALUES ('Тинькофф'),

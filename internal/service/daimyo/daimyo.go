@@ -165,42 +165,54 @@ func (s *DaimyoService) CreateSamuraiReport(ctx context.Context, date string) ([
 	//}
 	//s.controllerTurnoverStorage.GetTurnoversByDate(ctx, date)
 
+	reportMessages = append(reportMessages, date)
+
 	samurais, err := s.samuraiStorage.GetAllByDaimyo(ctx, "daimyo")
 	if err != nil {
 		return nil, nil
 	}
 
 	for _, samurai := range samurais {
-		str := samurai.Username + "\n"
-
-		str += "Тинькофф\n"
-		var samuraiTurnover, controllerTurnover float64
+		var sberSamuraiTurnover, sberControllerTurnover, tinSamuraiTurnover, tinControllerTurnover float64
+		var str string
 		var err error
 
-		samuraiTurnover, err = s.samuraiTurnoverStorage.GetTurnover(ctx, samurai.Username, date, 1)
+		tinSamuraiTurnover, err = s.samuraiTurnoverStorage.GetTurnover(ctx, samurai.Username, date, 1)
 		if err != nil {
-			str += "Ошибка получения данных\n"
+			//str += "Ошибка получения данных\n"
 		}
 
-		controllerTurnover, err = s.controllerTurnoverStorage.GetTurnover(ctx, samurai.Username, date, 1)
+		tinControllerTurnover, err = s.controllerTurnoverStorage.GetTurnover(ctx, samurai.Username, date, 1)
 		if err != nil {
-			str += "Ошибка получения данных\n"
+			//str += "Ошибка получения данных\n"
 		}
 
-		str += fmt.Sprintf("%d/%d/%d\n", int(controllerTurnover), int(samuraiTurnover), int(controllerTurnover-samuraiTurnover))
-
-		str += "Сбербанк\n"
-		samuraiTurnover, err = s.samuraiTurnoverStorage.GetTurnover(ctx, samurai.Username, date, 2)
+		//str += "Сбербанк\n"
+		sberSamuraiTurnover, err = s.samuraiTurnoverStorage.GetTurnover(ctx, samurai.Username, date, 2)
 		if err != nil {
-			str += "Ошибка получения данных\n"
+			//str += "Ошибка получения данных\n"
 		}
 
-		controllerTurnover, err = s.controllerTurnoverStorage.GetTurnover(ctx, samurai.Username, date, 2)
+		sberControllerTurnover, err = s.controllerTurnoverStorage.GetTurnover(ctx, samurai.Username, date, 2)
 		if err != nil {
-			str += "Ошибка получения данных\n"
+			//str += "Ошибка получения данных\n"
 		}
 
-		str += fmt.Sprintf("%d/%d/%d\n", int(controllerTurnover), int(samuraiTurnover), int(controllerTurnover-samuraiTurnover))
+		if (sberControllerTurnover-sberSamuraiTurnover == 0) && (tinControllerTurnover-tinSamuraiTurnover == 0) {
+			str += fmt.Sprintf("Расхождения по %s отсутсвуют\n\n", samurai.Username)
+			reportMessages = append(reportMessages, str)
+
+			continue
+		}
+
+		str += fmt.Sprintf("%s\n", samurai.Username)
+		str += fmt.Sprintf("Всего\n%d / %d / %d\n\n", int(tinControllerTurnover+sberControllerTurnover),
+			int(tinSamuraiTurnover+sberSamuraiTurnover),
+			int((tinControllerTurnover-tinSamuraiTurnover)+(sberControllerTurnover-sberSamuraiTurnover)))
+		str += fmt.Sprintf("Тинькофф\n%d / %d / %d\n", int(tinControllerTurnover), int(tinSamuraiTurnover),
+			int(tinControllerTurnover-tinSamuraiTurnover))
+		str += fmt.Sprintf("Сбербанк\n%d / %d / %d", int(sberControllerTurnover), int(sberSamuraiTurnover),
+			int(sberControllerTurnover-sberSamuraiTurnover))
 
 		reportMessages = append(reportMessages, str)
 	}
