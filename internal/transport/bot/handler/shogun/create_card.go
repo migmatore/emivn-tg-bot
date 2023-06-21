@@ -82,7 +82,7 @@ func (h *ShogunHandler) ChooseCardDaimyoAndCreateHandler(ctx context.Context, ms
 		return err
 	}
 
-	sessionManager.Card.DaimyoUsername = daimyo.Username
+	sessionManager.Card.OwnerUsername = daimyo.Username
 
 	if err := h.cardService.Create(ctx, sessionManager.Card); err != nil {
 		return err

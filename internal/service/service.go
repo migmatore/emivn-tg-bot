@@ -71,6 +71,7 @@ func New(deps Deps) *Service {
 			deps.Transactor,
 			deps.SamuraiStorage,
 			deps.SamuraiTurnoverStorage,
+			deps.DaimyoStorage,
 			deps.CardStorage,
 			deps.UserRoleStorage,
 			deps.RoleStorage,

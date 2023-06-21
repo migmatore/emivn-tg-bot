@@ -8,6 +8,7 @@ import (
 
 type MainOperatorStorage interface {
 	Insert(ctx context.Context, operator domain.MainOperator) error
+	GetByUsername(ctx context.Context, username string) (domain.MainOperator, error)
 }
 
 type UserRoleStorage interface {
@@ -72,4 +73,19 @@ func (s *MainOperatorService) Create(ctx context.Context, dto domain.MainOperato
 	}
 
 	return nil
+}
+
+func (s *MainOperatorService) GetByUsername(ctx context.Context, username string) (domain.MainOperatorDTO, error) {
+	operator, err := s.storage.GetByUsername(ctx, username)
+	if err != nil {
+		return domain.MainOperatorDTO{}, err
+	}
+
+	operatorDTO := domain.MainOperatorDTO{
+		Username:       operator.Username,
+		Nickname:       operator.Nickname,
+		ShogunUsername: operator.ShogunUsername,
+	}
+
+	return operatorDTO, nil
 }

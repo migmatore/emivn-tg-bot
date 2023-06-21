@@ -16,6 +16,7 @@ type CardService interface {
 
 type DaimyoService interface {
 	CreateSamuraiReport(ctx context.Context, date string) ([]string, error)
+	GetByUsername(ctx context.Context, username string) (domain.DaimyoDTO, error)
 }
 
 type ReplenishmentRequestService interface {

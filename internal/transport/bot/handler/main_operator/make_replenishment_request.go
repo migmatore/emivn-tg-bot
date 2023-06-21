@@ -1,4 +1,4 @@
-package daimyo
+package main_operator
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"strconv"
 )
 
-func (h *DaimyoHandler) RepReqChooseCardHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+func (h *MainOperatorHandler) RepReqChooseCardHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	cards, err := h.cardService.GetAllByUsername(ctx, msg.Text, string(msg.From.Username))
 	if err != nil {
 		return err
@@ -27,14 +27,14 @@ func (h *DaimyoHandler) RepReqChooseCardHandler(ctx context.Context, msg *tgb.Me
 		)...,
 	).WithResizeKeyboardMarkup()
 
-	h.sessionManager.Get(ctx).Step = domain.SessionStepDaimyoEnterReplenishmentRequestAmount
+	h.sessionManager.Get(ctx).Step = domain.SessionStepMainOperatorEnterReplenishmentRequestAmount
 
 	return msg.Answer("Введите название карты из списка, которую хотите пополнить:").
 		ReplyMarkup(kb).
 		DoVoid(ctx)
 }
 
-func (h *DaimyoHandler) EnterRepReqAmountHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+func (h *MainOperatorHandler) EnterRepReqAmountHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	sessionManager := h.sessionManager.Get(ctx)
 	sessionManager.ReplenishmentRequest.CardName = msg.Text
 
@@ -50,16 +50,16 @@ func (h *DaimyoHandler) EnterRepReqAmountHandler(ctx context.Context, msg *tgb.M
 			DoVoid(ctx)
 	}
 
-	sessionManager.Step = domain.SessionStepDaimyoMakeReplenishmentRequest
+	sessionManager.Step = domain.SessionStepMainOperatorMakeReplenishmentRequest
 	return msg.Answer("Введите сумму на пополнение").DoVoid(ctx)
 }
 
-func (h *DaimyoHandler) MakeRepReqHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+func (h *MainOperatorHandler) MakeRepReqHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	sessionManager := h.sessionManager.Get(ctx)
 
 	amount, err := strconv.ParseFloat(msg.Text, 32)
 	if err != nil {
-		sessionManager.Step = domain.SessionStepDaimyoMakeReplenishmentRequest
+		sessionManager.Step = domain.SessionStepMainOperatorMakeReplenishmentRequest
 		return msg.Answer("Пожалуйста, введите суточный лимит карты").DoVoid(ctx)
 	}
 
@@ -72,7 +72,7 @@ func (h *DaimyoHandler) MakeRepReqHandler(ctx context.Context, msg *tgb.MessageU
 	}
 
 	if float32(amount) > float32(card.DailyLimit) {
-		sessionManager.Step = domain.SessionStepDaimyoChangeReplenishmentRequestAmount
+		sessionManager.Step = domain.SessionStepMainOperatorChangeReplenishmentRequestAmount
 
 		kb := tg.NewReplyKeyboardMarkup(
 			tg.NewButtonColumn(
@@ -90,13 +90,13 @@ func (h *DaimyoHandler) MakeRepReqHandler(ctx context.Context, msg *tgb.MessageU
 		return err
 	}
 
-	daimyo, err := h.daimyoService.GetByUsername(ctx, string(msg.From.Username))
+	operator, err := h.mainOperatorService.GetByUsername(ctx, string(msg.From.Username))
 	if err != nil {
 		return err
 	}
 
 	msg.Client.SendMessage(chatId,
-		fmt.Sprintf("Появилась новая заявка на пополнение: %s / %s %d", daimyo.Username, card.Name, card.LastDigits)).
+		fmt.Sprintf("Появилась новая заявка на пополнение: %s / %s %d", operator.Nickname, card.Name, card.LastDigits)).
 		DoVoid(ctx)
 
 	h.sessionManager.Reset(sessionManager)
@@ -105,10 +105,10 @@ func (h *DaimyoHandler) MakeRepReqHandler(ctx context.Context, msg *tgb.MessageU
 		DoVoid(ctx)
 }
 
-func (h *DaimyoHandler) ChangeRepReqAmountHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+func (h *MainOperatorHandler) ChangeRepReqAmountHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	switch msg.Text {
 	case "Ввести другую сумму":
-		h.sessionManager.Get(ctx).Step = domain.SessionStepDaimyoMakeReplenishmentRequest
+		h.sessionManager.Get(ctx).Step = domain.SessionStepMainOperatorMakeReplenishmentRequest
 		return msg.Answer("Введите сумму на пополнение").DoVoid(ctx)
 	default:
 		h.sessionManager.Reset(h.sessionManager.Get(ctx))

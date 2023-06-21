@@ -20,12 +20,17 @@ type DaimyoService interface {
 	GetByUsername(ctx context.Context, username string) (domain.DaimyoDTO, error)
 }
 
+type MainOperatorService interface {
+	GetByUsername(ctx context.Context, username string) (domain.MainOperatorDTO, error)
+}
+
 type CashManagerHandler struct {
 	sessionManager *session.Manager[domain.Session]
 
 	replenishmentRequestService ReplenishmentRequestService
 	cardService                 CardService
 	daimyoService               DaimyoService
+	mainOperatorService         MainOperatorService
 }
 
 func New(
@@ -33,12 +38,14 @@ func New(
 	replenishmentRequestService ReplenishmentRequestService,
 	cardService CardService,
 	daimyoService DaimyoService,
+	mainOperatorService MainOperatorService,
 ) *CashManagerHandler {
 	return &CashManagerHandler{
 		sessionManager:              sm,
 		replenishmentRequestService: replenishmentRequestService,
 		cardService:                 cardService,
 		daimyoService:               daimyoService,
+		mainOperatorService:         mainOperatorService,
 	}
 }
 

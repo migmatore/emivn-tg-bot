@@ -17,14 +17,14 @@ func NewCardStorage(pool psql.AtomicPoolClient) *CardStorage {
 }
 
 func (s *CardStorage) Insert(ctx context.Context, card domain.Card) error {
-	q := `insert into cards(name, daimyo_username, last_digits, daily_limit, balance, bank_type_id) 
+	q := `insert into cards(name, owner_username, last_digits, daily_limit, balance, bank_type_id) 
 				values ($1, $2, $3, $4, $5, $6)`
 
 	if _, err := s.pool.Exec(
 		ctx,
 		q,
 		card.Name,
-		card.DaimyoUsername,
+		card.OwnerUsername,
 		card.LastDigits,
 		card.DailyLimit,
 		card.Balance,
@@ -42,13 +42,13 @@ func (s *CardStorage) Insert(ctx context.Context, card domain.Card) error {
 	return nil
 }
 
-func (s *CardStorage) GetAllByUsername(ctx context.Context, bankId int, daimyoUsername string) ([]*domain.Card, error) {
-	q := `select id, name, daimyo_username, last_digits, daily_limit, balance, bank_type_id from cards 
-                where daimyo_username=$1 and bank_type_id=$2`
+func (s *CardStorage) GetAllByUsername(ctx context.Context, bankId int, ownerUsername string) ([]*domain.Card, error) {
+	q := `select id, name, owner_username, last_digits, daily_limit, balance, bank_type_id from cards 
+                where owner_username=$1 and bank_type_id=$2`
 
 	cards := make([]*domain.Card, 0)
 
-	rows, err := s.pool.Query(ctx, q, daimyoUsername, bankId)
+	rows, err := s.pool.Query(ctx, q, ownerUsername, bankId)
 	if err != nil {
 		logging.GetLogger(ctx).Errorf("Query error. %v", err)
 		return nil, err
@@ -62,7 +62,7 @@ func (s *CardStorage) GetAllByUsername(ctx context.Context, bankId int, daimyoUs
 		err := rows.Scan(
 			&card.CardId,
 			&card.Name,
-			&card.DaimyoUsername,
+			&card.OwnerUsername,
 			&card.LastDigits,
 			&card.DailyLimit,
 			&card.Balance,
@@ -80,8 +80,11 @@ func (s *CardStorage) GetAllByUsername(ctx context.Context, bankId int, daimyoUs
 }
 
 func (s *CardStorage) GetAllByShogun(ctx context.Context, shogunUsername string) ([]*domain.Card, error) {
-	q := `select id, name, daimyo_username, last_digits, daily_limit, balance, bank_type_id from cards
-			where daimyo_username in (select username from daimyo where shogun_username = $1)`
+	q := `select id, name, owner_username, last_digits, daily_limit, balance, bank_type_id from cards
+				where owner_username in (select username from daimyo where shogun_username = $1)
+		  union
+		  select id, name, owner_username, last_digits, daily_limit, balance, bank_type_id from cards
+				where owner_username in (select username from main_operators where shogun_username = $1)`
 
 	cards := make([]*domain.Card, 0)
 
@@ -99,7 +102,7 @@ func (s *CardStorage) GetAllByShogun(ctx context.Context, shogunUsername string)
 		err := rows.Scan(
 			&card.CardId,
 			&card.Name,
-			&card.DaimyoUsername,
+			&card.OwnerUsername,
 			&card.LastDigits,
 			&card.DailyLimit,
 			&card.Balance,
@@ -117,14 +120,14 @@ func (s *CardStorage) GetAllByShogun(ctx context.Context, shogunUsername string)
 }
 
 func (s *CardStorage) GetByName(ctx context.Context, name string) (domain.Card, error) {
-	q := `select id, name, daimyo_username, last_digits, daily_limit, balance, bank_type_id from cards where name=$1`
+	q := `select id, name, owner_username, last_digits, daily_limit, balance, bank_type_id from cards where name=$1`
 
 	card := domain.Card{}
 
 	if err := s.pool.QueryRow(ctx, q, name).Scan(
 		&card.CardId,
 		&card.Name,
-		&card.DaimyoUsername,
+		&card.OwnerUsername,
 		&card.LastDigits,
 		&card.DailyLimit,
 		&card.Balance,
@@ -143,15 +146,15 @@ func (s *CardStorage) GetByName(ctx context.Context, name string) (domain.Card, 
 }
 
 func (s *CardStorage) GetByUsername(ctx context.Context, daimyoUsername string) (domain.Card, error) {
-	q := `select id, name, daimyo_username, last_digits, daily_limit, balance, bank_type_id from cards 
-                                                                                  where daimyo_username=$1`
+	q := `select id, name, owner_username, last_digits, daily_limit, balance, bank_type_id from cards 
+                                                                                  where owner_username=$1`
 
 	card := domain.Card{}
 
 	if err := s.pool.QueryRow(ctx, q, daimyoUsername).Scan(
 		&card.CardId,
 		&card.Name,
-		&card.DaimyoUsername,
+		&card.OwnerUsername,
 		&card.LastDigits,
 		&card.DailyLimit,
 		&card.Balance,
@@ -170,14 +173,14 @@ func (s *CardStorage) GetByUsername(ctx context.Context, daimyoUsername string) 
 }
 
 func (s *CardStorage) GetById(ctx context.Context, cardId int) (domain.Card, error) {
-	q := `select id, name, daimyo_username, last_digits, daily_limit, balance, bank_type_id from cards where id = $1`
+	q := `select id, name, owner_username, last_digits, daily_limit, balance, bank_type_id from cards where id = $1`
 
 	card := domain.Card{}
 
 	if err := s.pool.QueryRow(ctx, q, cardId).Scan(
 		&card.CardId,
 		&card.Name,
-		&card.DaimyoUsername,
+		&card.OwnerUsername,
 		&card.LastDigits,
 		&card.DailyLimit,
 		&card.Balance,

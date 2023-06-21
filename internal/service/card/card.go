@@ -9,7 +9,7 @@ import (
 
 type CardStorage interface {
 	Insert(ctx context.Context, card domain.Card) error
-	GetAllByUsername(ctx context.Context, bankId int, daimyoUsername string) ([]*domain.Card, error)
+	GetAllByUsername(ctx context.Context, bankId int, ownerUsername string) ([]*domain.Card, error)
 	GetAllByShogun(ctx context.Context, shogunUsername string) ([]*domain.Card, error)
 	GetByUsername(ctx context.Context, daimyoUsername string) (domain.Card, error)
 	GetByName(ctx context.Context, name string) (domain.Card, error)
@@ -39,24 +39,24 @@ func (s *CardService) Create(ctx context.Context, dto domain.CardDTO) error {
 	}
 
 	card := domain.Card{
-		Name:           dto.Name,
-		DaimyoUsername: dto.DaimyoUsername,
-		LastDigits:     dto.LastDigits,
-		DailyLimit:     dto.DailyLimit,
-		Balance:        0,
-		BankTypeId:     bankId,
+		Name:          dto.Name,
+		OwnerUsername: dto.OwnerUsername,
+		LastDigits:    dto.LastDigits,
+		DailyLimit:    dto.DailyLimit,
+		Balance:       0,
+		BankTypeId:    bankId,
 	}
 
 	return s.storage.Insert(ctx, card)
 }
 
-func (s *CardService) GetAllByUsername(ctx context.Context, bankName string, daimyoUsername string) ([]*domain.CardDTO, error) {
+func (s *CardService) GetAllByUsername(ctx context.Context, bankName string, ownerUsername string) ([]*domain.CardDTO, error) {
 	bankId, err := s.storage.GetBankIdByName(ctx, bankName)
 	if err != nil {
 		return nil, err
 	}
 
-	cards, err := s.storage.GetAllByUsername(ctx, bankId, daimyoUsername)
+	cards, err := s.storage.GetAllByUsername(ctx, bankId, ownerUsername)
 	if err != nil {
 		return nil, err
 	}
@@ -65,12 +65,12 @@ func (s *CardService) GetAllByUsername(ctx context.Context, bankName string, dai
 
 	for _, item := range cards {
 		cardDTO := domain.CardDTO{
-			Name:           item.Name,
-			DaimyoUsername: item.DaimyoUsername,
-			LastDigits:     item.LastDigits,
-			DailyLimit:     item.DailyLimit,
-			Balance:        item.Balance,
-			BankType:       bankName,
+			Name:          item.Name,
+			OwnerUsername: item.OwnerUsername,
+			LastDigits:    item.LastDigits,
+			DailyLimit:    item.DailyLimit,
+			Balance:       item.Balance,
+			BankType:      bankName,
 		}
 
 		cardDTOs = append(cardDTOs, &cardDTO)
@@ -89,11 +89,11 @@ func (s *CardService) GetAllByShogun(ctx context.Context, shogunUsername string)
 
 	for _, item := range cards {
 		cardDTO := domain.CardDTO{
-			Name:           item.Name,
-			DaimyoUsername: item.DaimyoUsername,
-			LastDigits:     item.LastDigits,
-			DailyLimit:     item.DailyLimit,
-			Balance:        item.Balance,
+			Name:          item.Name,
+			OwnerUsername: item.OwnerUsername,
+			LastDigits:    item.LastDigits,
+			DailyLimit:    item.DailyLimit,
+			Balance:       item.Balance,
 		}
 
 		cardDTOs = append(cardDTOs, &cardDTO)
@@ -117,8 +117,8 @@ func (s *CardService) GetCardsBalancesByShogun(ctx context.Context, shogunUserna
 	return cardsBalances, nil
 }
 
-func (s *CardService) GetByUsername(ctx context.Context, daimyoUsername string) (domain.CardDTO, error) {
-	card, err := s.storage.GetByUsername(ctx, daimyoUsername)
+func (s *CardService) GetByUsername(ctx context.Context, ownerUsername string) (domain.CardDTO, error) {
+	card, err := s.storage.GetByUsername(ctx, ownerUsername)
 	if err != nil {
 		return domain.CardDTO{}, err
 	}
@@ -129,12 +129,12 @@ func (s *CardService) GetByUsername(ctx context.Context, daimyoUsername string) 
 	}
 
 	cardDTO := domain.CardDTO{
-		Name:           card.Name,
-		DaimyoUsername: card.DaimyoUsername,
-		LastDigits:     card.LastDigits,
-		DailyLimit:     card.DailyLimit,
-		Balance:        card.Balance,
-		BankType:       bank.Name,
+		Name:          card.Name,
+		OwnerUsername: card.OwnerUsername,
+		LastDigits:    card.LastDigits,
+		DailyLimit:    card.DailyLimit,
+		Balance:       card.Balance,
+		BankType:      bank.Name,
 	}
 
 	return cardDTO, nil
@@ -152,12 +152,12 @@ func (s *CardService) GetByName(ctx context.Context, name string) (domain.CardDT
 	}
 
 	cardDTO := domain.CardDTO{
-		Name:           card.Name,
-		DaimyoUsername: card.DaimyoUsername,
-		LastDigits:     card.LastDigits,
-		DailyLimit:     card.DailyLimit,
-		Balance:        card.Balance,
-		BankType:       bank.Name,
+		Name:          card.Name,
+		OwnerUsername: card.OwnerUsername,
+		LastDigits:    card.LastDigits,
+		DailyLimit:    card.DailyLimit,
+		Balance:       card.Balance,
+		BankType:      bank.Name,
 	}
 
 	return cardDTO, nil

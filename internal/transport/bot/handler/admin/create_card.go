@@ -82,7 +82,7 @@ func (h *AdminHandler) ChooseCardDaimyoAndCreateHandler(ctx context.Context, msg
 		return err
 	}
 
-	sessionManager.Card.DaimyoUsername = daimyo.Username
+	sessionManager.Card.OwnerUsername = daimyo.Username
 
 	if err := h.cardService.Create(ctx, sessionManager.Card); err != nil {
 		return err

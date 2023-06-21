@@ -17,7 +17,9 @@ func (h *CashManagerHandler) RepReqMenuHandler(ctx context.Context, msg *tgb.Mes
 			domain.ActiveRequest.String(),
 		)
 		if err != nil {
-			return msg.Answer("Активные запросы отсутствуют").DoVoid(ctx)
+			h.sessionManager.Reset(h.sessionManager.Get(ctx))
+
+			return msg.Answer("Активные запросы отсутствуют.\nНапишите /start").DoVoid(ctx)
 		}
 
 		buttons := make([]tg.KeyboardButton, 0)
@@ -25,7 +27,15 @@ func (h *CashManagerHandler) RepReqMenuHandler(ctx context.Context, msg *tgb.Mes
 		for _, request := range requests {
 			card, _ := h.cardService.GetByName(ctx, request.CardName)
 
-			daimyo, _ := h.daimyoService.GetByUsername(ctx, card.DaimyoUsername)
+			var nickname string
+
+			daimyo, _ := h.daimyoService.GetByUsername(ctx, card.OwnerUsername)
+			if daimyo.Username == "" {
+				operator, _ := h.mainOperatorService.GetByUsername(ctx, card.OwnerUsername)
+				nickname = operator.Nickname
+			} else {
+				nickname = daimyo.Nickname
+			}
 
 			buttons = append(
 				buttons,
@@ -33,7 +43,7 @@ func (h *CashManagerHandler) RepReqMenuHandler(ctx context.Context, msg *tgb.Mes
 					"%s %d / %s / %d",
 					card.Name,
 					card.LastDigits,
-					daimyo.Nickname,
+					nickname,
 					int(request.Amount),
 				)),
 			)
@@ -45,9 +55,55 @@ func (h *CashManagerHandler) RepReqMenuHandler(ctx context.Context, msg *tgb.Mes
 			)...,
 		).WithResizeKeyboardMarkup()
 
-		return msg.Answer("Выберите запрос").ReplyMarkup(kb).DoVoid(ctx)
+		return msg.Answer("Выберите тип запроса").ReplyMarkup(kb).DoVoid(ctx)
+
 	case domain.CashManagerRepRequestsMenu.Objectionable:
-		return nil
+		requests, err := h.replenishmentRequestService.GetAllByCashManager(
+			ctx,
+			string(msg.From.Username),
+			domain.ObjectionableRequest.String(),
+		)
+		if err != nil {
+			h.sessionManager.Reset(h.sessionManager.Get(ctx))
+
+			return msg.Answer("Спорные запросы отсутствуют.\nНапишите /start").DoVoid(ctx)
+		}
+
+		buttons := make([]tg.KeyboardButton, 0)
+
+		for _, request := range requests {
+			card, _ := h.cardService.GetByName(ctx, request.CardName)
+
+			var nickname string
+
+			daimyo, _ := h.daimyoService.GetByUsername(ctx, card.OwnerUsername)
+			if daimyo.Username == "" {
+				operator, _ := h.mainOperatorService.GetByUsername(ctx, card.OwnerUsername)
+				nickname = operator.Nickname
+			} else {
+				nickname = daimyo.Nickname
+			}
+
+			buttons = append(
+				buttons,
+				tg.NewKeyboardButton(fmt.Sprintf(
+					"%s %d / %s / %d",
+					card.Name,
+					card.LastDigits,
+					nickname,
+					int(request.Amount),
+				)),
+			)
+		}
+
+		kb := tg.NewReplyKeyboardMarkup(
+			tg.NewButtonColumn(
+				buttons...,
+			)...,
+		).WithResizeKeyboardMarkup()
+
+		return msg.Answer("Выберите тип запроса").ReplyMarkup(kb).DoVoid(ctx)
+
 	default:
 		h.sessionManager.Reset(h.sessionManager.Get(ctx))
 		return msg.Answer("Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)

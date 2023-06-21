@@ -83,6 +83,7 @@ func (s *StartHandler) Start(ctx context.Context, msg *tgb.MessageUpdate) error 
 		return msg.Answer("Пожалуйста, выберите действие").
 			ReplyMarkup(buildAdminStartMenu()).
 			DoVoid(ctx)
+
 	case domain.ShogunRole.String():
 		s.sessionManager.Get(ctx).Step = domain.SessionStepShogunMainMenuHandler
 
@@ -96,6 +97,7 @@ func (s *StartHandler) Start(ctx context.Context, msg *tgb.MessageUpdate) error 
 		return msg.Answer("Пожалуйста, выберите действие").
 			ReplyMarkup(buildDaimyoStartMenu()).
 			DoVoid(ctx)
+
 	case domain.SamuraiRole.String():
 		s.sessionManager.Get(ctx).Step = domain.SessionStepSamuraiEnterDataMenuHandler
 
@@ -108,6 +110,7 @@ func (s *StartHandler) Start(ctx context.Context, msg *tgb.MessageUpdate) error 
 		return msg.Answer("Введите данные на конец смены с 8 до 12 часов дня. Без пробелов, точек и иных знаков.").
 			ReplyMarkup(buildSamuraiStartMenu()).
 			DoVoid(ctx)
+
 	case domain.CashManagerRole.String():
 		s.sessionManager.Get(ctx).Step = domain.SessionStepCashManagerMainMenuHandler
 
@@ -120,12 +123,21 @@ func (s *StartHandler) Start(ctx context.Context, msg *tgb.MessageUpdate) error 
 		return msg.Answer("Пожалуйста, выберите действие").
 			ReplyMarkup(buildCashManagerStartMenu()).
 			DoVoid(ctx)
+
 	case domain.ControllerRole.String():
 		s.sessionManager.Get(ctx).Step = domain.SessionStepControllerEnterDataMenuHandler
 
 		return msg.Answer("Введите данные на конец смены с 8 до 12 часов дня. Без пробелов, точек и иных знаков.").
 			ReplyMarkup(buildControllerStartMenu()).
 			DoVoid(ctx)
+
+	case domain.MainOperatorRole.String():
+		s.sessionManager.Get(ctx).Step = domain.SessionStepMainOperatorMainMenuHandler
+
+		return msg.Answer("Пожалуйста, выберите действие").
+			ReplyMarkup(buildMainOperatorStartMenu()).
+			DoVoid(ctx)
+
 	default:
 		return nil
 	}

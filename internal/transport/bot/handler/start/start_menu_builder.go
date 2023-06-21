@@ -72,3 +72,14 @@ func buildControllerStartMenu() *tg.ReplyKeyboardMarkup {
 		)...,
 	).WithResizeKeyboardMarkup()
 }
+
+func buildMainOperatorStartMenu() *tg.ReplyKeyboardMarkup {
+	return tg.NewReplyKeyboardMarkup(
+		tg.NewButtonColumn(
+			tg.NewKeyboardButton(domain.MainOperatorMainMenu.MakeReplenishmentRequest),
+			tg.NewKeyboardButton(domain.MainOperatorMainMenu.Requests),
+			tg.NewKeyboardButton(domain.MainOperatorMainMenu.FillReport),
+			tg.NewKeyboardButton(domain.MainOperatorMainMenu.WithdrawalRequest),
+		)...,
+	).WithResizeKeyboardMarkup()
+}

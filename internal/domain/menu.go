@@ -221,3 +221,16 @@ var ControllerMainMenu = struct {
 }{
 	EnterData: "Ввести данные на конец смены",
 }
+
+// main operator main menu
+var MainOperatorMainMenu = struct {
+	MakeReplenishmentRequest string
+	Requests                 string
+	FillReport               string
+	WithdrawalRequest        string
+}{
+	MakeReplenishmentRequest: "Запросить пополнение",
+	Requests:                 "Заявки",
+	FillReport:               "Зполнить отчет",
+	WithdrawalRequest:        "Заявка на вывод",
+}

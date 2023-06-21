@@ -100,8 +100,8 @@ func (s *SamuraiTurnoverStorage) GetByDateAndBank(
 }
 
 func (s *SamuraiTurnoverStorage) Update(ctx context.Context, turnover domain.SamuraiTurnover) error {
-	q := `update samurai_turnovers SET initial_amount=$1, final_amount=$2, turnover=$3 where samurai_username=$4 and bank_type_id=$5 
-                                                                               and (id=$6 or start_date=$7)`
+	q := `update samurai_turnovers SET initial_amount=$1, final_amount=$2, turnover=$3 where samurai_username=$4 
+                                                                               and bank_type_id=$5 and (id=$6 or start_date=$7)`
 
 	if _, err := s.pool.Exec(
 		ctx,

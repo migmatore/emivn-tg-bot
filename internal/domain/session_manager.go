@@ -6,6 +6,7 @@ const (
 	SessionStepInit = iota
 
 	// admin steps
+	// admin main menu
 	SessionStepAdminMainMenuHandler
 
 	// admin cards menu
@@ -22,27 +23,34 @@ const (
 	// admin hierrarchy menu
 	SessionStepHierarchyMenuHandler
 
+	// admin create entity menu
 	SessionStepCreateEntityMenuHandler
 
+	// admin create shogun
 	SessionStepCreateShogunUsername
 	SessionStepCreateShogun
 
+	// admin create daimyo
 	SessionStepCreateDaimyoUsername
 	SessionStepCreateDaimyoNickname
 	SessionStepCreateDaimyo
 
+	// admin create samurai
 	SessionStepCreateSamuraiUsername
 	SessionStepCreateSamuraiNickname
 	SessionStepCreateSamurai
 
+	// admin create cash manager
 	SessionStepCreateCashManagerUsername
 	SessionStepCreateCashManagerNickname
 	SessionStepCreateCashManager
 
+	// admin create cntroller
 	SessionStepCreateControllerUsername
 	SessionStepCreateController
 
 	// shogun steps
+	// shogun main menu
 	SessionStepShogunMainMenuHandler
 
 	// shogun cards menu
@@ -58,24 +66,31 @@ const (
 	// shogun hierarchy menu
 	SessionStepShogunHierarchyMenuHandler
 
+	// shogun create entity menu
 	SessionStepShogunCreateEntityMenuHandler
 
+	// shogun create daimyo
 	SessionStepShogunCreateDaimyoNickname
 	SessionStepShogunCreateDaimyo
-	SessionStepShogunCreateSamurai
 
+	// shogun create samurai
 	SessionStepShogunCreateSamuraiNickname
 	SessionStepShogunChooseSamuraiDaimyo
+	SessionStepShogunCreateSamurai
 
+	// shogun create cash manager
 	SessionStepShogunCreateCashManagerNickname
 	SessionStepShogunCreateCashManager
 
+	// shogun create main operator
 	SessionStepShogunCreateMainOperatorNickname
 	SessionStepShogunCreateMainOperator
 
+	// shogun in subordination menu
 	SessionStepShogunSubordinationMenuHandler
 
 	// diamyo steps
+	// daimyo main menu
 	SessionStepDaimyoMainMenuHandler
 
 	// daimyo replenishment request menu
@@ -95,16 +110,17 @@ const (
 	// daimyo hierarchy menu
 	SessionStepDaimyoHierarchyMenuHandler
 
+	// daimyo create samurai
+	SessionStepDaimyoCreateSamuraiUsername
+	SessionStepDaimyoCreateSamuraiNickname
+
 	// samurai steps
 	SessionStepSamuraiEnterDataMenuHandler
 	SessionStepSamuraiChooseBankMenuHandler
 	SessionStepSamuraiCreateTurnoverHandler
 
-	SessionStepDaimyoCreateSamuraiUsername
-	SessionStepDaimyoCreateSamuraiNickname
-
 	// cash manager steps
-	// cash mamager main menu handler
+	// cash mamager main menu
 	SessionStepCashManagerMainMenuHandler
 
 	// cash manager replenishment requests handler
@@ -116,6 +132,18 @@ const (
 	SessionStepControllerChooseSamuraiMenuHandler
 	SessionStepControllerChooseBankMenuHandler
 	SessionStepControllerCreateTurnoverHandler
+
+	// main operator steps
+	// main operator main menu
+	SessionStepMainOperatorMainMenuHandler
+
+	// main operator replenishment request menu
+	SessionStepMainOperatorChooseReplenishmentRequestBank
+
+	// main operator make replenishment request
+	SessionStepMainOperatorEnterReplenishmentRequestAmount
+	SessionStepMainOperatorChangeReplenishmentRequestAmount
+	SessionStepMainOperatorMakeReplenishmentRequest
 )
 
 type Session struct {

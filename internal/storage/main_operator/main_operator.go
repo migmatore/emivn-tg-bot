@@ -31,3 +31,25 @@ func (s *MainOperatorStorage) Insert(ctx context.Context, operator domain.MainOp
 
 	return nil
 }
+
+func (s MainOperatorStorage) GetByUsername(ctx context.Context, username string) (domain.MainOperator, error) {
+	q := `select username, nickname, shogun_username from main_operators where username=$1`
+
+	operator := domain.MainOperator{}
+
+	if err := s.pool.QueryRow(ctx, q, username).Scan(
+		&operator.Username,
+		&operator.Nickname,
+		&operator.ShogunUsername,
+	); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			logging.GetLogger(ctx).Errorf("Error: %v", err)
+			return operator, err
+		}
+
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return operator, err
+	}
+
+	return operator, nil
+}
