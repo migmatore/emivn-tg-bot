@@ -9,6 +9,7 @@ import (
 type ShogunStorage interface {
 	Insert(ctx context.Context, shogun domain.Shogun) error
 	GetAll(ctx context.Context) ([]*domain.Shogun, error)
+	GetByNickname(ctx context.Context, nickname string) (domain.Shogun, error)
 }
 
 type ShogunUserRoleStorage interface {
@@ -92,4 +93,18 @@ func (s *ShogunService) GetAll(ctx context.Context) ([]*domain.ShogunDTO, error)
 	}
 
 	return shogunsDTOs, nil
+}
+
+func (s *ShogunService) GetByNickname(ctx context.Context, nickname string) (domain.ShogunDTO, error) {
+	shogun, err := s.storage.GetByNickname(ctx, nickname)
+	if err != nil {
+		return domain.ShogunDTO{}, err
+	}
+
+	shogunDTO := domain.ShogunDTO{
+		Username: shogun.Username,
+		Nickname: shogun.Nickname,
+	}
+
+	return shogunDTO, nil
 }

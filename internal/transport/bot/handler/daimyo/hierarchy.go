@@ -26,8 +26,8 @@ func (h *DaimyoHandler) HierarchyMenuHandler(ctx context.Context, msg *tgb.Messa
 
 		buttons := make([]tg.KeyboardButton, 0)
 
-		for _, item := range samurais {
-			buttons = append(buttons, tg.NewKeyboardButton(item.Username))
+		for _, samurai := range samurais {
+			buttons = append(buttons, tg.NewKeyboardButton(samurai.Nickname))
 		}
 
 		kb := tg.NewReplyKeyboardMarkup(

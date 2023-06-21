@@ -59,8 +59,8 @@ func (h *AdminHandler) SetCardLimitHandler(ctx context.Context, msg *tgb.Message
 
 	buttons := make([]tg.KeyboardButton, 0)
 
-	for _, item := range daimyos {
-		buttons = append(buttons, tg.NewKeyboardButton(item.Username))
+	for _, daimyo := range daimyos {
+		buttons = append(buttons, tg.NewKeyboardButton(daimyo.Nickname))
 	}
 
 	kb := tg.NewReplyKeyboardMarkup(
@@ -76,7 +76,13 @@ func (h *AdminHandler) SetCardLimitHandler(ctx context.Context, msg *tgb.Message
 
 func (h *AdminHandler) ChooseCardDaimyoAndCreateHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	sessionManager := h.sessionManager.Get(ctx)
-	sessionManager.Card.DaimyoUsername = msg.Text
+
+	daimyo, err := h.daimyoService.GetByNickname(ctx, msg.Text)
+	if err != nil {
+		return err
+	}
+
+	sessionManager.Card.DaimyoUsername = daimyo.Username
 
 	if err := h.cardService.Create(ctx, sessionManager.Card); err != nil {
 		return err

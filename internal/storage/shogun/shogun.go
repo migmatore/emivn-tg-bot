@@ -59,3 +59,21 @@ func (s *ShogunStorage) GetAll(ctx context.Context) ([]*domain.Shogun, error) {
 
 	return shoguns, nil
 }
+
+func (s *ShogunStorage) GetByNickname(ctx context.Context, nickname string) (domain.Shogun, error) {
+	q := `select username, nickname from shoguns where nickname=$1`
+
+	shogun := domain.Shogun{}
+
+	if err := s.pool.QueryRow(ctx, q, nickname).Scan(&shogun.Username, &shogun.Nickname); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			logging.GetLogger(ctx).Errorf("Error: %v", err)
+			return shogun, err
+		}
+
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return shogun, err
+	}
+
+	return shogun, nil
+}

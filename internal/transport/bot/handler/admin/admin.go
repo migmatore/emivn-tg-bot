@@ -12,12 +12,14 @@ import (
 type ShogunService interface {
 	Create(ctx context.Context, dto domain.ShogunDTO) error
 	GetAll(ctx context.Context) ([]*domain.ShogunDTO, error)
+	GetByNickname(ctx context.Context, nickname string) (domain.ShogunDTO, error)
 }
 
 type DaimyoService interface {
 	Create(ctx context.Context, dto domain.DaimyoDTO) error
 	GetAll(ctx context.Context) ([]*domain.DaimyoDTO, error)
 	GetAllByShogun(ctx context.Context, shogunUsername string) ([]*domain.DaimyoDTO, error)
+	GetByNickname(ctx context.Context, nickname string) (domain.DaimyoDTO, error)
 }
 
 type SamuraiService interface {
@@ -80,8 +82,8 @@ func (h *AdminHandler) MainMenuHandler(ctx context.Context, msg *tgb.MessageUpda
 
 		buttons := make([]tg.KeyboardButton, 0)
 
-		for _, item := range shoguns {
-			buttons = append(buttons, tg.NewKeyboardButton(item.Username))
+		for _, shogun := range shoguns {
+			buttons = append(buttons, tg.NewKeyboardButton(shogun.Nickname))
 		}
 
 		kb := tg.NewReplyKeyboardMarkup(
@@ -129,7 +131,13 @@ func (h *AdminHandler) MainMenuHandler(ctx context.Context, msg *tgb.MessageUpda
 
 func (h *AdminHandler) CardsChooseShogunHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	sessionManager := h.sessionManager.Get(ctx)
-	sessionManager.Shogun.Username = msg.Text
+
+	shogun, err := h.shogunService.GetByNickname(ctx, msg.Text)
+	if err != nil {
+		return err
+	}
+
+	sessionManager.Shogun.Username = shogun.Username
 
 	kb := tg.NewReplyKeyboardMarkup(
 		tg.NewButtonColumn(

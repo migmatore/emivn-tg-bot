@@ -12,6 +12,7 @@ import (
 type SamuraiStorage interface {
 	Insert(ctx context.Context, samurai domain.Samurai) error
 	GetByUsername(ctx context.Context, username string) (domain.Samurai, error)
+	GetByNickname(ctx context.Context, nickname string) (domain.Samurai, error)
 	SetChatId(ctx context.Context, username string, id int64) error
 	GetAllByDaimyo(ctx context.Context, daimyoUsername string) ([]*domain.Samurai, error)
 }
@@ -23,6 +24,10 @@ type SamuraiTurnoverStorage interface {
 	Update(ctx context.Context, turnover domain.SamuraiTurnover) error
 
 	GetTurnover(ctx context.Context, samuraiUsername string, date string, bankId int) (float64, error)
+}
+
+type DaimyoStorage interface {
+	GetByNickname(ctx context.Context, nickname string) (domain.Daimyo, error)
 }
 
 type CardStorage interface {
@@ -42,6 +47,7 @@ type SamuraiService struct {
 
 	storage                SamuraiStorage
 	samuraiTurnoverStorage SamuraiTurnoverStorage
+	daimyoStorage          DaimyoStorage
 	cardStorage            CardStorage
 	userRoleStorage        UserRoleStorage
 	roleStorage            RoleStorage
@@ -51,6 +57,7 @@ func NewSamuraiService(
 	transactor storage.Transactor,
 	samuraiStorage SamuraiStorage,
 	turnoverStorage SamuraiTurnoverStorage,
+	daimyoStorage DaimyoStorage,
 	cardStorage CardStorage,
 	userRole UserRoleStorage,
 	role RoleStorage,
@@ -59,6 +66,7 @@ func NewSamuraiService(
 		transactor:             transactor,
 		storage:                samuraiStorage,
 		samuraiTurnoverStorage: turnoverStorage,
+		daimyoStorage:          daimyoStorage,
 		cardStorage:            cardStorage,
 		userRoleStorage:        userRole,
 		roleStorage:            role,
@@ -130,8 +138,50 @@ func (s *SamuraiService) GetByUsername(ctx context.Context, username string) (do
 	return samuraiDTO, nil
 }
 
+func (s *SamuraiService) GetByNickname(ctx context.Context, nickname string) (domain.SamuraiDTO, error) {
+	samurai, err := s.storage.GetByNickname(ctx, nickname)
+	if err != nil {
+		return domain.SamuraiDTO{}, nil
+	}
+
+	samuraiDTO := domain.SamuraiDTO{
+		Username:         samurai.Username,
+		Nickname:         samurai.Nickname,
+		DaimyoUsername:   samurai.DaimyoUsername,
+		TurnoverPerShift: samurai.TurnoverPerShift,
+		ChatId:           samurai.ChatId,
+	}
+
+	return samuraiDTO, nil
+}
+
 func (s *SamuraiService) GetAllByDaimyo(ctx context.Context, daimyoUsername string) ([]*domain.SamuraiDTO, error) {
 	samurais, err := s.storage.GetAllByDaimyo(ctx, daimyoUsername)
+	if err != nil {
+		return nil, err
+	}
+
+	samuraiDTOs := make([]*domain.SamuraiDTO, 0)
+
+	for _, item := range samurais {
+		samuraiDTO := domain.SamuraiDTO{
+			Username:         item.Username,
+			Nickname:         item.Nickname,
+			DaimyoUsername:   item.DaimyoUsername,
+			TurnoverPerShift: item.TurnoverPerShift,
+			ChatId:           item.ChatId,
+		}
+
+		samuraiDTOs = append(samuraiDTOs, &samuraiDTO)
+	}
+
+	return samuraiDTOs, nil
+}
+
+func (s *SamuraiService) GetAllByDaimyoNickname(ctx context.Context, nickname string) ([]*domain.SamuraiDTO, error) {
+	daimyo, err := s.daimyoStorage.GetByNickname(ctx, nickname)
+
+	samurais, err := s.storage.GetAllByDaimyo(ctx, daimyo.Username)
 	if err != nil {
 		return nil, err
 	}

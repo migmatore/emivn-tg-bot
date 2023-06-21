@@ -12,6 +12,7 @@ import (
 type DaimyoService interface {
 	Create(ctx context.Context, dto domain.DaimyoDTO) error
 	GetAllByShogun(ctx context.Context, shogunUsername string) ([]*domain.DaimyoDTO, error)
+	GetByNickname(ctx context.Context, nickname string) (domain.DaimyoDTO, error)
 }
 
 type SamuraiService interface {

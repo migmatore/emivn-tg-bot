@@ -18,7 +18,8 @@ type DaimyoService interface {
 }
 
 type SamuraiService interface {
-	GetAllByDaimyo(ctx context.Context, daimyoUsername string) ([]*domain.SamuraiDTO, error)
+	GetAllByDaimyoNickname(ctx context.Context, nickname string) ([]*domain.SamuraiDTO, error)
+	GetByNickname(ctx context.Context, nickname string) (domain.SamuraiDTO, error)
 }
 
 type ControllerService interface {
@@ -68,8 +69,8 @@ func (h *ControllerHandler) EnterDataMenuHandler(ctx context.Context, msg *tgb.M
 
 	buttons := make([]tg.KeyboardButton, 0)
 
-	for _, item := range daimyos {
-		buttons = append(buttons, tg.NewKeyboardButton(item.Username))
+	for _, daimyo := range daimyos {
+		buttons = append(buttons, tg.NewKeyboardButton(daimyo.Nickname))
 	}
 
 	kb := tg.NewReplyKeyboardMarkup(
@@ -86,15 +87,15 @@ func (h *ControllerHandler) EnterDataMenuHandler(ctx context.Context, msg *tgb.M
 func (h *ControllerHandler) ChooseDaimyoMenuHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	sessionManager := h.sessionManager.Get(ctx)
 
-	samurais, err := h.samuraiService.GetAllByDaimyo(ctx, msg.Text)
+	samurais, err := h.samuraiService.GetAllByDaimyoNickname(ctx, msg.Text)
 	if err != nil {
 		return err
 	}
 
 	buttons := make([]tg.KeyboardButton, 0)
 
-	for _, item := range samurais {
-		buttons = append(buttons, tg.NewKeyboardButton(item.Username))
+	for _, samurai := range samurais {
+		buttons = append(buttons, tg.NewKeyboardButton(samurai.Nickname))
 	}
 
 	kb := tg.NewReplyKeyboardMarkup(
@@ -111,7 +112,12 @@ func (h *ControllerHandler) ChooseDaimyoMenuHandler(ctx context.Context, msg *tg
 func (h *ControllerHandler) ChooseSamuraiMenuHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	sessionManager := h.sessionManager.Get(ctx)
 
-	sessionManager.ControllerTurnover.SamuraiUsername = msg.Text
+	samurai, err := h.samuraiService.GetByNickname(ctx, msg.Text)
+	if err != nil {
+		return err
+	}
+
+	sessionManager.ControllerTurnover.SamuraiUsername = samurai.Username
 
 	banks, err := h.cardService.GetBankNames(ctx)
 	if err != nil {

@@ -12,6 +12,7 @@ type DaimyoStorage interface {
 	GetAll(ctx context.Context) ([]*domain.Daimyo, error)
 	GetAllByShogun(ctx context.Context, shogunUsername string) ([]*domain.Daimyo, error)
 	GetByUsername(ctx context.Context, username string) (domain.Daimyo, error)
+	GetByNickname(ctx context.Context, nickname string) (domain.Daimyo, error)
 	//GetTurnovers(ctx context.Context, date string) ([]*domain.SamuraiReport, error)
 }
 
@@ -148,6 +149,22 @@ func (s *DaimyoService) GetAllByShogun(ctx context.Context, shogunUsername strin
 
 func (s *DaimyoService) GetByUsername(ctx context.Context, username string) (domain.DaimyoDTO, error) {
 	daimyo, err := s.storage.GetByUsername(ctx, username)
+	if err != nil {
+		return domain.DaimyoDTO{}, err
+	}
+
+	daimyoDTO := domain.DaimyoDTO{
+		Username:       daimyo.Username,
+		Nickname:       daimyo.Nickname,
+		CardsBalance:   daimyo.CardsBalance,
+		ShogunUsername: daimyo.ShogunUsername,
+	}
+
+	return daimyoDTO, nil
+}
+
+func (s *DaimyoService) GetByNickname(ctx context.Context, nickname string) (domain.DaimyoDTO, error) {
+	daimyo, err := s.storage.GetByNickname(ctx, nickname)
 	if err != nil {
 		return domain.DaimyoDTO{}, err
 	}

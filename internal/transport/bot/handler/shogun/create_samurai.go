@@ -20,8 +20,8 @@ func (h *ShogunHandler) EnterSamuraiNicknameHandler(ctx context.Context, msg *tg
 
 	buttons := make([]tg.KeyboardButton, 0)
 
-	for _, item := range daimyos {
-		buttons = append(buttons, tg.NewKeyboardButton(item.Username))
+	for _, daimyo := range daimyos {
+		buttons = append(buttons, tg.NewKeyboardButton(daimyo.Nickname))
 	}
 
 	kb := tg.NewReplyKeyboardMarkup(
@@ -37,7 +37,13 @@ func (h *ShogunHandler) EnterSamuraiNicknameHandler(ctx context.Context, msg *tg
 
 func (h *ShogunHandler) ChooseSamuraiDaimyoHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	sessionManager := h.sessionManager.Get(ctx)
-	sessionManager.Samurai.DaimyoUsername = msg.Text
+
+	daimyo, err := h.daimyoService.GetByNickname(ctx, msg.Text)
+	if err != nil {
+		return err
+	}
+
+	sessionManager.Samurai.DaimyoUsername = daimyo.Username
 
 	sessionManager.Step = domain.SessionStepShogunCreateSamurai
 	return msg.Answer("Введите telegram username").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)

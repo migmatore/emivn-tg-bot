@@ -28,6 +28,7 @@ type AuthService interface {
 type ShogunService interface {
 	Create(ctx context.Context, dto domain.ShogunDTO) error
 	GetAll(ctx context.Context) ([]*domain.ShogunDTO, error)
+	GetByNickname(ctx context.Context, nickname string) (domain.ShogunDTO, error)
 }
 
 type DaimyoService interface {
@@ -35,6 +36,7 @@ type DaimyoService interface {
 	GetAll(ctx context.Context) ([]*domain.DaimyoDTO, error)
 	GetAllByShogun(ctx context.Context, shogunUsername string) ([]*domain.DaimyoDTO, error)
 	GetByUsername(ctx context.Context, username string) (domain.DaimyoDTO, error)
+	GetByNickname(ctx context.Context, nickname string) (domain.DaimyoDTO, error)
 	CreateSamuraiReport(ctx context.Context, date string) ([]string, error)
 }
 
@@ -42,8 +44,10 @@ type SamuraiService interface {
 	Create(ctx context.Context, dto domain.SamuraiDTO) error
 	SetChatId(ctx context.Context, username string, id tg.ChatID) error
 	GetByUsername(ctx context.Context, username string) (domain.SamuraiDTO, error)
+	GetByNickname(ctx context.Context, nickname string) (domain.SamuraiDTO, error)
 	CreateTurnover(ctx context.Context, dto domain.SamuraiTurnoverDTO) error
 	GetAllByDaimyo(ctx context.Context, daimyoUsername string) ([]*domain.SamuraiDTO, error)
+	GetAllByDaimyoNickname(ctx context.Context, nickname string) ([]*domain.SamuraiDTO, error)
 }
 
 type CashManagerService interface {
