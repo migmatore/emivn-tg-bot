@@ -49,6 +49,11 @@ const (
 	SessionStepCreateControllerNickname
 	SessionStepCreateController
 
+	// admin create main operator
+	SessionStepCreateMainOperatorUsername
+	SessionStepCreateMainOperatorNickname
+	SessionStepCreateMainOperator
+
 	// shogun steps
 	// shogun main menu
 	SessionStepShogunMainMenuHandler
@@ -125,6 +130,13 @@ const (
 
 	// cash manager replenishment requests handler
 	SessionStepCashManagerRepReqMenuHandler
+
+	// cash manager replenishment request selection handler
+	SessionStepCashManagerRepReqSelectHandler
+
+	SessionStepCashManagerRepReqActionHandler
+
+	SessionStepCashManagerRepReqConfirmActionHandler
 
 	// controller steps
 	SessionStepControllerEnterDataMenuHandler

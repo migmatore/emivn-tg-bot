@@ -10,6 +10,8 @@ import (
 
 type ReplenishmentRequestService interface {
 	GetAllByCashManager(ctx context.Context, username string, status string) ([]*domain.ReplenishmentRequestDTO, error)
+	GetByCardName(ctx context.Context, name string) (domain.ReplenishmentRequestDTO, error)
+	ChangeStatus(ctx context.Context, cardName string, status string) error
 }
 
 type CardService interface {

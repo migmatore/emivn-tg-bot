@@ -69,7 +69,7 @@ func (s *ReplenishmentRequestStorage) GetAllByCashManager(
                where cash_manager_username = $1 
                and status_id = (select id from replenishment_request_status_groups where name = $2)`
 
-	replenishmentRequests := make([]*domain.ReplenishmentRequest, 0)
+	requests := make([]*domain.ReplenishmentRequest, 0)
 
 	rows, err := s.pool.Query(ctx, q, username, status)
 	if err != nil {
@@ -80,23 +80,76 @@ func (s *ReplenishmentRequestStorage) GetAllByCashManager(
 	defer rows.Close()
 
 	for rows.Next() {
-		var replenishmentRequest domain.ReplenishmentRequest
+		var request domain.ReplenishmentRequest
 
 		err := rows.Scan(
-			&replenishmentRequest.ReplenishmentRequestId,
-			&replenishmentRequest.CashManagerUsername,
-			&replenishmentRequest.OwnerUsername,
-			&replenishmentRequest.CardId,
-			&replenishmentRequest.Amount,
-			&replenishmentRequest.StatusId,
+			&request.ReplenishmentRequestId,
+			&request.CashManagerUsername,
+			&request.OwnerUsername,
+			&request.CardId,
+			&request.Amount,
+			&request.StatusId,
 		)
 		if err != nil {
 			logging.GetLogger(ctx).Errorf("Query error. %v", err)
 			return nil, err
 		}
 
-		replenishmentRequests = append(replenishmentRequests, &replenishmentRequest)
+		requests = append(requests, &request)
 	}
 
-	return replenishmentRequests, nil
+	return requests, nil
+}
+
+func (s *ReplenishmentRequestStorage) GetByCardId(
+	ctx context.Context,
+	cardId int,
+) (domain.ReplenishmentRequest, error) {
+	q := `select id, cash_manager_username, owner_username, card_id, amount, status_id from replenishment_requests 
+                                                                             where card_id = $1`
+
+	request := domain.ReplenishmentRequest{}
+
+	if err := s.pool.QueryRow(ctx, q, cardId).Scan(
+		&request.ReplenishmentRequestId,
+		&request.CashManagerUsername,
+		&request.OwnerUsername,
+		&request.CardId,
+		&request.Amount,
+		&request.StatusId,
+	); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			logging.GetLogger(ctx).Errorf("Error: %v", err)
+			return request, err
+		}
+
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return request, err
+	}
+
+	return request, nil
+}
+
+func (s *ReplenishmentRequestStorage) UpdateStatus(ctx context.Context, cardId int, statusId int) error {
+	q := `update replenishment_requests set status_id = $1 
+                              where card_id = $2 and status_id = 
+                                     (select id from replenishment_request_status_groups where name = $3)`
+
+	if _, err := s.pool.Exec(
+		ctx,
+		q,
+		statusId,
+		cardId,
+		domain.ActiveRequest.String(),
+	); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			logging.GetLogger(ctx).Errorf("Error: %v", err)
+			return err
+		}
+
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return err
+	}
+
+	return nil
 }

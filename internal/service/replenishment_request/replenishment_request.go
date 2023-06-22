@@ -11,6 +11,8 @@ type ReplenishmentRequestStorage interface {
 	Insert(ctx context.Context, replenishmentReq domain.ReplenishmentRequest) error
 	CheckIfExists(ctx context.Context, cardName string) (bool, error)
 	GetAllByCashManager(ctx context.Context, username string, status string) ([]*domain.ReplenishmentRequest, error)
+	GetByCardId(ctx context.Context, cardId int) (domain.ReplenishmentRequest, error)
+	UpdateStatus(ctx context.Context, cardId int, statusId int) error
 }
 
 type CashManagerStorage interface {
@@ -142,4 +144,48 @@ func (s *ReplenishmentRequestService) GetAllByCashManager(
 	}
 
 	return requestsDTOs, nil
+}
+
+func (s *ReplenishmentRequestService) GetByCardName(
+	ctx context.Context,
+	name string,
+) (domain.ReplenishmentRequestDTO, error) {
+	card, err := s.cardStorage.GetByName(ctx, name)
+	if err != nil {
+		return domain.ReplenishmentRequestDTO{}, err
+	}
+
+	request, err := s.storage.GetByCardId(ctx, card.CardId)
+	if err != nil {
+		return domain.ReplenishmentRequestDTO{}, err
+	}
+
+	status, err := s.replenishmentRequestStatusStorage.GetById(ctx, request.StatusId)
+	if err != nil {
+		return domain.ReplenishmentRequestDTO{}, err
+	}
+
+	requestDTO := domain.ReplenishmentRequestDTO{
+		CashManagerUsername: request.CashManagerUsername,
+		OwnerUsername:       request.OwnerUsername,
+		CardName:            name,
+		Amount:              request.Amount,
+		Status:              status,
+	}
+
+	return requestDTO, nil
+}
+
+func (s *ReplenishmentRequestService) ChangeStatus(ctx context.Context, cardName string, status string) error {
+	statusId, err := s.replenishmentRequestStatusStorage.GetId(ctx, status)
+	if err != nil {
+		return err
+	}
+
+	card, err := s.cardStorage.GetByName(ctx, cardName)
+	if err != nil {
+		return err
+	}
+
+	return s.storage.UpdateStatus(ctx, card.CardId, statusId)
 }

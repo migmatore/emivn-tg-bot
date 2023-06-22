@@ -166,7 +166,7 @@ func (h *DaimyoHandler) MainMenuHandler(ctx context.Context, msg *tgb.MessageUpd
 //			ReplyMarkup(tg.NewReplyKeyboardRemove()).
 //			DoVoid(ctx)
 //
-//	case domain.AdminCreateEntityMenu.CreateCashManager:
+//	case domain.AdminCreateEntityMenu.CreateCashManagerHandler:
 //		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateCashManagerUsername
 //
 //		return msg.Answer(fmt.Sprintf("Введите telegram username")).

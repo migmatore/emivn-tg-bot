@@ -34,6 +34,10 @@ type ControllerService interface {
 	Create(ctx context.Context, dto domain.ControllerDTO) error
 }
 
+type MainOperatorService interface {
+	Create(ctx context.Context, dto domain.MainOperatorDTO) error
+}
+
 type CardService interface {
 	Create(ctx context.Context, dto domain.CardDTO) error
 	GetBankNames(ctx context.Context) ([]*domain.BankDTO, error)
@@ -44,12 +48,13 @@ type CardService interface {
 type AdminHandler struct {
 	sessionManager *session.Manager[domain.Session]
 
-	shogunService      ShogunService
-	daimyoService      DaimyoService
-	samuraiService     SamuraiService
-	cashManagerService CashManagerService
-	controllerService  ControllerService
-	cardService        CardService
+	shogunService       ShogunService
+	daimyoService       DaimyoService
+	samuraiService      SamuraiService
+	cashManagerService  CashManagerService
+	controllerService   ControllerService
+	mainOperatorService MainOperatorService
+	cardService         CardService
 }
 
 func NewAdminHandler(
@@ -59,16 +64,18 @@ func NewAdminHandler(
 	samuraiService SamuraiService,
 	cashManagerService CashManagerService,
 	controllerService ControllerService,
+	mainOperatorService MainOperatorService,
 	cardService CardService,
 ) *AdminHandler {
 	return &AdminHandler{
-		sessionManager:     sm,
-		shogunService:      shogunService,
-		daimyoService:      daimyoService,
-		samuraiService:     samuraiService,
-		cashManagerService: cashManagerService,
-		controllerService:  controllerService,
-		cardService:        cardService,
+		sessionManager:      sm,
+		shogunService:       shogunService,
+		daimyoService:       daimyoService,
+		samuraiService:      samuraiService,
+		cashManagerService:  cashManagerService,
+		controllerService:   controllerService,
+		mainOperatorService: mainOperatorService,
+		cardService:         cardService,
 	}
 }
 
@@ -257,6 +264,13 @@ func (h *AdminHandler) CreateEntityMenuHandler(ctx context.Context, msg *tgb.Mes
 
 	case domain.AdminCreateEntityMenu.CreateController:
 		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateControllerNickname
+
+		return msg.Answer(fmt.Sprintf("Введите имя")).
+			ReplyMarkup(tg.NewReplyKeyboardRemove()).
+			DoVoid(ctx)
+
+	case domain.AdminCreateEntityMenu.CreateMainOperator:
+		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateMainOperatorNickname
 
 		return msg.Answer(fmt.Sprintf("Введите имя")).
 			ReplyMarkup(tg.NewReplyKeyboardRemove()).

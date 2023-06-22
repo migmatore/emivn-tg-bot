@@ -26,11 +26,16 @@ func (h *Handler) registerAdminHandlers() {
 	// cash manager
 	h.Message(h.AdminHandler.EnterCashManagerNicknameHandler, h.isSessionStep(domain.SessionStepCreateCashManagerNickname))
 	h.Message(h.AdminHandler.EnterCashManagerUsernameHandler, h.isSessionStep(domain.SessionStepCreateCashManagerUsername))
-	h.Message(h.AdminHandler.CreateCashManager, h.isSessionStep(domain.SessionStepCreateCashManager))
+	h.Message(h.AdminHandler.CreateCashManagerHandler, h.isSessionStep(domain.SessionStepCreateCashManager))
 
 	// controller
 	h.Message(h.AdminHandler.EnterControllerNicknameHandler, h.isSessionStep(domain.SessionStepCreateControllerNickname))
 	h.Message(h.AdminHandler.EnterControllerUsernameAndCreateHandler, h.isSessionStep(domain.SessionStepCreateController))
+
+	// main operator
+	h.Message(h.AdminHandler.EnterMainOperatorNicknameHandler, h.isSessionStep(domain.SessionStepCreateMainOperatorNickname))
+	h.Message(h.AdminHandler.EnterMainOperatorUsernameHandler, h.isSessionStep(domain.SessionStepCreateMainOperatorUsername))
+	h.Message(h.AdminHandler.CreateMainOperatorHandler, h.isSessionStep(domain.SessionStepCreateMainOperator))
 
 	// cards menu
 	h.Message(h.AdminHandler.CardsChooseShogunHandler, h.isSessionStep(domain.SessionStepAdminCardsChooseShogunHandler))

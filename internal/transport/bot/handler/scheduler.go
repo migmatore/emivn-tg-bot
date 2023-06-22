@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"emivn-tg-bot/internal/domain"
-	"emivn-tg-bot/pkg/logging"
 	"errors"
 	"sync"
 	"time"
@@ -71,7 +70,7 @@ func (s *Scheduler) Run(ctx context.Context) {
 		//if err := s.transactorService.WithinTransaction(ctx, func(txCtx context.Context) error {
 		task, err := s.schedulerService.UpdateTime(ctx, time.Now(), domain.TaskStatusWait)
 		if err != nil {
-			logging.GetLogger(ctx).Errorf("%v", err)
+			//logging.GetLogger(ctx).Errorf("%v", err)
 			//return err
 		}
 
@@ -88,7 +87,7 @@ func (s *Scheduler) Run(ctx context.Context) {
 			} else {
 				task.Status = domain.TaskStatusDeferred
 				if err := s.schedulerService.Update(ctx, task); err != nil {
-					logging.GetLogger(ctx).Errorf("%v", err)
+					//logging.GetLogger(ctx).Errorf("%v", err)
 					//return err
 				}
 			}
@@ -130,6 +129,6 @@ func (s *Scheduler) exec(ctx context.Context, task *domain.Task, fn domain.TaskF
 	}
 
 	if err := s.schedulerService.Update(ctx, *task); err != nil {
-		logging.GetLogger(ctx).Errorf("Scheduler error: %v", err)
+		//logging.GetLogger(ctx).Errorf("Scheduler error: %v", err)
 	}
 }

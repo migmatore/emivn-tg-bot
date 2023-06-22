@@ -205,13 +205,11 @@ var CashManagerRepRequestsMenu = struct {
 
 // cash manager confirm replenishment requests menu
 var CashManagerConfirmRepRequestsMenu = struct {
-	Confirm     string
-	EnterAmount string
-	Cancel      string
+	Confirm string
+	Cancel  string
 }{
-	Confirm:     "Подтвердить",
-	EnterAmount: "Ввести сумму",
-	Cancel:      "Отменить заявку",
+	Confirm: "Подтвердить",
+	Cancel:  "Отменить заявку",
 }
 
 // Controller

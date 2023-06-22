@@ -40,7 +40,7 @@ func (h *AdminHandler) EnterDaimyoUsernameHandler(ctx context.Context, msg *tgb.
 
 	sessionManager.Step = domain.SessionStepCreateDaimyo
 
-	return msg.Answer("Введите имя сёгуна, которому будет подчиняться даймё.").
+	return msg.Answer("Выберите сёгуна, которому будет подчиняться даймё.").
 		ReplyMarkup(kb).
 		DoVoid(ctx)
 }

@@ -5,6 +5,7 @@ import (
 	"emivn-tg-bot/internal/domain"
 	"emivn-tg-bot/internal/storage/psql"
 	"emivn-tg-bot/pkg/logging"
+	"github.com/jackc/pgx/v4"
 	"github.com/migmatore/bakery-shop-api/pkg/utils"
 	"time"
 )
@@ -68,6 +69,10 @@ func (s *SchedulerStorage) UpdateTime(ctx context.Context, time1 time.Time, stat
 		&task.UpdatedAt,
 	); err != nil {
 		if err := utils.ParsePgError(err); err != nil {
+			if err == pgx.ErrNoRows {
+				return task, err
+			}
+
 			logging.GetLogger(ctx).Errorf("Error: %v", err)
 			return task, err
 		}

@@ -44,7 +44,7 @@ func (h *AdminHandler) EnterCashManagerUsernameHandler(ctx context.Context, msg 
 		DoVoid(ctx)
 }
 
-func (h *AdminHandler) CreateCashManager(ctx context.Context, msg *tgb.MessageUpdate) error {
+func (h *AdminHandler) CreateCashManagerHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	sessionManager := h.sessionManager.Get(ctx)
 
 	shogun, err := h.shogunService.GetByNickname(ctx, msg.Text)
