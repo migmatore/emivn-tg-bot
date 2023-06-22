@@ -50,15 +50,15 @@ func NewStartHandler(
 	}
 }
 
-func (s *StartHandler) Start(ctx context.Context, msg *tgb.MessageUpdate) error {
-	role, err := s.AuthService.GetRole(ctx, string(msg.Chat.Username))
+func (h *StartHandler) Start(ctx context.Context, msg *tgb.MessageUpdate) error {
+	role, err := h.AuthService.GetRole(ctx, string(msg.Chat.Username))
 	if err != nil {
 		return msg.Answer("Error").DoVoid(ctx)
 	}
 
 	switch role {
 	case domain.AdminRole.String():
-		s.sessionManager.Get(ctx).Step = domain.SessionStepAdminMainMenuHandler
+		h.sessionManager.Get(ctx).Step = domain.SessionStepAdminMainMenuHandler
 
 		//if err := s.scheduler.Add(ctx, domain.TaskDTO{
 		//	Alias:           "notify_samurai",
@@ -85,24 +85,24 @@ func (s *StartHandler) Start(ctx context.Context, msg *tgb.MessageUpdate) error 
 			DoVoid(ctx)
 
 	case domain.ShogunRole.String():
-		s.sessionManager.Get(ctx).Step = domain.SessionStepShogunMainMenuHandler
+		h.sessionManager.Get(ctx).Step = domain.SessionStepShogunMainMenuHandler
 
 		return msg.Answer("Пожалуйста, выберите действие").
 			ReplyMarkup(buildShogunStartMenu()).
 			DoVoid(ctx)
 
 	case domain.DaimyoRole.String():
-		s.sessionManager.Get(ctx).Step = domain.SessionStepDaimyoMainMenuHandler
+		h.sessionManager.Get(ctx).Step = domain.SessionStepDaimyoMainMenuHandler
 
 		return msg.Answer("Пожалуйста, выберите действие").
 			ReplyMarkup(buildDaimyoStartMenu()).
 			DoVoid(ctx)
 
 	case domain.SamuraiRole.String():
-		s.sessionManager.Get(ctx).Step = domain.SessionStepSamuraiEnterDataMenuHandler
+		h.sessionManager.Get(ctx).Step = domain.SessionStepSamuraiEnterDataMenuHandler
 
-		if err := s.SamuraiService.SetChatId(ctx, string(msg.Chat.Username), msg.Chat.ID); err != nil {
-			s.sessionManager.Reset(s.sessionManager.Get(ctx))
+		if err := h.SamuraiService.SetChatId(ctx, string(msg.Chat.Username), msg.Chat.ID); err != nil {
+			h.sessionManager.Reset(h.sessionManager.Get(ctx))
 
 			return msg.Answer("Ошибка").DoVoid(ctx)
 		}
@@ -112,10 +112,10 @@ func (s *StartHandler) Start(ctx context.Context, msg *tgb.MessageUpdate) error 
 			DoVoid(ctx)
 
 	case domain.CashManagerRole.String():
-		s.sessionManager.Get(ctx).Step = domain.SessionStepCashManagerMainMenuHandler
+		h.sessionManager.Get(ctx).Step = domain.SessionStepCashManagerMainMenuHandler
 
-		if err := s.CashManagerService.SetChatId(ctx, string(msg.Chat.Username), msg.Chat.ID); err != nil {
-			s.sessionManager.Reset(s.sessionManager.Get(ctx))
+		if err := h.CashManagerService.SetChatId(ctx, string(msg.Chat.Username), msg.Chat.ID); err != nil {
+			h.sessionManager.Reset(h.sessionManager.Get(ctx))
 
 			return msg.Answer("Ошибка").DoVoid(ctx)
 		}
@@ -125,14 +125,14 @@ func (s *StartHandler) Start(ctx context.Context, msg *tgb.MessageUpdate) error 
 			DoVoid(ctx)
 
 	case domain.ControllerRole.String():
-		s.sessionManager.Get(ctx).Step = domain.SessionStepControllerEnterDataMenuHandler
+		h.sessionManager.Get(ctx).Step = domain.SessionStepControllerEnterDataMenuHandler
 
 		return msg.Answer("Введите данные на конец смены с 8 до 12 часов дня. Без пробелов, точек и иных знаков.").
 			ReplyMarkup(buildControllerStartMenu()).
 			DoVoid(ctx)
 
 	case domain.MainOperatorRole.String():
-		s.sessionManager.Get(ctx).Step = domain.SessionStepMainOperatorMainMenuHandler
+		h.sessionManager.Get(ctx).Step = domain.SessionStepMainOperatorMainMenuHandler
 
 		return msg.Answer("Пожалуйста, выберите действие").
 			ReplyMarkup(buildMainOperatorStartMenu()).

@@ -98,6 +98,7 @@ func New(deps Deps) *Service {
 		),
 		Card: card.NewCardService(deps.Transactor, deps.CardStorage),
 		ReplenishmentRequest: replenishment_request.NewReplenishmentRequestService(
+			deps.Transactor,
 			deps.ReplenishmentRequestStorage,
 			deps.CashManagerStorage,
 			deps.DaimyoStorage,

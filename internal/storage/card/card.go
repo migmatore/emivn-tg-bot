@@ -198,6 +198,27 @@ func (s *CardStorage) GetById(ctx context.Context, cardId int) (domain.Card, err
 	return card, nil
 }
 
+func (s *CardStorage) UpdateLimit(ctx context.Context, name string, limit int) error {
+	q := `update cards set daily_limit = $1 where name = $2`
+
+	if _, err := s.pool.Exec(
+		ctx,
+		q,
+		limit,
+		name,
+	); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			logging.GetLogger(ctx).Errorf("Error: %v", err)
+			return err
+		}
+
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return err
+	}
+
+	return nil
+}
+
 func (s *CardStorage) GetBankNames(ctx context.Context) ([]*domain.Bank, error) {
 	q := `select id, name from bank_types`
 

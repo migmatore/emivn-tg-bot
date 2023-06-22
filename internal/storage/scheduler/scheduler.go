@@ -108,3 +108,19 @@ func (s *SchedulerStorage) Update(ctx context.Context, task domain.Task) error {
 
 	return nil
 }
+
+func (s *SchedulerStorage) Delete(ctx context.Context, taskName string) error {
+	q := `delete from tasks where name = $1`
+
+	if _, err := s.pool.Exec(ctx, q, taskName); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			logging.GetLogger(ctx).Errorf("Error: %v", err)
+			return err
+		}
+
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return err
+	}
+
+	return nil
+}

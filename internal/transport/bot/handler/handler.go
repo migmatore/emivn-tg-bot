@@ -72,6 +72,7 @@ type CardService interface {
 	GetAllByShogun(ctx context.Context, shogunUsername string) ([]*domain.CardDTO, error)
 	GetByUsername(ctx context.Context, ownerUsername string) (domain.CardDTO, error)
 	GetByName(ctx context.Context, name string) (domain.CardDTO, error)
+	ChangeLimit(ctx context.Context, name string, limit int) error
 	GetBankNames(ctx context.Context) ([]*domain.BankDTO, error)
 	GetCardsBalancesByShogun(ctx context.Context, shogunUsername string) ([]string, error)
 }
@@ -147,6 +148,7 @@ func New(deps Deps) *Handler {
 			deps.ReplenishmentRequestService,
 			deps.CashManagerService,
 			deps.SamuraiService,
+			scheduler,
 		),
 		CashManagerHandler: cash_manager.New(
 			sm.Manager,
@@ -186,7 +188,8 @@ func New(deps Deps) *Handler {
 
 func (h *Handler) Init(ctx context.Context) (*tgb.Router, *Scheduler) {
 	listenersMap := domain.TaskFuncsMap{
-		"notify_samurai": h.SamuraiHandler.Notify,
+		"notify_samurai":    h.SamuraiHandler.Notify,
+		"change_card_limit": h.DaimyoHandler.NotifyCardLimitChange,
 	}
 
 	h.scheduler.Configure(listenersMap, time.Second*1)

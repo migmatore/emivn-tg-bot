@@ -3,6 +3,7 @@ package replenishment_request
 import (
 	"context"
 	"emivn-tg-bot/internal/domain"
+	"emivn-tg-bot/internal/storage"
 	"github.com/mr-linch/go-tg"
 )
 
@@ -23,6 +24,7 @@ type DaimyoStorage interface {
 type CardStorage interface {
 	GetByName(ctx context.Context, name string) (domain.Card, error)
 	GetById(ctx context.Context, cardId int) (domain.Card, error)
+	UpdateLimit(ctx context.Context, name string, limit int) error
 }
 
 type ReplenishmentRequestStatusStorage interface {
@@ -31,6 +33,8 @@ type ReplenishmentRequestStatusStorage interface {
 }
 
 type ReplenishmentRequestService struct {
+	transactor storage.Transactor
+
 	storage                           ReplenishmentRequestStorage
 	cashManagerStorage                CashManagerStorage
 	daimyoStorage                     DaimyoStorage
@@ -39,6 +43,7 @@ type ReplenishmentRequestService struct {
 }
 
 func NewReplenishmentRequestService(
+	transactor storage.Transactor,
 	storage ReplenishmentRequestStorage,
 	cashManager CashManagerStorage,
 	daimyo DaimyoStorage,
@@ -46,6 +51,7 @@ func NewReplenishmentRequestService(
 	replenishmentRequestStatus ReplenishmentRequestStatusStorage,
 ) *ReplenishmentRequestService {
 	return &ReplenishmentRequestService{
+		transactor:                        transactor,
 		storage:                           storage,
 		cashManagerStorage:                cashManager,
 		daimyoStorage:                     daimyo,
@@ -83,7 +89,19 @@ func (s *ReplenishmentRequestService) Create(ctx context.Context, dto domain.Rep
 		StatusId:            statusId,
 	}
 
-	if err := s.storage.Insert(ctx, replenishmentReq); err != nil {
+	if err := s.transactor.WithinTransaction(ctx, func(txCtx context.Context) error {
+		if err := s.storage.Insert(ctx, replenishmentReq); err != nil {
+			return err
+		}
+
+		newLimit := card.DailyLimit - int(replenishmentReq.Amount)
+
+		if err := s.cardStorage.UpdateLimit(ctx, card.Name, newLimit); err != nil {
+			return err
+		}
+
+		return nil
+	}); err != nil {
 		return 0, err
 	}
 

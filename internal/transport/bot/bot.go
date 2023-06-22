@@ -3,6 +3,7 @@ package bot
 import (
 	"context"
 	"emivn-tg-bot/internal/config"
+	"emivn-tg-bot/internal/domain"
 	"emivn-tg-bot/internal/storage/psql"
 	"emivn-tg-bot/internal/transport/bot/handler"
 	"emivn-tg-bot/pkg/logging"
@@ -58,7 +59,7 @@ func (b *Bot) Run(ctx context.Context) error {
 	} else {
 		logging.GetLogger(ctx).Info("start polling...")
 
-		//go b.scheduler.Run(context.WithValue(ctx, domain.TaskKey{}, botClient))
+		go b.scheduler.Run(context.WithValue(ctx, domain.TaskKey{}, botClient))
 
 		err := tgb.NewPoller(
 			b.router,

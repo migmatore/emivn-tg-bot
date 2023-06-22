@@ -14,6 +14,7 @@ type CardStorage interface {
 	GetByUsername(ctx context.Context, daimyoUsername string) (domain.Card, error)
 	GetByName(ctx context.Context, name string) (domain.Card, error)
 	GetById(ctx context.Context, cardId int) (domain.Card, error)
+	UpdateLimit(ctx context.Context, name string, limit int) error
 	GetBankNames(ctx context.Context) ([]*domain.Bank, error)
 	GetBankIdByName(ctx context.Context, bankName string) (int, error)
 	GetBankById(ctx context.Context, bankId int) (domain.Bank, error)
@@ -161,6 +162,10 @@ func (s *CardService) GetByName(ctx context.Context, name string) (domain.CardDT
 	}
 
 	return cardDTO, nil
+}
+
+func (s *CardService) ChangeLimit(ctx context.Context, name string, limit int) error {
+	return s.storage.UpdateLimit(ctx, name, limit)
 }
 
 func (s *CardService) GetBankNames(ctx context.Context) ([]*domain.BankDTO, error) {

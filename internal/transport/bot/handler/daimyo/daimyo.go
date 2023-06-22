@@ -12,6 +12,8 @@ type CardService interface {
 	GetAllByUsername(ctx context.Context, bankName string, daimyoUsername string) ([]*domain.CardDTO, error)
 	GetBankNames(ctx context.Context) ([]*domain.BankDTO, error)
 	GetByUsername(ctx context.Context, daimyoUsername string) (domain.CardDTO, error)
+	GetByName(ctx context.Context, name string) (domain.CardDTO, error)
+	ChangeLimit(ctx context.Context, name string, limit int) error
 }
 
 type DaimyoService interface {
@@ -33,8 +35,9 @@ type SamuraiService interface {
 	GetAllByDaimyo(ctx context.Context, daimyoUsername string) ([]*domain.SamuraiDTO, error)
 }
 
-type SchedulerService interface {
+type Scheduler interface {
 	Add(ctx context.Context, dto domain.TaskDTO) error
+	Delete(ctx context.Context, taskName string) error
 }
 
 type DaimyoHandler struct {
@@ -46,7 +49,7 @@ type DaimyoHandler struct {
 	cashManagerService          CashManagerService
 	samuraiService              SamuraiService
 
-	schedulerService SchedulerService
+	scheduler Scheduler
 }
 
 func NewDaimyoHandler(
@@ -56,6 +59,7 @@ func NewDaimyoHandler(
 	replenishmentRequestService ReplenishmentRequestService,
 	cashManagerService CashManagerService,
 	samuraiService SamuraiService,
+	scheduler Scheduler,
 ) *DaimyoHandler {
 	return &DaimyoHandler{
 		sessionManager:              sm,
@@ -64,6 +68,7 @@ func NewDaimyoHandler(
 		replenishmentRequestService: replenishmentRequestService,
 		cashManagerService:          cashManagerService,
 		samuraiService:              samuraiService,
+		scheduler:                   scheduler,
 	}
 }
 
