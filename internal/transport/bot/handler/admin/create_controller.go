@@ -8,18 +8,18 @@ import (
 	"strings"
 )
 
-func (h *AdminHandler) EnterControllerUsername(ctx context.Context, msg *tgb.MessageUpdate) error {
+func (h *AdminHandler) EnterControllerNicknameHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	sessionManager := h.sessionManager.Get(ctx)
-	// TODO: create regular expression to check the username is correct
-	sessionManager.Controller.Username = strings.ReplaceAll(msg.Text, "@", "")
+
+	sessionManager.Controller.Nickname = msg.Text
 
 	sessionManager.Step = domain.SessionStepCreateController
 	return msg.Answer("Введите nickname").DoVoid(ctx)
 }
 
-func (h *AdminHandler) EnterControllerNicknameAndCreate(ctx context.Context, msg *tgb.MessageUpdate) error {
+func (h *AdminHandler) EnterControllerUsernameAndCreateHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	sessionManager := h.sessionManager.Get(ctx)
-	sessionManager.Controller.Nickname = msg.Text
+	sessionManager.Controller.Username = strings.ReplaceAll(msg.Text, "@", "")
 
 	if err := h.controllerService.Create(ctx, sessionManager.Controller); err != nil {
 		return err
@@ -27,5 +27,5 @@ func (h *AdminHandler) EnterControllerNicknameAndCreate(ctx context.Context, msg
 
 	h.sessionManager.Reset(sessionManager)
 
-	return msg.Answer("Контролёр успешно создан. Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
+	return msg.Answer("Контролёр успешно создан.\nНапишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
 }

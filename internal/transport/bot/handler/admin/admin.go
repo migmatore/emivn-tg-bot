@@ -228,45 +228,42 @@ func (h *AdminHandler) HierarchyMenuHandler(ctx context.Context, msg *tgb.Messag
 func (h *AdminHandler) CreateEntityMenuHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	switch msg.Text {
 	case domain.AdminCreateEntityMenu.CreateShogun:
-		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateShogunUsername
+		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateShogunNickname
 
-		return msg.Answer(fmt.Sprintf("Введите telegram username")).
+		return msg.Answer(fmt.Sprintf("Введите имя")).
 			ReplyMarkup(tg.NewReplyKeyboardRemove()).
 			DoVoid(ctx)
 
 	case domain.AdminCreateEntityMenu.CreateDaimyo:
-		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateDaimyoUsername
+		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateDaimyoNickname
 
-		return msg.Answer(fmt.Sprintf("Введите telegram username")).
+		return msg.Answer(fmt.Sprintf("Введите имя")).
 			ReplyMarkup(tg.NewReplyKeyboardRemove()).
 			DoVoid(ctx)
 
 	case domain.AdminCreateEntityMenu.CreateSamurai:
-		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateSamuraiUsername
+		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateSamuraiNickname
 
-		return msg.Answer(fmt.Sprintf("Введите telegram username")).
+		return msg.Answer(fmt.Sprintf("Введите имя")).
 			ReplyMarkup(tg.NewReplyKeyboardRemove()).
 			DoVoid(ctx)
 
 	case domain.AdminCreateEntityMenu.CreateCashManager:
-		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateCashManagerUsername
+		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateCashManagerNickname
 
-		return msg.Answer(fmt.Sprintf("Введите telegram username")).
+		return msg.Answer(fmt.Sprintf("Введите имя")).
 			ReplyMarkup(tg.NewReplyKeyboardRemove()).
 			DoVoid(ctx)
 
 	case domain.AdminCreateEntityMenu.CreateController:
-		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateControllerUsername
+		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateControllerNickname
 
-		return msg.Answer(fmt.Sprintf("Введите telegram username")).
+		return msg.Answer(fmt.Sprintf("Введите имя")).
 			ReplyMarkup(tg.NewReplyKeyboardRemove()).
 			DoVoid(ctx)
 
-	//case domain.AdminCreateEntityMenu.Back:
-	//	h.sessionManager.Get(ctx).Step = domain.SessionStepInit
-	//	return msg.Answer("Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
 	default:
-		h.sessionManager.Get(ctx).Step = domain.SessionStepInit
+		h.sessionManager.Reset(h.sessionManager.Get(ctx))
 		return msg.Answer("Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
 	}
 }

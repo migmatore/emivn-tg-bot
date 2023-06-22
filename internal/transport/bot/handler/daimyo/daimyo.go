@@ -141,13 +141,13 @@ func (h *DaimyoHandler) MainMenuHandler(ctx context.Context, msg *tgb.MessageUpd
 //func (h *DaimyoHandler) CreateEntityMenuHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 //	switch msg.Text {
 //	case domain.AdminCreateEntityMenu.CreateShogun:
-//		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateShogunUsername
+//		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateShogunNickname
 //
 //		return msg.Answer(fmt.Sprintf("Введите telegram username")).
 //			ReplyMarkup(tg.NewReplyKeyboardRemove()).
 //			DoVoid(ctx)
 //
-//	case domain.AdminCreateEntityMenu.CreateDaimyo:
+//	case domain.AdminCreateEntityMenu.CreateDaimyoHandler:
 //		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateDaimyoUsername
 //
 //		return msg.Answer(fmt.Sprintf("Введите telegram username")).

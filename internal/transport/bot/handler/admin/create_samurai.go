@@ -8,19 +8,18 @@ import (
 	"strings"
 )
 
-func (h *AdminHandler) EnterSamuraiUsernameHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
-	sessionManager := h.sessionManager.Get(ctx)
-
-	// TODO: create regular expression to check the username is correct
-	sessionManager.Samurai.Username = strings.ReplaceAll(msg.Text, "@", "")
-
-	sessionManager.Step = domain.SessionStepCreateSamuraiNickname
-	return msg.Answer("Введите nickname").DoVoid(ctx)
-}
-
 func (h *AdminHandler) EnterSamuraiNicknameHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	sessionManager := h.sessionManager.Get(ctx)
+
 	sessionManager.Samurai.Nickname = msg.Text
+
+	sessionManager.Step = domain.SessionStepCreateSamuraiUsername
+	return msg.Answer("Введите telegram username").DoVoid(ctx)
+}
+
+func (h *AdminHandler) EnterSamuraiUsernameHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+	sessionManager := h.sessionManager.Get(ctx)
+	sessionManager.Samurai.Username = strings.ReplaceAll(msg.Text, "@", "")
 
 	daimyos, err := h.daimyoService.GetAll(ctx)
 	if err != nil {
@@ -61,5 +60,5 @@ func (h *AdminHandler) CreateSamuraiHandler(ctx context.Context, msg *tgb.Messag
 	}
 
 	h.sessionManager.Reset(sessionManager)
-	return msg.Answer("Самурай успешно создан. Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
+	return msg.Answer("Самурай успешно создан.\nНапишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
 }

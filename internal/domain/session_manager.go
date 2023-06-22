@@ -27,7 +27,7 @@ const (
 	SessionStepCreateEntityMenuHandler
 
 	// admin create shogun
-	SessionStepCreateShogunUsername
+	SessionStepCreateShogunNickname
 	SessionStepCreateShogun
 
 	// admin create daimyo
@@ -46,7 +46,7 @@ const (
 	SessionStepCreateCashManager
 
 	// admin create cntroller
-	SessionStepCreateControllerUsername
+	SessionStepCreateControllerNickname
 	SessionStepCreateController
 
 	// shogun steps
