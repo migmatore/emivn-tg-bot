@@ -14,6 +14,7 @@ type CardService interface {
 	GetByUsername(ctx context.Context, daimyoUsername string) (domain.CardDTO, error)
 	GetByName(ctx context.Context, name string) (domain.CardDTO, error)
 	ChangeLimit(ctx context.Context, name string, limit int) error
+	GetLimits(ctx context.Context, owner string) ([]string, error)
 }
 
 type DaimyoService interface {
@@ -110,7 +111,17 @@ func (h *DaimyoHandler) MainMenuHandler(ctx context.Context, msg *tgb.MessageUpd
 		return nil
 
 	case domain.DaimyoMainMenu.CardLimit:
-		return nil
+		limits, err := h.cardService.GetLimits(ctx, string(msg.From.Username))
+		if err != nil {
+			return err
+		}
+
+		for _, limit := range limits {
+			return msg.Answer(limit).DoVoid(ctx)
+		}
+
+		h.sessionManager.Reset(h.sessionManager.Get(ctx))
+		return msg.Answer("Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
 
 	case domain.DaimyoMainMenu.Report:
 		kb := tg.NewReplyKeyboardMarkup(

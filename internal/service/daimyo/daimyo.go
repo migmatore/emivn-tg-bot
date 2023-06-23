@@ -198,8 +198,6 @@ func (s *DaimyoService) CreateSamuraiReport(ctx context.Context, date string) ([
 	//}
 	//s.controllerTurnoverStorage.GetTurnoversByDate(ctx, date)
 
-	reportMessages = append(reportMessages, date)
-
 	samurais, err := s.samuraiStorage.GetAllByDaimyo(ctx, "daimyo")
 	if err != nil {
 		return nil, nil
@@ -238,7 +236,7 @@ func (s *DaimyoService) CreateSamuraiReport(ctx context.Context, date string) ([
 			continue
 		}
 
-		str += fmt.Sprintf("%s\n", samurai.Username)
+		str += fmt.Sprintf("%s\n (%s)", samurai.Username, date)
 		str += fmt.Sprintf("Всего\n%d / %d / %d\n\n", int(tinControllerTurnover+sberControllerTurnover),
 			int(tinSamuraiTurnover+sberSamuraiTurnover),
 			int((tinControllerTurnover-tinSamuraiTurnover)+(sberControllerTurnover-sberSamuraiTurnover)))

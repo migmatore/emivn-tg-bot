@@ -104,6 +104,7 @@ func New(deps Deps) *Service {
 			deps.DaimyoStorage,
 			deps.CardStorage,
 			deps.ReplenishmentRequestStatusStorage,
+			deps.MainOperatorStorage,
 		),
 		SchedulerService: scheduler.New(deps.SchedulerStorage),
 	}

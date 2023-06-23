@@ -75,6 +75,7 @@ type CardService interface {
 	ChangeLimit(ctx context.Context, name string, limit int) error
 	GetBankNames(ctx context.Context) ([]*domain.BankDTO, error)
 	GetCardsBalancesByShogun(ctx context.Context, shogunUsername string) ([]string, error)
+	GetLimits(ctx context.Context, owner string) ([]string, error)
 }
 
 type ReplenishmentRequestService interface {

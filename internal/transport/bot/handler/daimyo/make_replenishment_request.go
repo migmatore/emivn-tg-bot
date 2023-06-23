@@ -54,7 +54,7 @@ func (h *DaimyoHandler) EnterRepReqAmountHandler(ctx context.Context, msg *tgb.M
 	}
 
 	sessionManager.Step = domain.SessionStepDaimyoMakeReplenishmentRequest
-	return msg.Answer("Введите сумму на пополнение").DoVoid(ctx)
+	return msg.Answer("Введите сумму на пополнение").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
 }
 
 func (h *DaimyoHandler) MakeRepReqHandler(ctx context.Context, msg *tgb.MessageUpdate) error {

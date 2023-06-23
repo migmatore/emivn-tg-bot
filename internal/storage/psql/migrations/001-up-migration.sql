@@ -82,7 +82,7 @@ CREATE TABLE controller_turnovers
     id                  INTEGER      NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     controller_username VARCHAR(255) NOT NULL REFERENCES controllers (username),
     samurai_username    VARCHAR(255) NOT NULL REFERENCES samurai (username),
-    start_date          DATE         NOT NULL DEFAULT now(),
+    start_date          DATE         NOT NULL DEFAULT current_date,
     initial_amount      FLOAT        NOT NULL DEFAULT 0,
     final_amount        FLOAT        NOT NULL DEFAULT 0,
     turnover            FLOAT        NOT NULL DEFAULT 0,
@@ -102,7 +102,9 @@ CREATE TABLE replenishment_requests
     owner_username        VARCHAR(255) NOT NULL,
     card_id               INTEGER      NOT NULL REFERENCES cards (id),
     amount                DECIMAL      NOT NULL DEFAULT 0,
-    status_id             INTEGER      NOT NULL REFERENCES replenishment_request_status_groups (id)
+    status_id             INTEGER      NOT NULL REFERENCES replenishment_request_status_groups (id),
+    creation_date DATE NOT NULL DEFAULT current_date,
+    creation_time TIME NOT NULL DEFAULT current_time
 );
 
 CREATE TABLE roles

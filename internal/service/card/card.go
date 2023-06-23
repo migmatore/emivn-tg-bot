@@ -9,6 +9,7 @@ import (
 
 type CardStorage interface {
 	Insert(ctx context.Context, card domain.Card) error
+	GetAll(ctx context.Context, ownerUsername string) ([]*domain.Card, error)
 	GetAllByUsername(ctx context.Context, bankId int, ownerUsername string) ([]*domain.Card, error)
 	GetAllByShogun(ctx context.Context, shogunUsername string) ([]*domain.Card, error)
 	GetByUsername(ctx context.Context, daimyoUsername string) (domain.Card, error)
@@ -103,21 +104,6 @@ func (s *CardService) GetAllByShogun(ctx context.Context, shogunUsername string)
 	return cardDTOs, nil
 }
 
-func (s *CardService) GetCardsBalancesByShogun(ctx context.Context, shogunUsername string) ([]string, error) {
-	cardsBalances := make([]string, 0)
-
-	cards, err := s.storage.GetAllByShogun(ctx, shogunUsername)
-	if err != nil {
-		return nil, nil
-	}
-
-	for _, item := range cards {
-		cardsBalances = append(cardsBalances, fmt.Sprintf("%s - %f", item.Name, item.Balance))
-	}
-
-	return cardsBalances, nil
-}
-
 func (s *CardService) GetByUsername(ctx context.Context, ownerUsername string) (domain.CardDTO, error) {
 	card, err := s.storage.GetByUsername(ctx, ownerUsername)
 	if err != nil {
@@ -164,10 +150,6 @@ func (s *CardService) GetByName(ctx context.Context, name string) (domain.CardDT
 	return cardDTO, nil
 }
 
-func (s *CardService) ChangeLimit(ctx context.Context, name string, limit int) error {
-	return s.storage.UpdateLimit(ctx, name, limit)
-}
-
 func (s *CardService) GetBankNames(ctx context.Context) ([]*domain.BankDTO, error) {
 	banks, err := s.storage.GetBankNames(ctx)
 	if err != nil {
@@ -186,4 +168,38 @@ func (s *CardService) GetBankNames(ctx context.Context) ([]*domain.BankDTO, erro
 	}
 
 	return bankDTOs, nil
+}
+
+func (s *CardService) GetCardsBalancesByShogun(ctx context.Context, shogunUsername string) ([]string, error) {
+	cardsBalances := make([]string, 0)
+
+	cards, err := s.storage.GetAllByShogun(ctx, shogunUsername)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, card := range cards {
+		cardsBalances = append(cardsBalances, fmt.Sprintf("%s - %d", card.Name, int(card.Balance)))
+	}
+
+	return cardsBalances, nil
+}
+
+func (s *CardService) ChangeLimit(ctx context.Context, name string, limit int) error {
+	return s.storage.UpdateLimit(ctx, name, limit)
+}
+
+func (s *CardService) GetLimits(ctx context.Context, owner string) ([]string, error) {
+	cardLimits := make([]string, 0)
+
+	cards, err := s.storage.GetAll(ctx, owner)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, card := range cards {
+		cardLimits = append(cardLimits, fmt.Sprintf("%s - %d", card.Name, card.DailyLimit))
+	}
+
+	return cardLimits, nil
 }

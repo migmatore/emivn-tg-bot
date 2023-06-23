@@ -42,6 +42,43 @@ func (s *CardStorage) Insert(ctx context.Context, card domain.Card) error {
 	return nil
 }
 
+func (s *CardStorage) GetAll(ctx context.Context, ownerUsername string) ([]*domain.Card, error) {
+	q := `select id, name, owner_username, last_digits, daily_limit, balance, bank_type_id from cards 
+                where owner_username=$1`
+
+	cards := make([]*domain.Card, 0)
+
+	rows, err := s.pool.Query(ctx, q, ownerUsername)
+	if err != nil {
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var card domain.Card
+
+		err := rows.Scan(
+			&card.CardId,
+			&card.Name,
+			&card.OwnerUsername,
+			&card.LastDigits,
+			&card.DailyLimit,
+			&card.Balance,
+			&card.BankTypeId,
+		)
+		if err != nil {
+			logging.GetLogger(ctx).Errorf("Query error. %v", err)
+			return nil, err
+		}
+
+		cards = append(cards, &card)
+	}
+
+	return cards, nil
+}
+
 func (s *CardStorage) GetAllByUsername(ctx context.Context, bankId int, ownerUsername string) ([]*domain.Card, error) {
 	q := `select id, name, owner_username, last_digits, daily_limit, balance, bank_type_id from cards 
                 where owner_username=$1 and bank_type_id=$2`

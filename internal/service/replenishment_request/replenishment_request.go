@@ -34,6 +34,10 @@ type ReplenishmentRequestStatusStorage interface {
 	GetById(ctx context.Context, statusId int) (string, error)
 }
 
+type MainOperatorStorage interface {
+	GetByUsername(ctx context.Context, username string) (domain.MainOperator, error)
+}
+
 type ReplenishmentRequestService struct {
 	transactor storage.Transactor
 
@@ -42,6 +46,7 @@ type ReplenishmentRequestService struct {
 	daimyoStorage                     DaimyoStorage
 	cardStorage                       CardStorage
 	replenishmentRequestStatusStorage ReplenishmentRequestStatusStorage
+	mainOperatorStorage               MainOperatorStorage
 }
 
 func NewReplenishmentRequestService(
@@ -51,6 +56,7 @@ func NewReplenishmentRequestService(
 	daimyo DaimyoStorage,
 	card CardStorage,
 	replenishmentRequestStatus ReplenishmentRequestStatusStorage,
+	mainOperatorStorage MainOperatorStorage,
 ) *ReplenishmentRequestService {
 	return &ReplenishmentRequestService{
 		transactor:                        transactor,
@@ -59,16 +65,22 @@ func NewReplenishmentRequestService(
 		daimyoStorage:                     daimyo,
 		cardStorage:                       card,
 		replenishmentRequestStatusStorage: replenishmentRequestStatus,
+		mainOperatorStorage:               mainOperatorStorage,
 	}
 }
 
 func (s *ReplenishmentRequestService) Create(ctx context.Context, dto domain.ReplenishmentRequestDTO) (tg.ChatID, error) {
-	daimyo, err := s.daimyoStorage.GetByUsername(ctx, dto.OwnerUsername)
-	if err != nil {
-		return 0, err
+	var shogunUsername string
+
+	daimyo, _ := s.daimyoStorage.GetByUsername(ctx, dto.OwnerUsername)
+	if daimyo.Username == "" {
+		operator, _ := s.mainOperatorStorage.GetByUsername(ctx, dto.OwnerUsername)
+		shogunUsername = operator.ShogunUsername
+	} else {
+		shogunUsername = daimyo.ShogunUsername
 	}
 
-	cashManager, err := s.cashManagerStorage.GetByShogunUsername(ctx, daimyo.ShogunUsername)
+	cashManager, err := s.cashManagerStorage.GetByShogunUsername(ctx, shogunUsername)
 	if err != nil {
 		return 0, err
 	}

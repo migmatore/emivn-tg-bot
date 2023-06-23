@@ -7,6 +7,7 @@ type ReplenishmentRequest struct {
 	CardId                 int
 	Amount                 float32
 	StatusId               int
+	CreationDate           string
 }
 
 type ReplenishmentRequestDTO struct {

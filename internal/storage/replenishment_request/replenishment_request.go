@@ -6,6 +6,7 @@ import (
 	"emivn-tg-bot/internal/storage/psql"
 	"emivn-tg-bot/pkg/logging"
 	"github.com/migmatore/bakery-shop-api/pkg/utils"
+	"time"
 )
 
 type ReplenishmentRequestStorage struct {
@@ -17,8 +18,9 @@ func NewReplenishmentRequestStorage(pool psql.AtomicPoolClient) *ReplenishmentRe
 }
 
 func (s *ReplenishmentRequestStorage) Insert(ctx context.Context, replenishmentReq domain.ReplenishmentRequest) error {
-	q := `insert into replenishment_requests(cash_manager_username, owner_username, card_id, amount, status_id) 
-		values ($1, $2, $3, $4, $5)`
+	q := `insert into replenishment_requests(cash_manager_username, owner_username, card_id, amount, status_id, 
+                                   creation_date, creation_time) 
+				values ($1, $2, $3, $4, $5, $6, $7)`
 
 	if _, err := s.pool.Exec(
 		ctx,
@@ -28,6 +30,8 @@ func (s *ReplenishmentRequestStorage) Insert(ctx context.Context, replenishmentR
 		replenishmentReq.CardId,
 		replenishmentReq.Amount,
 		replenishmentReq.StatusId,
+		time.Now().Format("2006-01-02"),
+		time.Now().Format("15:04:05"),
 	); err != nil {
 		if err := utils.ParsePgError(err); err != nil {
 			logging.GetLogger(ctx).Errorf("Error: %v", err)
