@@ -66,7 +66,7 @@ func (h *DaimyoHandler) MakeRepReqHandler(ctx context.Context, msg *tgb.MessageU
 		return msg.Answer("Пожалуйста, введите суточный лимит карты").DoVoid(ctx)
 	}
 
-	sessionManager.ReplenishmentRequest.Amount = float32(amount)
+	sessionManager.ReplenishmentRequest.RequiredAmount = float32(amount)
 	sessionManager.ReplenishmentRequest.OwnerUsername = string(msg.From.Username)
 
 	card, err := h.cardService.GetByUsername(ctx, string(msg.From.Username))
@@ -96,7 +96,7 @@ func (h *DaimyoHandler) MakeRepReqHandler(ctx context.Context, msg *tgb.MessageU
 	taskName := fmt.Sprintf(
 		"%s_%d",
 		sessionManager.ReplenishmentRequest.CardName,
-		int(sessionManager.ReplenishmentRequest.Amount),
+		int(sessionManager.ReplenishmentRequest.RequiredAmount),
 	)
 
 	if err := h.scheduler.Add(ctx, domain.TaskDTO{

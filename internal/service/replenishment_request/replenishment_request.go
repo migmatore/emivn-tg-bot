@@ -99,7 +99,7 @@ func (s *ReplenishmentRequestService) Create(ctx context.Context, dto domain.Rep
 		CashManagerUsername: cashManager.Username,
 		OwnerUsername:       dto.OwnerUsername,
 		CardId:              card.CardId,
-		Amount:              dto.Amount,
+		RequiredAmount:      dto.RequiredAmount,
 		StatusId:            statusId,
 	}
 
@@ -108,7 +108,7 @@ func (s *ReplenishmentRequestService) Create(ctx context.Context, dto domain.Rep
 			return err
 		}
 
-		newLimit := card.DailyLimit - int(replenishmentReq.Amount)
+		newLimit := card.DailyLimit - int(replenishmentReq.RequiredAmount)
 
 		if err := s.cardStorage.UpdateLimit(ctx, card.Name, newLimit); err != nil {
 			return err
@@ -148,7 +148,7 @@ func (s *ReplenishmentRequestService) GetAllByCashManager(
 			CashManagerUsername: request.CashManagerUsername,
 			OwnerUsername:       request.OwnerUsername,
 			CardName:            card.Name,
-			Amount:              request.Amount,
+			RequiredAmount:      request.RequiredAmount,
 			Status:              status,
 		}
 
@@ -181,7 +181,7 @@ func (s *ReplenishmentRequestService) GetByCardName(
 		CashManagerUsername: request.CashManagerUsername,
 		OwnerUsername:       request.OwnerUsername,
 		CardName:            name,
-		Amount:              request.Amount,
+		RequiredAmount:      request.RequiredAmount,
 		Status:              status,
 	}
 

@@ -28,7 +28,7 @@ func (s *ReplenishmentRequestStorage) Insert(ctx context.Context, replenishmentR
 		replenishmentReq.CashManagerUsername,
 		replenishmentReq.OwnerUsername,
 		replenishmentReq.CardId,
-		replenishmentReq.Amount,
+		replenishmentReq.RequiredAmount,
 		replenishmentReq.StatusId,
 		time.Now().Format("2006-01-02"),
 		time.Now().Format("15:04:05"),
@@ -91,7 +91,7 @@ func (s *ReplenishmentRequestStorage) GetAllByCashManager(
 			&request.CashManagerUsername,
 			&request.OwnerUsername,
 			&request.CardId,
-			&request.Amount,
+			&request.RequiredAmount,
 			&request.StatusId,
 		)
 		if err != nil {
@@ -119,7 +119,7 @@ func (s *ReplenishmentRequestStorage) GetByCardId(
 		&request.CashManagerUsername,
 		&request.OwnerUsername,
 		&request.CardId,
-		&request.Amount,
+		&request.RequiredAmount,
 		&request.StatusId,
 	); err != nil {
 		if err := utils.ParsePgError(err); err != nil {

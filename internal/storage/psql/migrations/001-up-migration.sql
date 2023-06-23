@@ -101,10 +101,11 @@ CREATE TABLE replenishment_requests
     cash_manager_username VARCHAR(255) NOT NULL REFERENCES cash_managers (username),
     owner_username        VARCHAR(255) NOT NULL,
     card_id               INTEGER      NOT NULL REFERENCES cards (id),
-    amount                DECIMAL      NOT NULL DEFAULT 0,
+    required_amount       DECIMAL      NOT NULL DEFAULT 0,
+    actual_amount         DECIMAL      NOT NULL DEFAULT 0,
     status_id             INTEGER      NOT NULL REFERENCES replenishment_request_status_groups (id),
-    creation_date DATE NOT NULL DEFAULT current_date,
-    creation_time TIME NOT NULL DEFAULT current_time
+    creation_date         DATE         NOT NULL DEFAULT current_date,
+    creation_time         TIME         NOT NULL DEFAULT current_time
 );
 
 CREATE TABLE roles

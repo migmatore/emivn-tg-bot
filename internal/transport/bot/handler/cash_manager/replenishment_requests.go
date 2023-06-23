@@ -45,7 +45,7 @@ func (h *CashManagerHandler) RepReqMenuHandler(ctx context.Context, msg *tgb.Mes
 					card.Name,
 					card.LastDigits,
 					nickname,
-					int(request.Amount),
+					int(request.RequiredAmount),
 				)),
 			)
 		}
@@ -94,7 +94,7 @@ func (h *CashManagerHandler) RepReqMenuHandler(ctx context.Context, msg *tgb.Mes
 					card.Name,
 					card.LastDigits,
 					nickname,
-					int(request.Amount),
+					int(request.RequiredAmount),
 				)),
 			)
 		}

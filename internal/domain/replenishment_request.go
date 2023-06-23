@@ -5,7 +5,8 @@ type ReplenishmentRequest struct {
 	CashManagerUsername    string
 	OwnerUsername          string
 	CardId                 int
-	Amount                 float32
+	RequiredAmount         float32
+	ActualAmount           float32
 	StatusId               int
 	CreationDate           string
 }
@@ -14,6 +15,7 @@ type ReplenishmentRequestDTO struct {
 	CashManagerUsername string
 	OwnerUsername       string
 	CardName            string
-	Amount              float32
+	RequiredAmount      float32
+	ActualAmount        float32
 	Status              string
 }

@@ -63,7 +63,7 @@ func (h *MainOperatorHandler) MakeRepReqHandler(ctx context.Context, msg *tgb.Me
 		return msg.Answer("Пожалуйста, введите суточный лимит карты").DoVoid(ctx)
 	}
 
-	sessionManager.ReplenishmentRequest.Amount = float32(amount)
+	sessionManager.ReplenishmentRequest.RequiredAmount = float32(amount)
 	sessionManager.ReplenishmentRequest.OwnerUsername = string(msg.From.Username)
 
 	card, err := h.cardService.GetByUsername(ctx, string(msg.From.Username))
