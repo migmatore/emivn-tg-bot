@@ -9,6 +9,7 @@ type ReplenishmentRequest struct {
 	ActualAmount           float32
 	StatusId               int
 	CreationDate           string
+	CreationTime           string
 }
 
 type ReplenishmentRequestDTO struct {

@@ -236,7 +236,7 @@ func (s *DaimyoService) CreateSamuraiReport(ctx context.Context, date string) ([
 			continue
 		}
 
-		str += fmt.Sprintf("%s\n (%s)", samurai.Username, date)
+		str += fmt.Sprintf("%s (%s)\n\n", samurai.Username, date)
 		str += fmt.Sprintf("Всего\n%d / %d / %d\n\n", int(tinControllerTurnover+sberControllerTurnover),
 			int(tinSamuraiTurnover+sberSamuraiTurnover),
 			int((tinControllerTurnover-tinSamuraiTurnover)+(sberControllerTurnover-sberSamuraiTurnover)))

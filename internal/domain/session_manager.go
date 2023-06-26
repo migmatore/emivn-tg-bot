@@ -106,6 +106,17 @@ const (
 	SessionStepDaimyoMakeReplenishmentRequest
 	SessionStepDaimyoChangeReplenishmentRequestAmount
 
+	// daimyo requests menu
+	SessionStepDaimyoRepReqMenuHandler
+
+	// daimyo objectionable replenishment request selection handler
+	SessionStepDaimyoObjRepReqSelectHandler
+
+	// daimyo objectionable replenishment request action handler
+	SessionStepDaimyoObjRepReqActionHandler
+
+	SessionStepDaimyoRepReqAnotherAmountHandler
+
 	// daimyo report menu
 	SessionStepDaimyoReportMenuHandler
 
@@ -131,12 +142,17 @@ const (
 	// cash manager replenishment requests handler
 	SessionStepCashManagerRepReqMenuHandler
 
-	// cash manager replenishment request selection handler
-	SessionStepCashManagerRepReqSelectHandler
+	// cash manager active replenishment request selection handler
+	SessionStepCashManagerActRepReqSelectHandler
 
-	SessionStepCashManagerRepReqActionHandler
+	SessionStepCashManagerActRepReqActionHandler
 
-	SessionStepCashManagerRepReqConfirmActionHandler
+	SessionStepCashManagerActRepReqConfirmActionHandler
+
+	SessionStepCashManagerRepReqAnotherAmountHandler
+
+	SessionStepCashManagerObjRepReqSelectHandler
+	SessionStepCashManagerObjRepReqAnotherAmountSelectHandler
 
 	// controller steps
 	SessionStepControllerEnterDataMenuHandler

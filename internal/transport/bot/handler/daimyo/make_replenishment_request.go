@@ -104,7 +104,7 @@ func (h *DaimyoHandler) MakeRepReqHandler(ctx context.Context, msg *tgb.MessageU
 		Name:            taskName,
 		Arguments:       domain.FuncArgs{"task_name": taskName},
 		IntervalMinutes: 0,
-		RunAt:           time.Now().Add(time.Second * 30),
+		RunAt:           time.Now().Add(time.Second * 5),
 	}); err != nil {
 		return msg.Answer(err.Error()).DoVoid(ctx)
 	}

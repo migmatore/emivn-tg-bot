@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/mr-linch/go-tg"
 	"github.com/mr-linch/go-tg/tgb"
+	"strconv"
 	"strings"
 )
 
@@ -15,12 +16,18 @@ func (h *CashManagerHandler) RepReqMenuHandler(ctx context.Context, msg *tgb.Mes
 		requests, err := h.replenishmentRequestService.GetAllByCashManager(
 			ctx,
 			string(msg.From.Username),
-			domain.ActiveRequest.String(),
+			domain.ActiveRequests.String(),
 		)
 		if err != nil {
+			return err
+		}
+
+		if len(requests) == 0 {
 			h.sessionManager.Reset(h.sessionManager.Get(ctx))
 
-			return msg.Answer("Активные запросы отсутствуют.\nНапишите /start").DoVoid(ctx)
+			return msg.Answer("Активные запросы отсутствуют.\nНапишите /start").
+				ReplyMarkup(tg.NewReplyKeyboardRemove()).
+				DoVoid(ctx)
 		}
 
 		buttons := make([]tg.KeyboardButton, 0)
@@ -56,20 +63,26 @@ func (h *CashManagerHandler) RepReqMenuHandler(ctx context.Context, msg *tgb.Mes
 			)...,
 		).WithResizeKeyboardMarkup()
 
-		h.sessionManager.Get(ctx).Step = domain.SessionStepCashManagerRepReqSelectHandler
+		h.sessionManager.Get(ctx).Step = domain.SessionStepCashManagerActRepReqSelectHandler
 
-		return msg.Answer("Выберите тип запроса").ReplyMarkup(kb).DoVoid(ctx)
+		return msg.Answer("Выберите запрос").ReplyMarkup(kb).DoVoid(ctx)
 
 	case domain.CashManagerRepRequestsMenu.Objectionable:
 		requests, err := h.replenishmentRequestService.GetAllByCashManager(
 			ctx,
 			string(msg.From.Username),
-			domain.ObjectionableRequest.String(),
+			domain.ObjectionableRequests.String(),
 		)
 		if err != nil {
+			return err
+		}
+
+		if len(requests) == 0 {
 			h.sessionManager.Reset(h.sessionManager.Get(ctx))
 
-			return msg.Answer("Спорные запросы отсутствуют.\nНапишите /start").DoVoid(ctx)
+			return msg.Answer("Спорные запросы отсутствуют.\nНапишите /start").
+				ReplyMarkup(tg.NewReplyKeyboardRemove()).
+				DoVoid(ctx)
 		}
 
 		buttons := make([]tg.KeyboardButton, 0)
@@ -105,7 +118,9 @@ func (h *CashManagerHandler) RepReqMenuHandler(ctx context.Context, msg *tgb.Mes
 			)...,
 		).WithResizeKeyboardMarkup()
 
-		return msg.Answer("Выберите тип запроса").ReplyMarkup(kb).DoVoid(ctx)
+		h.sessionManager.Get(ctx).Step = domain.SessionStepCashManagerObjRepReqSelectHandler
+
+		return msg.Answer("Выберите запрос").ReplyMarkup(kb).DoVoid(ctx)
 
 	default:
 		h.sessionManager.Reset(h.sessionManager.Get(ctx))
@@ -113,13 +128,18 @@ func (h *CashManagerHandler) RepReqMenuHandler(ctx context.Context, msg *tgb.Mes
 	}
 }
 
-func (h *CashManagerHandler) RepReqSelectHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+func (h *CashManagerHandler) ActRepReqSelectHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	sessionManager := h.sessionManager.Get(ctx)
 
 	s := strings.Split(msg.Text, "/")
 	cardMsg := strings.Split(s[0], " ")
 
-	sessionManager.ReplenishmentRequest.CardName = cardMsg[0]
+	request, err := h.replenishmentRequestService.GetByCardName(ctx, cardMsg[0])
+	if err != nil {
+		return err
+	}
+
+	sessionManager.ReplenishmentRequest = request
 
 	kb := tg.NewReplyKeyboardMarkup(
 		tg.NewButtonColumn(
@@ -128,15 +148,15 @@ func (h *CashManagerHandler) RepReqSelectHandler(ctx context.Context, msg *tgb.M
 		)...,
 	).WithResizeKeyboardMarkup()
 
-	sessionManager.Step = domain.SessionStepCashManagerRepReqActionHandler
+	sessionManager.Step = domain.SessionStepCashManagerActRepReqActionHandler
 
 	return msg.Answer("Подтвердите действие").ReplyMarkup(kb).DoVoid(ctx)
 }
 
-func (h *CashManagerHandler) RepReqActionHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+func (h *CashManagerHandler) ActRepReqActionHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	switch msg.Text {
 	case domain.CashManagerConfirmRepRequestsMenu.Confirm:
-		h.sessionManager.Get(ctx).Step = domain.SessionStepCashManagerRepReqConfirmActionHandler
+		h.sessionManager.Get(ctx).Step = domain.SessionStepCashManagerActRepReqConfirmActionHandler
 
 		kb := tg.NewReplyKeyboardMarkup(
 			tg.NewButtonColumn(
@@ -154,16 +174,22 @@ func (h *CashManagerHandler) RepReqActionHandler(ctx context.Context, msg *tgb.M
 	}
 }
 
-func (h *CashManagerHandler) RepReqConfirmActionHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+func (h *CashManagerHandler) ActRepReqConfirmActionHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	switch msg.Text {
 	case "Да":
 		sessionManager := h.sessionManager.Get(ctx)
 
-		if err := h.replenishmentRequestService.ChangeStatus(
-			ctx,
-			sessionManager.ReplenishmentRequest.CardName,
-			domain.ObjectionableRequest.String(),
-		); err != nil {
+		//if err := h.replenishmentRequestService.ChangeStatus(
+		//	ctx,
+		//	sessionManager.ReplenishmentRequest.CardName,
+		//	domain.ObjectionableRequests.String(),
+		//); err != nil {
+		//	return err
+		//}
+
+		//sessionManager.ReplenishmentRequest.ActualAmount = sessionManager.ReplenishmentRequest.RequiredAmount
+
+		if err := h.replenishmentRequestService.ConfirmRequest(ctx, sessionManager.ReplenishmentRequest); err != nil {
 			return err
 		}
 
@@ -171,9 +197,63 @@ func (h *CashManagerHandler) RepReqConfirmActionHandler(ctx context.Context, msg
 
 		return msg.Answer("Данные записаны.\nНапишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
 	case "Нет":
-		return nil
+		h.sessionManager.Get(ctx).Step = domain.SessionStepCashManagerRepReqAnotherAmountHandler
+
+		return msg.Answer("Введите сумму").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
+
 	default:
 		h.sessionManager.Reset(h.sessionManager.Get(ctx))
 		return msg.Answer("Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
 	}
+}
+
+func (h *CashManagerHandler) ObjRepReqSelectHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+	sessionManager := h.sessionManager.Get(ctx)
+
+	s := strings.Split(msg.Text, "/")
+	cardMsg := strings.Split(s[0], " ")
+
+	request, err := h.replenishmentRequestService.GetByCardName(ctx, cardMsg[0])
+	if err != nil {
+		return err
+	}
+
+	sessionManager.ReplenishmentRequest = request
+
+	kb := tg.NewReplyKeyboardMarkup(
+		tg.NewButtonColumn(
+			tg.NewKeyboardButton("Пополнено на другую сумму"),
+		)...,
+	).WithResizeKeyboardMarkup()
+
+	sessionManager.Step = domain.SessionStepCashManagerObjRepReqAnotherAmountSelectHandler
+
+	return msg.Answer("Подтвердите действие").ReplyMarkup(kb).DoVoid(ctx)
+}
+
+func (h *CashManagerHandler) ObjRepReqAnotherAmountSelectionHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+	h.sessionManager.Get(ctx).Step = domain.SessionStepCashManagerRepReqAnotherAmountHandler
+
+	return msg.Answer("Введите сумму").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
+}
+
+func (h *CashManagerHandler) RepReqAnotherAmountHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+	sessionManager := h.sessionManager.Get(ctx)
+
+	amount, err := strconv.Atoi(msg.Text)
+	if err != nil {
+		return err
+	}
+
+	//sessionManager.ReplenishmentRequest.ActualAmount += float32(amount)
+	sessionManager.ReplenishmentRequest.RequiredAmount = float32(amount)
+	//sessionManager.ReplenishmentRequest.ActualAmount = float32(amount)
+
+	if err := h.replenishmentRequestService.ConfirmRequest(ctx, sessionManager.ReplenishmentRequest); err != nil {
+		return err
+	}
+
+	h.sessionManager.Reset(sessionManager)
+
+	return msg.Answer("Данные записаны.\nНапишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
 }

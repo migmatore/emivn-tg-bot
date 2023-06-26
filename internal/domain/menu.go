@@ -164,6 +164,22 @@ var DaimyoHierarchyMenu = struct {
 	InSubordination: "В подчинении",
 }
 
+var DaimyoRepRequestsMenu = struct {
+	Active        string
+	Objectionable string
+}{
+	Active:        "Активные",
+	Objectionable: "Спорные",
+}
+
+var DaimyoConfirmRepRequestsMenu = struct {
+	Replenished              string
+	ReplenishedAnotherAmount string
+}{
+	Replenished:              "Пополнено",
+	ReplenishedAnotherAmount: "Пополнено на другую сумму",
+}
+
 // Samurai
 
 var SamuraiMainMenu = struct {

@@ -25,6 +25,9 @@ type DaimyoService interface {
 type ReplenishmentRequestService interface {
 	Create(ctx context.Context, dto domain.ReplenishmentRequestDTO) (tg.ChatID, error)
 	CheckIfExists(ctx context.Context, cardName string) (bool, error)
+	GetAllByOwner(ctx context.Context, username string, status string) ([]*domain.ReplenishmentRequestDTO, error)
+	GetByCardName(ctx context.Context, name string) (domain.ReplenishmentRequestDTO, error)
+	ConfirmRequest(ctx context.Context, dto domain.ReplenishmentRequestDTO) error
 }
 
 type CashManagerService interface {
@@ -108,7 +111,16 @@ func (h *DaimyoHandler) MainMenuHandler(ctx context.Context, msg *tgb.MessageUpd
 		return msg.Answer("Выберите банк").ReplyMarkup(kb).DoVoid(ctx)
 
 	case domain.DaimyoMainMenu.Requests:
-		return nil
+		kb := tg.NewReplyKeyboardMarkup(
+			tg.NewButtonColumn(
+				tg.NewKeyboardButton(domain.DaimyoRepRequestsMenu.Active),
+				tg.NewKeyboardButton(domain.DaimyoRepRequestsMenu.Objectionable),
+			)...,
+		).WithResizeKeyboardMarkup()
+
+		h.sessionManager.Get(ctx).Step = domain.SessionStepDaimyoRepReqMenuHandler
+
+		return msg.Answer("Выберите действие").ReplyMarkup(kb).DoVoid(ctx)
 
 	case domain.DaimyoMainMenu.CardLimit:
 		limits, err := h.cardService.GetLimits(ctx, string(msg.From.Username))

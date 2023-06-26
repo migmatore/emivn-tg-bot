@@ -11,8 +11,11 @@ type ReplenishmentRequestStorage interface {
 	Insert(ctx context.Context, replenishmentReq domain.ReplenishmentRequest) error
 	CheckIfExists(ctx context.Context, cardName string) (bool, error)
 	GetAllByCashManager(ctx context.Context, username string, status string) ([]*domain.ReplenishmentRequest, error)
+	GetAllByOwner(ctx context.Context, username string, status string) ([]*domain.ReplenishmentRequest, error)
 	GetByCardId(ctx context.Context, cardId int) (domain.ReplenishmentRequest, error)
 	UpdateStatus(ctx context.Context, cardId int, statusId int) error
+	UpdateActualAmount(ctx context.Context, cardId int, amount float32) error
+	UpdateRequiredAmount(ctx context.Context, cardId int, amount float32) error
 }
 
 type CashManagerStorage interface {
@@ -90,7 +93,7 @@ func (s *ReplenishmentRequestService) Create(ctx context.Context, dto domain.Rep
 		return 0, err
 	}
 
-	statusId, err := s.replenishmentRequestStatusStorage.GetId(ctx, domain.ActiveRequest.String())
+	statusId, err := s.replenishmentRequestStatusStorage.GetId(ctx, domain.ActiveRequests.String())
 	if err != nil {
 		return 0, err
 	}
@@ -100,17 +103,18 @@ func (s *ReplenishmentRequestService) Create(ctx context.Context, dto domain.Rep
 		OwnerUsername:       dto.OwnerUsername,
 		CardId:              card.CardId,
 		RequiredAmount:      dto.RequiredAmount,
+		ActualAmount:        0,
 		StatusId:            statusId,
 	}
 
 	if err := s.transactor.WithinTransaction(ctx, func(txCtx context.Context) error {
-		if err := s.storage.Insert(ctx, replenishmentReq); err != nil {
+		if err := s.storage.Insert(txCtx, replenishmentReq); err != nil {
 			return err
 		}
 
 		newLimit := card.DailyLimit - int(replenishmentReq.RequiredAmount)
 
-		if err := s.cardStorage.UpdateLimit(ctx, card.Name, newLimit); err != nil {
+		if err := s.cardStorage.UpdateLimit(txCtx, card.Name, newLimit); err != nil {
 			return err
 		}
 
@@ -149,6 +153,40 @@ func (s *ReplenishmentRequestService) GetAllByCashManager(
 			OwnerUsername:       request.OwnerUsername,
 			CardName:            card.Name,
 			RequiredAmount:      request.RequiredAmount,
+			ActualAmount:        request.ActualAmount,
+			Status:              status,
+		}
+
+		requestsDTOs = append(requestsDTOs, &requestDTO)
+	}
+
+	return requestsDTOs, nil
+}
+
+func (s *ReplenishmentRequestService) GetAllByOwner(
+	ctx context.Context,
+	username string,
+	status string,
+) ([]*domain.ReplenishmentRequestDTO, error) {
+	requests, err := s.storage.GetAllByOwner(ctx, username, status)
+	if err != nil {
+		return nil, err
+	}
+
+	requestsDTOs := make([]*domain.ReplenishmentRequestDTO, 0)
+
+	for _, request := range requests {
+		card, err := s.cardStorage.GetById(ctx, request.CardId)
+		if err != nil {
+			return nil, err
+		}
+
+		requestDTO := domain.ReplenishmentRequestDTO{
+			CashManagerUsername: request.CashManagerUsername,
+			OwnerUsername:       request.OwnerUsername,
+			CardName:            card.Name,
+			RequiredAmount:      request.RequiredAmount,
+			ActualAmount:        request.ActualAmount,
 			Status:              status,
 		}
 
@@ -182,6 +220,7 @@ func (s *ReplenishmentRequestService) GetByCardName(
 		OwnerUsername:       request.OwnerUsername,
 		CardName:            name,
 		RequiredAmount:      request.RequiredAmount,
+		ActualAmount:        request.ActualAmount,
 		Status:              status,
 	}
 
@@ -200,4 +239,87 @@ func (s *ReplenishmentRequestService) ChangeStatus(ctx context.Context, cardName
 	}
 
 	return s.storage.UpdateStatus(ctx, card.CardId, statusId)
+}
+
+func (s *ReplenishmentRequestService) ConfirmRequest(ctx context.Context, dto domain.ReplenishmentRequestDTO) error {
+	card, err := s.cardStorage.GetByName(ctx, dto.CardName)
+	if err != nil {
+		return err
+	}
+
+	switch dto.Status {
+	case domain.ActiveRequests.String():
+		statusId, err := s.replenishmentRequestStatusStorage.GetId(ctx, domain.ObjectionableRequests.String())
+		if err != nil {
+			return err
+		}
+
+		oldRequest, err := s.storage.GetByCardId(ctx, card.CardId)
+		if err != nil {
+			return err
+		}
+
+		if err := s.transactor.WithinTransaction(ctx, func(txCtx context.Context) error {
+			if oldRequest.RequiredAmount != dto.RequiredAmount {
+				if err := s.storage.UpdateRequiredAmount(txCtx, card.CardId, dto.RequiredAmount); err != nil {
+					return err
+				}
+			}
+
+			if err := s.storage.UpdateStatus(txCtx, card.CardId, statusId); err != nil {
+				return err
+			}
+
+			return nil
+		}); err != nil {
+			return err
+		}
+
+	case domain.ObjectionableRequests.String():
+		if dto.RequiredAmount != dto.ActualAmount {
+			//oldRequest, err := s.storage.GetByCardId(ctx, card.CardId)
+			//if err != nil {
+			//	return err
+			//}
+
+			if err := s.storage.UpdateActualAmount(ctx, card.CardId, dto.ActualAmount); err != nil {
+				return err
+			}
+
+			return nil
+		}
+
+		statusId, err := s.replenishmentRequestStatusStorage.GetId(ctx, domain.CompletedRequests.String())
+		if err != nil {
+			return err
+		}
+
+		oldRequest, err := s.storage.GetByCardId(ctx, card.CardId)
+		if err != nil {
+			return err
+		}
+
+		if err := s.transactor.WithinTransaction(ctx, func(txCtx context.Context) error {
+			if oldRequest.RequiredAmount != dto.RequiredAmount {
+				if err := s.storage.UpdateRequiredAmount(txCtx, card.CardId, dto.RequiredAmount); err != nil {
+					return err
+				}
+			}
+
+			if err := s.storage.UpdateActualAmount(txCtx, card.CardId, dto.ActualAmount); err != nil {
+				return err
+			}
+
+			if err := s.storage.UpdateStatus(txCtx, card.CardId, statusId); err != nil {
+				return err
+			}
+
+			return nil
+		}); err != nil {
+			return err
+		}
+		return nil
+	}
+
+	return nil
 }
