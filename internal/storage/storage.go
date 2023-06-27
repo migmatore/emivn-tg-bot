@@ -9,6 +9,7 @@ import (
 	"emivn-tg-bot/internal/storage/daimyo"
 	"emivn-tg-bot/internal/storage/main_operator"
 	"emivn-tg-bot/internal/storage/psql"
+	"emivn-tg-bot/internal/storage/referal"
 	"emivn-tg-bot/internal/storage/replenishment_request"
 	"emivn-tg-bot/internal/storage/replenishment_request_status"
 	"emivn-tg-bot/internal/storage/role"
@@ -36,6 +37,7 @@ type Storage struct {
 	ReplenishmentRequestStatusStorage *replenishment_request_status.ReplenishmentRequestStatusStorage
 	UserRole                          *user_role.UserRoleStorage
 	Role                              *role.RoleStorage
+	Referal                           *referal.ReferalStorage
 
 	Scheduler *scheduler.SchedulerStorage
 }
@@ -57,6 +59,7 @@ func New(pool psql.AtomicPoolClient) *Storage {
 		ReplenishmentRequestStatusStorage: replenishment_request_status.NewReplenishmentRequestStatusStorage(pool),
 		UserRole:                          user_role.NewUserRoleStorage(pool),
 		Role:                              role.NewRoleStorage(pool),
+		Referal:                           referal.New(pool),
 		Scheduler:                         scheduler.NewSchedulerStorage(pool),
 	}
 }

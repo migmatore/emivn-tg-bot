@@ -7,6 +7,7 @@ import (
 
 type UserRoleStorage interface {
 	Insert(ctx context.Context, user domain.UserRole) error
+	UpdateUsername(ctx context.Context, old string, new string) error
 }
 
 type UserRoleSerivce struct {

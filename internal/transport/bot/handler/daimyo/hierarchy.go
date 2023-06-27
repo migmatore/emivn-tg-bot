@@ -3,6 +3,7 @@ package daimyo
 import (
 	"context"
 	"emivn-tg-bot/internal/domain"
+	"emivn-tg-bot/pkg/utils"
 	"fmt"
 	"github.com/mr-linch/go-tg"
 	"github.com/mr-linch/go-tg/tgb"
@@ -12,9 +13,9 @@ import (
 func (h *DaimyoHandler) HierarchyMenuHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	switch msg.Text {
 	case domain.DaimyoHierarchyMenu.CreateSamurai:
-		h.sessionManager.Get(ctx).Step = domain.SessionStepDaimyoCreateSamuraiUsername
+		h.sessionManager.Get(ctx).Step = domain.SessionStepDaimyoCreateSamuraiNickname
 
-		return msg.Answer(fmt.Sprintf("Введите telegram username")).
+		return msg.Answer(fmt.Sprintf("Введите имя")).
 			ReplyMarkup(tg.NewReplyKeyboardRemove()).
 			DoVoid(ctx)
 
@@ -46,17 +47,63 @@ func (h *DaimyoHandler) HierarchyMenuHandler(ctx context.Context, msg *tgb.Messa
 	}
 }
 
-func (h *DaimyoHandler) EnterSamuraiUsernameHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+func (h *DaimyoHandler) EnterSamuraiNicknameHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	sessionManager := h.sessionManager.Get(ctx)
-	sessionManager.Samurai.Username = strings.ReplaceAll(msg.Text, "@", "")
+	sessionManager.Samurai.Nickname = msg.Text
 
-	sessionManager.Step = domain.SessionStepDaimyoCreateSamuraiNickname
-	return msg.Answer("Введите nickname").DoVoid(ctx)
+	kb := tg.NewReplyKeyboardMarkup(
+		tg.NewButtonColumn(
+			tg.NewKeyboardButton(domain.EntityCreationMethodMenu.Tag),
+			tg.NewKeyboardButton(domain.EntityCreationMethodMenu.Link),
+		)...,
+	).WithResizeKeyboardMarkup()
+
+	sessionManager.Step = domain.SessionStepDaimyoSamuraiCreationMethod
+	return msg.Answer("Введите telegram username").ReplyMarkup(kb).DoVoid(ctx)
+}
+
+func (h *DaimyoHandler) SamuraiCreationHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
+	switch msg.Text {
+	case domain.EntityCreationMethodMenu.Tag:
+		h.sessionManager.Get(ctx).Step = domain.SessionStepDaimyoCreateSamurai
+		return msg.Answer("Введите telegram username").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
+
+	case domain.EntityCreationMethodMenu.Link:
+		sessionManager := h.sessionManager.Get(ctx)
+
+		link := utils.GenerateLink()
+
+		sessionManager.Samurai.Username = link
+		sessionManager.Samurai.DaimyoUsername = string(msg.From.Username)
+
+		if err := h.referalService.Create(ctx, link, domain.SamuraiRole.String()); err != nil {
+			return err
+		}
+
+		if err := h.samuraiService.Create(ctx, sessionManager.Samurai); err != nil {
+			return err
+		}
+
+		h.sessionManager.Reset(sessionManager)
+
+		me, err := msg.Client.Me(ctx)
+		if err != nil {
+			return err
+		}
+
+		return msg.Answer(fmt.Sprintf("https://t.me/%s?start=%s", me.Username, link)).
+			ReplyMarkup(tg.NewReplyKeyboardRemove()).
+			DoVoid(ctx)
+
+	default:
+		h.sessionManager.Reset(h.sessionManager.Get(ctx))
+		return msg.Answer("Напишите /start").ReplyMarkup(tg.NewReplyKeyboardRemove()).DoVoid(ctx)
+	}
 }
 
 func (h *DaimyoHandler) CreateSamuraiHandler(ctx context.Context, msg *tgb.MessageUpdate) error {
 	sessionManager := h.sessionManager.Get(ctx)
-	sessionManager.Samurai.Nickname = msg.Text
+	sessionManager.Samurai.Username = strings.ReplaceAll(msg.Text, "@", "")
 	sessionManager.Samurai.DaimyoUsername = string(msg.From.Username)
 
 	if err := h.samuraiService.Create(ctx, sessionManager.Samurai); err != nil {

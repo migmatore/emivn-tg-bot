@@ -127,8 +127,9 @@ const (
 	SessionStepDaimyoHierarchyMenuHandler
 
 	// daimyo create samurai
-	SessionStepDaimyoCreateSamuraiUsername
 	SessionStepDaimyoCreateSamuraiNickname
+	SessionStepDaimyoSamuraiCreationMethod
+	SessionStepDaimyoCreateSamurai
 
 	// samurai steps
 	SessionStepSamuraiEnterDataMenuHandler

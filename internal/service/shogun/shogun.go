@@ -10,6 +10,8 @@ type ShogunStorage interface {
 	Insert(ctx context.Context, shogun domain.Shogun) error
 	GetAll(ctx context.Context) ([]*domain.Shogun, error)
 	GetByNickname(ctx context.Context, nickname string) (domain.Shogun, error)
+	GetByUsername(ctx context.Context, username string) (domain.Shogun, error)
+	UpdateUsername(ctx context.Context, old string, new string) error
 }
 
 type ShogunUserRoleStorage interface {

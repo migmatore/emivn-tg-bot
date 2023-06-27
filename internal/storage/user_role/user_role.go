@@ -31,3 +31,19 @@ func (s *UserRoleStorage) Insert(ctx context.Context, user domain.UserRole) erro
 
 	return nil
 }
+
+func (s *UserRoleStorage) UpdateUsername(ctx context.Context, old string, new string) error {
+	q := `update user_roles set username=$1 where username=$2`
+
+	if _, err := s.pool.Exec(ctx, q, new, old); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			logging.GetLogger(ctx).Errorf("Error: %v", err)
+			return err
+		}
+
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return err
+	}
+
+	return nil
+}

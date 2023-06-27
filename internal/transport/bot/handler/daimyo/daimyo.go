@@ -39,6 +39,10 @@ type SamuraiService interface {
 	GetAllByDaimyo(ctx context.Context, daimyoUsername string) ([]*domain.SamuraiDTO, error)
 }
 
+type ReferalService interface {
+	Create(ctx context.Context, link string, role string) error
+}
+
 type Scheduler interface {
 	Add(ctx context.Context, dto domain.TaskDTO) error
 	Delete(ctx context.Context, taskName string) error
@@ -52,6 +56,7 @@ type DaimyoHandler struct {
 	replenishmentRequestService ReplenishmentRequestService
 	cashManagerService          CashManagerService
 	samuraiService              SamuraiService
+	referalService              ReferalService
 
 	scheduler Scheduler
 }
@@ -63,6 +68,7 @@ func NewDaimyoHandler(
 	replenishmentRequestService ReplenishmentRequestService,
 	cashManagerService CashManagerService,
 	samuraiService SamuraiService,
+	referalService ReferalService,
 	scheduler Scheduler,
 ) *DaimyoHandler {
 	return &DaimyoHandler{
@@ -72,6 +78,7 @@ func NewDaimyoHandler(
 		replenishmentRequestService: replenishmentRequestService,
 		cashManagerService:          cashManagerService,
 		samuraiService:              samuraiService,
+		referalService:              referalService,
 		scheduler:                   scheduler,
 	}
 }

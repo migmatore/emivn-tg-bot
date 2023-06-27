@@ -7,6 +7,7 @@ import (
 	"emivn-tg-bot/internal/service/controller"
 	"emivn-tg-bot/internal/service/daimyo"
 	"emivn-tg-bot/internal/service/main_operator"
+	"emivn-tg-bot/internal/service/referal"
 	"emivn-tg-bot/internal/service/replenishment_request"
 	"emivn-tg-bot/internal/service/replenishment_request_status"
 	"emivn-tg-bot/internal/service/role"
@@ -34,6 +35,7 @@ type Deps struct {
 	ReplenishmentRequestStatusStorage replenishment_request_status.ReplenishmentRequestStatusStorage
 	UserRoleStorage                   user_role.UserRoleStorage
 	RoleStorage                       role.RoleStorage
+	ReferalStorage                    referal.ReferalStorage
 	SchedulerStorage                  scheduler.SchedulerStorage
 }
 
@@ -49,6 +51,7 @@ type Service struct {
 	MainOperator         *main_operator.MainOperatorService
 	Card                 *card.CardService
 	ReplenishmentRequest *replenishment_request.ReplenishmentRequestService
+	Referal              *referal.ReferalService
 	SchedulerService     *scheduler.SchedulerService
 }
 
@@ -56,8 +59,24 @@ func New(deps Deps) *Service {
 	return &Service{
 		Transactor: NewTransactorService(deps.Transactor),
 
-		Auth:   auth.NewAuthService(deps.AuthStorage),
-		Shogun: shogun.NewShogunService(deps.Transactor, deps.ShogunStorage, deps.UserRoleStorage, deps.RoleStorage),
+		Auth: auth.NewAuthService(
+			deps.AuthStorage,
+			deps.ShogunStorage,
+			deps.DaimyoStorage,
+			deps.SamuraiStorage,
+			deps.CashManagerStorage,
+			deps.ControllerStorage,
+			deps.MainOperatorStorage,
+			deps.ReferalStorage,
+			deps.UserRoleStorage,
+			deps.RoleStorage,
+		),
+		Shogun: shogun.NewShogunService(
+			deps.Transactor,
+			deps.ShogunStorage,
+			deps.UserRoleStorage,
+			deps.RoleStorage,
+		),
 		Daimyo: daimyo.NewDaimyoService(
 			deps.Transactor,
 			deps.DaimyoStorage,
@@ -106,6 +125,7 @@ func New(deps Deps) *Service {
 			deps.ReplenishmentRequestStatusStorage,
 			deps.MainOperatorStorage,
 		),
+		Referal:          referal.New(deps.ReferalStorage, deps.RoleStorage),
 		SchedulerService: scheduler.New(deps.SchedulerStorage),
 	}
 }

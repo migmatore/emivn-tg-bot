@@ -129,3 +129,19 @@ func (s *SamuraiStorage) GetAllByDaimyo(ctx context.Context, daimyoUsername stri
 
 	return samurais, nil
 }
+
+func (s *SamuraiStorage) UpdateUsername(ctx context.Context, old string, new string) error {
+	q := `update samurai set username=$1 where username=$2`
+
+	if _, err := s.pool.Exec(ctx, q, new, old); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			logging.GetLogger(ctx).Errorf("Error: %v", err)
+			return err
+		}
+
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return err
+	}
+
+	return nil
+}

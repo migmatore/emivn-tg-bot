@@ -13,6 +13,7 @@ type DaimyoStorage interface {
 	GetAllByShogun(ctx context.Context, shogunUsername string) ([]*domain.Daimyo, error)
 	GetByUsername(ctx context.Context, username string) (domain.Daimyo, error)
 	GetByNickname(ctx context.Context, nickname string) (domain.Daimyo, error)
+	UpdateUsername(ctx context.Context, old string, new string) error
 	//GetTurnovers(ctx context.Context, date string) ([]*domain.SamuraiReport, error)
 }
 

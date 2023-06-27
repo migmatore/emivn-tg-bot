@@ -4,6 +4,7 @@ import "context"
 
 type RoleStorage interface {
 	GetIdByName(ctx context.Context, role string) (int, error)
+	GetById(ctx context.Context, roleId int) (string, error)
 }
 
 type RoleService struct {

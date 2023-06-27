@@ -9,6 +9,7 @@ import (
 
 type ControllerStorage interface {
 	Insert(ctx context.Context, cotroller domain.Controller) error
+	UpdateUsername(ctx context.Context, old string, new string) error
 }
 
 type ControllerTurnoverStorage interface {

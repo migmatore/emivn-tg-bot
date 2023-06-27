@@ -24,6 +24,7 @@ func (h *Handler) registerDaimyoHandler() {
 
 	// hierarchy
 	h.Message(h.DaimyoHandler.HierarchyMenuHandler, h.isSessionStep(domain.SessionStepDaimyoHierarchyMenuHandler))
-	h.Message(h.DaimyoHandler.EnterSamuraiUsernameHandler, h.isSessionStep(domain.SessionStepDaimyoCreateSamuraiUsername))
-	h.Message(h.DaimyoHandler.CreateSamuraiHandler, h.isSessionStep(domain.SessionStepDaimyoCreateSamuraiNickname))
+	h.Message(h.DaimyoHandler.EnterSamuraiNicknameHandler, h.isSessionStep(domain.SessionStepDaimyoCreateSamuraiNickname))
+	h.Message(h.DaimyoHandler.SamuraiCreationHandler, h.isSessionStep(domain.SessionStepDaimyoSamuraiCreationMethod))
+	h.Message(h.DaimyoHandler.CreateSamuraiHandler, h.isSessionStep(domain.SessionStepDaimyoCreateSamurai))
 }

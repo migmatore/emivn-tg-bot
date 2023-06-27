@@ -60,6 +60,24 @@ func (s *ShogunStorage) GetAll(ctx context.Context) ([]*domain.Shogun, error) {
 	return shoguns, nil
 }
 
+func (s *ShogunStorage) GetByUsername(ctx context.Context, username string) (domain.Shogun, error) {
+	q := `select username, nickname from shoguns where username=$1`
+
+	shogun := domain.Shogun{}
+
+	if err := s.pool.QueryRow(ctx, q, username).Scan(&shogun.Username, &shogun.Nickname); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			logging.GetLogger(ctx).Errorf("Error: %v", err)
+			return shogun, err
+		}
+
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return shogun, err
+	}
+
+	return shogun, nil
+}
+
 func (s *ShogunStorage) GetByNickname(ctx context.Context, nickname string) (domain.Shogun, error) {
 	q := `select username, nickname from shoguns where nickname=$1`
 
@@ -76,4 +94,20 @@ func (s *ShogunStorage) GetByNickname(ctx context.Context, nickname string) (dom
 	}
 
 	return shogun, nil
+}
+
+func (s *ShogunStorage) UpdateUsername(ctx context.Context, old string, new string) error {
+	q := `update shoguns set username=$1 where username=$2`
+
+	if _, err := s.pool.Exec(ctx, q, new, old); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			logging.GetLogger(ctx).Errorf("Error: %v", err)
+			return err
+		}
+
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return err
+	}
+
+	return nil
 }

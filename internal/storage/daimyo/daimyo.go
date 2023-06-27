@@ -133,3 +133,19 @@ func (s *DaimyoStorage) GetByNickname(ctx context.Context, nickname string) (dom
 
 	return daimyo, nil
 }
+
+func (s *DaimyoStorage) UpdateUsername(ctx context.Context, old string, new string) error {
+	q := `update daimyo set username=$1 where username=$2`
+
+	if _, err := s.pool.Exec(ctx, q, new, old); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			logging.GetLogger(ctx).Errorf("Error: %v", err)
+			return err
+		}
+
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return err
+	}
+
+	return nil
+}

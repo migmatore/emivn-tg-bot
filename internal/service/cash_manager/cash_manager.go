@@ -13,6 +13,7 @@ type CashManagerStorage interface {
 	GetByShogunUsername(ctx context.Context, username string) (domain.CashManager, error)
 	GetByUsername(ctx context.Context, username string) (domain.CashManager, error)
 	SetChatId(ctx context.Context, username string, id int64) error
+	UpdateUsername(ctx context.Context, old string, new string) error
 }
 
 type CashManagerUserRoleStorage interface {

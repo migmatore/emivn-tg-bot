@@ -50,6 +50,7 @@ func (a *App) Run(ctx context.Context) error {
 		MainOperatorStorage:               storages.MainOperator,
 		UserRoleStorage:                   storages.UserRole,
 		RoleStorage:                       storages.Role,
+		ReferalStorage:                    storages.Referal,
 		CardStorage:                       storages.Card,
 		ReplenishmentRequestStorage:       storages.ReplenishmentRequest,
 		ReplenishmentRequestStatusStorage: storages.ReplenishmentRequestStatusStorage,
@@ -67,6 +68,7 @@ func (a *App) Run(ctx context.Context) error {
 		CashManagerService:          services.CashManager,
 		CardService:                 services.Card,
 		ReplenishmentRequestService: services.ReplenishmentRequest,
+		ReferalService:              services.Referal,
 		SchedulerService:            services.SchedulerService,
 	})
 

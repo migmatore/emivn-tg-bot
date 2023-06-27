@@ -23,7 +23,7 @@ type TransactorService interface {
 
 type AuthService interface {
 	//CheckAuthRole(ctx context.Context, username string, requiredRole domain.Role) (bool, error)
-	GetRole(ctx context.Context, username string) (string, error)
+	Auth(ctx context.Context, link string, username string) (string, error)
 }
 
 type ShogunService interface {
@@ -88,6 +88,10 @@ type ReplenishmentRequestService interface {
 	ConfirmRequest(ctx context.Context, dto domain.ReplenishmentRequestDTO) error
 }
 
+type ReferalService interface {
+	Create(ctx context.Context, link string, role string) error
+}
+
 // TODO: Refactor DI
 type Deps struct {
 	sessionManager *session.Manager[domain.Session]
@@ -101,6 +105,7 @@ type Deps struct {
 	MainOperatorService         MainOperatorService
 	CardService                 CardService
 	ReplenishmentRequestService ReplenishmentRequestService
+	ReferalService              ReferalService
 
 	TransactorService TransactorService
 	SchedulerService  SchedulerService
@@ -154,6 +159,7 @@ func New(deps Deps) *Handler {
 			deps.ReplenishmentRequestService,
 			deps.CashManagerService,
 			deps.SamuraiService,
+			deps.ReferalService,
 			scheduler,
 		),
 		CashManagerHandler: cash_manager.New(

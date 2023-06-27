@@ -2,8 +2,15 @@ package domain
 
 // TODO: menu code refactoring(with back button)
 
-// Admin
+var EntityCreationMethodMenu = struct {
+	Tag  string
+	Link string
+}{
+	Tag:  "Тэг",
+	Link: "Ссылка",
+}
 
+// Admin
 var AdminMainMenu = struct {
 	Cards        string
 	RequestsList string

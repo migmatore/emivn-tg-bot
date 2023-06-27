@@ -100,3 +100,19 @@ func (s *CashManagerStorage) SetChatId(ctx context.Context, username string, id 
 
 	return nil
 }
+
+func (s *CashManagerStorage) UpdateUsername(ctx context.Context, old string, new string) error {
+	q := `update cash_managers set username=$1 where username=$2`
+
+	if _, err := s.pool.Exec(ctx, q, new, old); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			logging.GetLogger(ctx).Errorf("Error: %v", err)
+			return err
+		}
+
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return err
+	}
+
+	return nil
+}

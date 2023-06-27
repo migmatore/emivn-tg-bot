@@ -15,6 +15,7 @@ type SamuraiStorage interface {
 	GetByNickname(ctx context.Context, nickname string) (domain.Samurai, error)
 	SetChatId(ctx context.Context, username string, id int64) error
 	GetAllByDaimyo(ctx context.Context, daimyoUsername string) ([]*domain.Samurai, error)
+	UpdateUsername(ctx context.Context, old string, new string) error
 }
 
 type SamuraiTurnoverStorage interface {

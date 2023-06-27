@@ -32,3 +32,21 @@ func (s *RoleStorage) GetIdByName(ctx context.Context, role string) (int, error)
 
 	return id, nil
 }
+
+func (s *RoleStorage) GetById(ctx context.Context, roleId int) (string, error) {
+	q := `select name from roles where id=$1`
+
+	var name string
+
+	if err := s.pool.QueryRow(ctx, q, roleId).Scan(&name); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			logging.GetLogger(ctx).Errorf("Error: %v", err)
+			return name, err
+		}
+
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return name, err
+	}
+
+	return name, nil
+}

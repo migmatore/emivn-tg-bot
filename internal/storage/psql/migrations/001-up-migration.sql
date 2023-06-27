@@ -135,6 +135,13 @@ CREATE TABLE tasks
     updated_at   TIMESTAMP   NOT NULL
 );
 
+CREATE TABLE referals
+(
+    id             INTEGER      NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    link           VARCHAR(10)  NOT NULL UNIQUE,
+    role_id        INTEGER      NOT NULL REFERENCES roles (id)
+);
+
 INSERT INTO roles(name)
 VALUES ('Администратор'),
        ('Сёгун'),

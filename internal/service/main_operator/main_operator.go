@@ -9,6 +9,7 @@ import (
 type MainOperatorStorage interface {
 	Insert(ctx context.Context, operator domain.MainOperator) error
 	GetByUsername(ctx context.Context, username string) (domain.MainOperator, error)
+	UpdateUsername(ctx context.Context, old string, new string) error
 }
 
 type UserRoleStorage interface {

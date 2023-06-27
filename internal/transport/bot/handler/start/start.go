@@ -6,11 +6,12 @@ import (
 	"github.com/mr-linch/go-tg"
 	"github.com/mr-linch/go-tg/tgb"
 	"github.com/mr-linch/go-tg/tgb/session"
+	"strings"
 )
 
 type AuthService interface {
 	//CheckAuthRole(ctx context.Context, username string, requiredRole domain.Role) (bool, error)
-	GetRole(ctx context.Context, username string) (string, error)
+	Auth(ctx context.Context, link string, username string) (string, error)
 }
 
 type SamuraiService interface {
@@ -51,7 +52,15 @@ func NewStartHandler(
 }
 
 func (h *StartHandler) Start(ctx context.Context, msg *tgb.MessageUpdate) error {
-	role, err := h.AuthService.GetRole(ctx, string(msg.Chat.Username))
+	s := strings.Split(msg.Text, " ")
+
+	var link string
+
+	if len(s) > 1 {
+		link = s[1]
+	}
+
+	role, err := h.AuthService.Auth(ctx, link, string(msg.From.Username))
 	if err != nil {
 		return msg.Answer("Error").DoVoid(ctx)
 	}

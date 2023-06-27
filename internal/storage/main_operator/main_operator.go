@@ -53,3 +53,19 @@ func (s MainOperatorStorage) GetByUsername(ctx context.Context, username string)
 
 	return operator, nil
 }
+
+func (s *MainOperatorStorage) UpdateUsername(ctx context.Context, old string, new string) error {
+	q := `update main_operators set username=$1 where username=$2`
+
+	if _, err := s.pool.Exec(ctx, q, new, old); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			logging.GetLogger(ctx).Errorf("Error: %v", err)
+			return err
+		}
+
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return err
+	}
+
+	return nil
+}
