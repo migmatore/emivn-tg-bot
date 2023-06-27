@@ -22,6 +22,10 @@ func (h *Handler) registerDaimyoHandler() {
 	h.Message(h.DaimyoHandler.ReportMenuHandler, h.isSessionStep(domain.SessionStepDaimyoReportMenuHandler))
 	h.Message(h.DaimyoHandler.ReportPeriodMenuHandler, h.isSessionStep(domain.SessionStepDaimyoReportPeriodMenuHandler))
 
+	// report with period
+	h.Message(h.DaimyoHandler.ReportStartPeriodHandler, h.isSessionStep(domain.SessionStepDaimyoReportStartPeriod))
+	h.Message(h.DaimyoHandler.ReportEndPeriodHandler, h.isSessionStep(domain.SessionStepDaimyoReportEndPeriod))
+
 	// hierarchy
 	h.Message(h.DaimyoHandler.HierarchyMenuHandler, h.isSessionStep(domain.SessionStepDaimyoHierarchyMenuHandler))
 	h.Message(h.DaimyoHandler.EnterSamuraiNicknameHandler, h.isSessionStep(domain.SessionStepDaimyoCreateSamuraiNickname))

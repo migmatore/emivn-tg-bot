@@ -25,6 +25,8 @@ type SamuraiTurnoverStorage interface {
 	Update(ctx context.Context, turnover domain.SamuraiTurnover) error
 
 	GetTurnover(ctx context.Context, samuraiUsername string, date string, bankId int) (float64, error)
+	GetTurnoverSumWithPeriod(ctx context.Context, samuraiUsername string, startDate string, endDate string,
+		bankId int) (float64, error)
 }
 
 type DaimyoStorage interface {

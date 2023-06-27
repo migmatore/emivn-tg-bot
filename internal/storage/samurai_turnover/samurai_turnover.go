@@ -148,3 +148,28 @@ func (s *SamuraiTurnoverStorage) GetTurnover(
 
 	return turnover, nil
 }
+
+func (s *SamuraiTurnoverStorage) GetTurnoverSumWithPeriod(
+	ctx context.Context,
+	samuraiUsername string,
+	startDate string,
+	endDate string,
+	bankId int,
+) (float64, error) {
+	q := `select sum(turnover::decimal) from samurai_turnovers where samurai_username=$1 and start_date between $2 and $3 
+                                         and bank_type_id=$4`
+
+	var turnover float64
+
+	if err := s.pool.QueryRow(ctx, q, samuraiUsername, startDate, endDate, bankId).Scan(&turnover); err != nil {
+		if err := utils.ParsePgError(err); err != nil {
+			logging.GetLogger(ctx).Errorf("Error: %v", err)
+			return turnover, err
+		}
+
+		logging.GetLogger(ctx).Errorf("Query error. %v", err)
+		return turnover, err
+	}
+
+	return turnover, nil
+}

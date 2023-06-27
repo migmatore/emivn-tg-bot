@@ -38,7 +38,9 @@ type DaimyoService interface {
 	GetAllByShogun(ctx context.Context, shogunUsername string) ([]*domain.DaimyoDTO, error)
 	GetByUsername(ctx context.Context, username string) (domain.DaimyoDTO, error)
 	GetByNickname(ctx context.Context, nickname string) (domain.DaimyoDTO, error)
-	CreateSamuraiReport(ctx context.Context, date string) ([]string, error)
+	CreateSamuraiReport(ctx context.Context, daimyoUsername string, date string) ([]string, error)
+	CreateSamuraiReportWithPeriod(ctx context.Context, daimyoUsername string, startDate string,
+		endDate string) ([]string, error)
 }
 
 type SamuraiService interface {

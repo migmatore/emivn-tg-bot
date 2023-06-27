@@ -133,6 +133,10 @@ const (
 	// daimyo make report
 	SessionStepDaimyoReportPeriodMenuHandler
 
+	// daimyo make report with period
+	SessionStepDaimyoReportStartPeriod
+	SessionStepDaimyoReportEndPeriod
+
 	// daimyo hierarchy menu
 	SessionStepDaimyoHierarchyMenuHandler
 
@@ -198,4 +202,9 @@ type Session struct {
 	ReplenishmentRequest ReplenishmentRequestDTO
 	SamuraiTurnover      SamuraiTurnoverDTO
 	ControllerTurnover   ControllerTurnoverDTO
+
+	ReportPeriod struct {
+		StartDate string
+		EndDate   string
+	}
 }

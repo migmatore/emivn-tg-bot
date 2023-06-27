@@ -19,6 +19,8 @@ type DaimyoStorage interface {
 
 type SamuraiTurnoverStorage interface {
 	GetTurnover(ctx context.Context, samuraiUsername string, date string, bankId int) (float64, error)
+	GetTurnoverSumWithPeriod(ctx context.Context, samuraiUsername string, startDate string, endDate string,
+		bankId int) (float64, error)
 	//GetTurnoversByDate(ctx context.Context, date string) ([]*domain.SamuraiTurnover, error)
 }
 
@@ -180,7 +182,7 @@ func (s *DaimyoService) GetByNickname(ctx context.Context, nickname string) (dom
 	return daimyoDTO, nil
 }
 
-func (s *DaimyoService) CreateSamuraiReport(ctx context.Context, date string) ([]string, error) {
+func (s *DaimyoService) CreateSamuraiReport(ctx context.Context, daimyoUsername string, date string) ([]string, error) {
 	reportMessages := make([]string, 0)
 
 	//reports := make([]domain.SamuraiReport, 0)
@@ -199,9 +201,9 @@ func (s *DaimyoService) CreateSamuraiReport(ctx context.Context, date string) ([
 	//}
 	//s.controllerTurnoverStorage.GetTurnoversByDate(ctx, date)
 
-	samurais, err := s.samuraiStorage.GetAllByDaimyo(ctx, "daimyo")
+	samurais, err := s.samuraiStorage.GetAllByDaimyo(ctx, daimyoUsername)
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
 	for _, samurai := range samurais {
@@ -237,7 +239,7 @@ func (s *DaimyoService) CreateSamuraiReport(ctx context.Context, date string) ([
 			continue
 		}
 
-		str += fmt.Sprintf("%s (%s)\n\n", samurai.Username, date)
+		str += fmt.Sprintf("%s (%s)\n\n", samurai.Nickname, date)
 		str += fmt.Sprintf("Всего\n%d / %d / %d\n\n", int(tinControllerTurnover+sberControllerTurnover),
 			int(tinSamuraiTurnover+sberSamuraiTurnover),
 			int((tinControllerTurnover-tinSamuraiTurnover)+(sberControllerTurnover-sberSamuraiTurnover)))
@@ -248,6 +250,64 @@ func (s *DaimyoService) CreateSamuraiReport(ctx context.Context, date string) ([
 
 		reportMessages = append(reportMessages, str)
 	}
+
+	return reportMessages, nil
+}
+
+func (s *DaimyoService) CreateSamuraiReportWithPeriod(
+	ctx context.Context,
+	daimyoUsername string,
+	startDate string,
+	endDate string,
+) ([]string, error) {
+	daimyo, err := s.storage.GetByUsername(ctx, daimyoUsername)
+	if err != nil {
+		return nil, err
+	}
+
+	reportMessages := make([]string, 0)
+
+	samurais, err := s.samuraiStorage.GetAllByDaimyo(ctx, daimyoUsername)
+	if err != nil {
+		return nil, err
+	}
+
+	var turnoverSum float64
+
+	samuraiTurnovers := make([]string, 0)
+
+	for _, samurai := range samurais {
+		var err error
+		var tinTurnover, sberTurnover float64
+
+		var samuraiTurnover string
+
+		samuraiTurnover += fmt.Sprintf("%s\n", samurai.Nickname)
+
+		tinTurnover, err = s.samuraiTurnoverStorage.GetTurnoverSumWithPeriod(ctx, samurai.Username, startDate, endDate, 1)
+		if err != nil {
+
+		}
+
+		sberTurnover, err = s.samuraiTurnoverStorage.GetTurnoverSumWithPeriod(ctx, samurai.Username, startDate, endDate, 2)
+		if err != nil {
+
+		}
+
+		samuraiTurnover += fmt.Sprintf("%d / %d", int(tinTurnover), int(sberTurnover))
+		turnoverSum += tinTurnover + sberTurnover
+
+		samuraiTurnovers = append(samuraiTurnovers, samuraiTurnover)
+	}
+
+	reportMessages = append(reportMessages, fmt.Sprintf(
+		"%s\nОборот: %d\n0.0015 -> %d",
+		daimyo.Nickname,
+		int(turnoverSum),
+		int(0.0015*turnoverSum),
+	))
+
+	reportMessages = append(reportMessages, samuraiTurnovers...)
 
 	return reportMessages, nil
 }
