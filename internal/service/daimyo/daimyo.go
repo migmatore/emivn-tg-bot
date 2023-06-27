@@ -301,8 +301,10 @@ func (s *DaimyoService) CreateSamuraiReportWithPeriod(
 	}
 
 	reportMessages = append(reportMessages, fmt.Sprintf(
-		"%s\nОборот: %d\n0.0015 -> %d",
+		"%s (%s - %s)\nОборот: %d\n0.0015 -> %d",
 		daimyo.Nickname,
+		startDate,
+		endDate,
 		int(turnoverSum),
 		int(0.0015*turnoverSum),
 	))
