@@ -28,30 +28,36 @@ const (
 
 	// admin create shogun
 	SessionStepCreateShogunNickname
+	SessionStepShogunCreationMethod
 	SessionStepCreateShogun
 
 	// admin create daimyo
-	SessionStepCreateDaimyoUsername
 	SessionStepCreateDaimyoNickname
+	SessionStepChooseDaimyoShogun
+	SessionStepDaimyoCreationMethod
 	SessionStepCreateDaimyo
 
 	// admin create samurai
-	SessionStepCreateSamuraiUsername
 	SessionStepCreateSamuraiNickname
+	SessionStepChooseSamuraiDaimyo
+	SessionStepSamuraiCreationMethod
 	SessionStepCreateSamurai
 
 	// admin create cash manager
-	SessionStepCreateCashManagerUsername
 	SessionStepCreateCashManagerNickname
+	SessionStepChooseCashManagerShogun
+	SessionStepCashManagerCreationMethod
 	SessionStepCreateCashManager
 
 	// admin create cntroller
 	SessionStepCreateControllerNickname
+	SessionStepControllerCreationMethod
 	SessionStepCreateController
 
 	// admin create main operator
-	SessionStepCreateMainOperatorUsername
 	SessionStepCreateMainOperatorNickname
+	SessionStepChooseMainOperatorShogun
+	SessionStepMainOperatorCreationMethod
 	SessionStepCreateMainOperator
 
 	// shogun steps
@@ -76,19 +82,23 @@ const (
 
 	// shogun create daimyo
 	SessionStepShogunCreateDaimyoNickname
+	SessionStepShogunDaimyoCreationMethod
 	SessionStepShogunCreateDaimyo
 
 	// shogun create samurai
 	SessionStepShogunCreateSamuraiNickname
 	SessionStepShogunChooseSamuraiDaimyo
+	SessionStepShogunSamuraiCreationMethod
 	SessionStepShogunCreateSamurai
 
 	// shogun create cash manager
 	SessionStepShogunCreateCashManagerNickname
+	SessionStepShogunCashManagerCreationMethod
 	SessionStepShogunCreateCashManager
 
 	// shogun create main operator
 	SessionStepShogunCreateMainOperatorNickname
+	SessionStepShogunMainOperatorCreationMethod
 	SessionStepShogunCreateMainOperator
 
 	// shogun in subordination menu

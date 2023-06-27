@@ -151,6 +151,7 @@ func New(deps Deps) *Handler {
 			deps.ControllerService,
 			deps.MainOperatorService,
 			deps.CardService,
+			deps.ReferalService,
 		),
 		DaimyoHandler: daimyo.NewDaimyoHandler(
 			sm.Manager,
@@ -181,6 +182,7 @@ func New(deps Deps) *Handler {
 			deps.CashManagerService,
 			deps.MainOperatorService,
 			deps.CardService,
+			deps.ReferalService,
 		),
 		ControllerHandler: controller.New(
 			sm.Manager,

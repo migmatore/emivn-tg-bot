@@ -59,7 +59,7 @@ func (h *DaimyoHandler) EnterSamuraiNicknameHandler(ctx context.Context, msg *tg
 	).WithResizeKeyboardMarkup()
 
 	sessionManager.Step = domain.SessionStepDaimyoSamuraiCreationMethod
-	return msg.Answer("Введите telegram username").ReplyMarkup(kb).DoVoid(ctx)
+	return msg.Answer("Выберите способ").ReplyMarkup(kb).DoVoid(ctx)
 }
 
 func (h *DaimyoHandler) SamuraiCreationHandler(ctx context.Context, msg *tgb.MessageUpdate) error {

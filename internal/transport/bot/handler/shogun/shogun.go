@@ -34,6 +34,10 @@ type CardService interface {
 	GetCardsBalancesByShogun(ctx context.Context, shogunUsername string) ([]string, error)
 }
 
+type ReferalService interface {
+	Create(ctx context.Context, link string, role string) error
+}
+
 type ShogunHandler struct {
 	sessionManager *session.Manager[domain.Session]
 
@@ -42,6 +46,7 @@ type ShogunHandler struct {
 	cashManagerService  CashManagerService
 	mainOperatorService MainOperatorService
 	cardService         CardService
+	referalService      ReferalService
 }
 
 func NewShogunHandler(
@@ -51,6 +56,7 @@ func NewShogunHandler(
 	cashManagerService CashManagerService,
 	mainOperatorService MainOperatorService,
 	cardService CardService,
+	referalService ReferalService,
 ) *ShogunHandler {
 	return &ShogunHandler{
 		sessionManager:      sm,
@@ -59,6 +65,7 @@ func NewShogunHandler(
 		cashManagerService:  cashManagerService,
 		mainOperatorService: mainOperatorService,
 		cardService:         cardService,
+		referalService:      referalService,
 	}
 }
 

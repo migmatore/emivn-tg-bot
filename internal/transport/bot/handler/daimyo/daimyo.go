@@ -183,7 +183,7 @@ func (h *DaimyoHandler) MainMenuHandler(ctx context.Context, msg *tgb.MessageUpd
 //			DoVoid(ctx)
 //
 //	case domain.AdminCreateEntityMenu.CreateDaimyoHandler:
-//		h.sessionManager.Get(ctx).Step = domain.SessionStepCreateDaimyoUsername
+//		h.sessionManager.Get(ctx).Step = domain.SessionStepChooseDaimyoShogun
 //
 //		return msg.Answer(fmt.Sprintf("Введите telegram username")).
 //			ReplyMarkup(tg.NewReplyKeyboardRemove()).
