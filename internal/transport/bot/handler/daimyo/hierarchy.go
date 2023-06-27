@@ -71,7 +71,7 @@ func (h *DaimyoHandler) SamuraiCreationHandler(ctx context.Context, msg *tgb.Mes
 	case domain.EntityCreationMethodMenu.Link:
 		sessionManager := h.sessionManager.Get(ctx)
 
-		link := utils.GenerateLink()
+		link := utils.GenerateLink(sessionManager.Samurai.Nickname)
 
 		sessionManager.Samurai.Username = link
 		sessionManager.Samurai.DaimyoUsername = string(msg.From.Username)
